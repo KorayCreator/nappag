@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nappag</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --blue: #007bff; --bg: #f0f2f5; --white: #ffffff; --gray: #65676b; }
+        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; color: #1c1e21; }
+        nav { background: var(--white); height: 65px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--blue); }
+        .nav-inner { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+        .logo { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900; color: var(--blue); text-transform: uppercase; cursor: pointer; }
+        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; box-sizing: border-box; }
+        .card { background: var(--white); border-radius: 12px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 15px; }
+        input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; }
+        .btn { border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-blue { background: var(--blue); color: white; width: 100%; }
+        .avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        .actions { display: flex; gap: 15px; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
+        .act-btn { background: none; border: none; color: var(--gray); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .comment-area { background: #f0f2f5; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 13px; border: 1px solid #e4e6eb; }
+        .search-area { max-width: 500px; margin: 10px auto; padding: 0 15px; position: relative; }
+        #search-results { position: absolute; background: white; width: calc(100% - 30px); z-index: 1001; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .search-item { padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        #profile-pg, #edit-pg { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index: 2000; display: none; overflow-y: auto; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="auth-pg" class="container">
+    <div class="card" style="text-align:center; margin-top: 50px;">
+        <div class="logo" style="font-size: 50px; margin-bottom: 10px;">NAPPAG</div>
+        <input type="text" id="u-name" placeholder="Kullanıcı Adı">
+        <input type="password" id="u-pass" placeholder="Şifre">
+        <button class="btn btn-blue" onclick="handleAuth()">Giriş Yap / Kaydol</button>
+    </div>
+</div>
+
+<div id="main-pg" class="hidden">
+    <nav><div class="nav-inner"><div class="logo" onclick="location.reload()">NAPPAG</div><div onclick="openUser(auth.currentUser.displayName)"><i class="fas fa-user-circle fa-2x" style="color:var(--blue); cursor:pointer;"></i></div></div></nav>
+    <div class="search-area">
+        <input type="text" id="src-inp" placeholder="🔍 Kullanıcı ara..." oninput="searchUsers(this.value)">
+        <div id="search-results" class="hidden"></div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <textarea id="inp" placeholder="Neler oluyor? (Resim yapıştırabilirsin)"></textarea>
+            <input type="file" id="f-up" class="hidden" onchange="prevImg('p-img', 'f-up')">
+            <label for="f-up" style="color:var(--blue); cursor:pointer; font-weight:bold;"><i class="fas fa-image"></i> Fotoğraf Ekle</label>
+            <img id="p-img" style="width:100%; display:none; border-radius:10px; margin-top:10px;">
+            <button class="btn btn-blue" style="margin-top:10px;" onclick="send()">Paylaş</button>
+        </div>
+        <div id="posts-list"></div>
+    </div>
+</div>
+
+<div id="profile-pg">
+    <nav><div class="nav-inner"><div class="logo" onclick="closeP()">←</div><b>PROFİL</b></div></nav>
+    <div style="text-align:center; padding: 20px; border-bottom: 1px solid #eee;">
+        <img id="p-av" class="avatar" style="width:100px; height:100px; border:3px solid var(--blue)">
+        <h2 id="p-un" style="margin:10px 0 5px;"></h2>
+        <p id="p-bi" style="color:var(--gray); white-space: pre-wrap;"></p>
+        <button id="edit-btn" class="btn" style="background:#eee; margin-top:10px; display:none;" onclick="openEdit()">Düzenle</button>
+    </div>
+    <div id="p-li" class="container"></div>
+</div>
+
+<div id="edit-pg">
+    <nav><div class="nav-inner"><div class="logo" onclick="closeEdit()">✕</div><b>PROFİLİ DÜZENLE</b></div></nav>
+    <div class="container" style="margin-top:20px;">
+        <div style="text-align:center; margin-bottom:20px;">
+            <img id="ed-av-prev" class="avatar" style="width:100px; height:100px; margin-bottom:10px;">
+            <input type="file" id="f-av-edit" class="hidden" onchange="prevImg('ed-av-prev', 'f-av-edit')">
+            <label for="f-av-edit" class="btn" style="background:#f0f2f5; display:inline-block;">Yeni Fotoğraf Seç</label>
+        </div>
+        <p>İsim:</p>
+        <input type="text" id="ed-name" placeholder="Görünen İsim">
+        <p>Bio:</p>
+        <textarea id="ed-bio" placeholder="Kendinden bahset..."></textarea>
+        <button class="btn btn-blue" onclick="saveP()">Kaydet ve Yenile</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, arrayUnion, arrayRemove, setDoc, getDocs, getDoc, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const cfg = { apiKey: "AIzaSyBc1oohhXQFNr5QsoPG1VBc5lTMGaMoyos", authDomain: "nappag-8c527.firebaseapp.com", projectId: "nappag-8c527", storageBucket: "nappag-8c527.firebasestorage.app", messagingSenderId: "370496474734", appId: "1:370496474734:web:172774434cb14af279207f" };
+    const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
+
+    document.getElementById('inp').addEventListener('paste', e => {
+        const item = Array.from(e.clipboardData.items).find(x => x.type.indexOf('image') !== -1);
+        if (item) {
+            const r = new FileReader();
+            r.onload = (ev) => { document.getElementById('p-img').src = ev.target.result; document.getElementById('p-img').style.display = 'block'; };
+            r.readAsDataURL(item.getAsFile());
+        }
+    });
+
+    window.handleAuth = async () => {
+        const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
+        if(!n || p.length < 6) return alert("Geçerli isim ve şifre girin.");
+        try { await signInWithEmailAndPassword(auth, n+"@napag.com", p); }
+        catch {
+            const userSnap = await getDoc(doc(db, "users", n));
+            if (userSnap.exists()) return alert("Bu kullanıcı adı zaten alınmış!");
+            try { 
+                const r = await createUserWithEmailAndPassword(auth, n+"@napag.com", p);
+                const pic = `https://ui-avatars.com/api/?name=${n}`;
+                await updateProfile(r.user, { displayName: n, photoURL: pic });
+                await setDoc(doc(db, "users", n), { username: n, pic, bio: "" });
+            } catch(e) { alert(e.message); }
+        }
+    };
+
+    onAuthStateChanged(auth, u => {
+        document.getElementById('auth-pg').classList.toggle('hidden', u);
+        document.getElementById('main-pg').classList.toggle('hidden', !u);
+        if(u) load();
+    });
+
+    window.prevImg = (imgId, fileId) => {
+        const r = new FileReader();
+        r.onload = () => { document.getElementById(imgId).src = r.result; document.getElementById(imgId).style.display='block'; };
+        r.readAsDataURL(document.getElementById(fileId).files[0]);
+    };
+
+    window.send = async () => {
+        const t = document.getElementById('inp').value, m = document.getElementById('p-img').src;
+        if(!t && !m) return;
+        await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: auth.currentUser.photoURL, m: m.startsWith('data') ? m : "", ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
+        document.getElementById('inp').value = ""; document.getElementById('p-img').style.display = 'none';
+    };
+
+    function load() { onSnapshot(query(collection(db, "messages"), orderBy("ts", "desc")), sn => render(sn, "posts-list")); }
+
+    function render(sn, tid) {
+        document.getElementById(tid).innerHTML = sn.docs.map(docSnap => {
+            const d = docSnap.data(), id = docSnap.id, uid = auth.currentUser.uid;
+            const cs = (d.comments || []).map(c => `<div><b onclick="openUser('${c.n}')" style="cursor:pointer">@${c.n}:</b> ${c.t}</div>`).join("");
+            return `<div class="card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;" onclick="openUser('${d.n}')">
+                    <img src="${d.p}" class="avatar"> <b style="cursor:pointer">@${d.n}</b>
+                </div>
+                <div style="white-space:pre-wrap;">${d.t}</div>
+                ${d.m ? `<img src="${d.m}" style="width:100%; border-radius:10px; margin-top:10px;">` : ""}
+                <div class="actions">
+                    <button class="act-btn" onclick="vote('${id}','l')" style="color:${d.likes?.includes(uid)?'#007bff':''}"><i class="fas fa-heart"></i> ${d.likes?.length || 0}</button>
+                    <button class="act-btn" onclick="vote('${id}','d')" style="color:${d.dislikes?.includes(uid)?'#007bff':''}"><i class="fas fa-heart-broken"></i> ${d.dislikes?.length || 0}</button>
+                    <button class="act-btn" onclick="addComment('${id}')"><i class="fas fa-comment"></i> ${d.comments?.length || 0}</button>
+                </div>
+                ${cs ? `<div class="comment-area">${cs}</div>` : ""}
+            </div>`;
+        }).join("");
+    }
+
+    window.vote = async (id, type) => {
+        const r = doc(db, "messages", id), uid = auth.currentUser.uid;
+        const sn = await getDoc(r);
+        const d = sn.data();
+        if(type==='l') {
+            if(d.likes.includes(uid)) await updateDoc(r, { likes: arrayRemove(uid) });
+            else await updateDoc(r, { likes: arrayUnion(uid), dislikes: arrayRemove(uid) });
+        } else {
+            if(d.dislikes.includes(uid)) await updateDoc(r, { dislikes: arrayRemove(uid) });
+            else await updateDoc(r, { dislikes: arrayUnion(uid), likes: arrayRemove(uid) });
+        }
+    };
+
+    window.addComment = async (id) => {
+        const msg = prompt("Yorumunuz:");
+        if(msg) await updateDoc(doc(db, "messages", id), { comments: arrayUnion({ n: auth.currentUser.displayName, t: msg }) });
+    };
+
+    window.searchUsers = async (val) => {
+        const res = document.getElementById('search-results');
+        if(val.length < 1) return res.classList.add('hidden');
+        const sn = await getDocs(collection(db, "users"));
+        const m = sn.docs.map(d => d.data()).filter(u => u.username.includes(val.toLowerCase()));
+        res.innerHTML = m.map(u => `<div class="search-item" onclick="openUser('${u.username}')"><img src="${u.pic}" class="avatar"><b>@${u.username}</b></div>`).join("");
+        res.classList.remove('hidden');
+    };
+
+    window.openUser = async (n) => {
+        const userSnap = await getDoc(doc(db, "users", n));
+        if(!userSnap.exists()) return;
+        const u = userSnap.data();
+        document.getElementById('profile-pg').style.display='block';
+        document.getElementById('p-av').src = u.pic;
+        document.getElementById('p-un').innerText = "@"+u.username;
+        document.getElementById('p-bi').innerText = u.bio || "";
+        document.getElementById('edit-btn').style.display = (n === auth.currentUser.displayName) ? 'inline-block' : 'none';
+        const pSn = await getDocs(query(collection(db, "messages"), where("n", "==", n), orderBy("ts", "desc")));
+        render(pSn, "p-li");
+        document.getElementById('search-results').classList.add('hidden');
+    };
+
+    window.openEdit = async () => {
+        const uSnap = await getDoc(doc(db, "users", auth.currentUser.displayName));
+        const uData = uSnap.data();
+        document.getElementById('edit-pg').style.display='block';
+        document.getElementById('ed-av-prev').src = uData.pic;
+        document.getElementById('ed-name').value = uData.username;
+        document.getElementById('ed-bio').value = uData.bio || "";
+    };
+
+    window.saveP = async () => {
+        const nN = document.getElementById('ed-name').value.trim().toLowerCase();
+        const nP = document.getElementById('ed-av-prev').src;
+        const nB = document.getElementById('ed-bio').value;
+        const oldN = auth.currentUser.displayName;
+
+        if (nN !== oldN) {
+            const userSnap = await getDoc(doc(db, "users", nN));
+            if (userSnap.exists()) return alert("Bu isim zaten alınmış!");
+        }
+
+        await updateProfile(auth.currentUser, { displayName: nN, photoURL: nP });
+        await setDoc(doc(db, "users", nN), { username: nN, pic: nP, bio: nB });
+        location.reload();
+    };
+
+    window.closeP = () => document.getElementById('profile-pg').style.display='none';
+    window.closeEdit = () => document.getElementById('edit-pg').style.display='none';
+</script>
+</body>
+</html>
