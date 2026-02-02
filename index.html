@@ -337,30 +337,3 @@
 
 
 
-<style>
-    /* Kayıt butonunun mobilde tıklanmasını engelleyen katmanları temizler */
-    button, input[type="submit"], .kayit-butonu-classi { 
-        cursor: pointer !important;
-        touch-action: manipulation !important;
-        position: relative !important;
-        z-index: 9999 !important; /* Butonu en öne getirir */
-    }
-</style>
-
-<script>
-    // Mobilde tıklama (click) bazen algılanmaz, dokunmayı (touchend) zorla ekliyoruz
-    document.addEventListener('DOMContentLoaded', function() {
-        var kayitButonlari = document.querySelectorAll('button, input[type="submit"]');
-        
-        kayitButonlari.forEach(function(buton) {
-            buton.addEventListener('touchend', function(e) {
-                // Eğer buton bir formun içindeyse, formu gönderir
-                if(this.type === 'submit' || this.form) {
-                    this.form.submit();
-                } else {
-                    this.click(); // Normal tıklama fonksiyonunu tetikler
-                }
-            });
-        });
-    });
-</script>
