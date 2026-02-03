@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nappag | Kusursuz Sürüm</title>
+    <title>Nappag | Global Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
@@ -12,7 +12,6 @@
         }
         body { background: var(--bg); font-family: "Times New Roman", Times, serif; margin: 0; color: #1c1e21; overflow-x: hidden; }
         
-        /* LOGO & GENEL STİLLER */
         .nappag-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; border: 3px solid #000; padding: 5px 12px; box-shadow: 4px 4px 0px #000; transition: 0.1s; }
         .nappag-logo:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
         .kare-surat { width: 25px; height: 25px; background: #FFDB5E; border: 2px solid #000; position: relative; box-sizing: border-box; }
@@ -20,7 +19,6 @@
         .kare-surat::after { content: ''; position: absolute; bottom: 6px; left: 5px; width: 12px; height: 2.5px; background: #000; }
         .logo-text { font-weight: 900; font-size: 22px; color: #000; letter-spacing: -1px; }
 
-        /* KARŞILAMA EKRANI */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); display: flex; flex-direction: column;
@@ -33,7 +31,6 @@
             box-shadow: 8px 8px 0px #000; margin: 20px;
         }
 
-        /* DİĞER STİLLER */
         nav { background: var(--nappag-yellow); border-bottom: 2px solid var(--border); height: 65px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .nav-inner { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
         .main-layout { display: flex; max-width: 1200px; margin: 0 auto; gap: 20px; padding: 15px; }
@@ -72,8 +69,8 @@
 
 <div id="welcome-screen">
     <div class="kare-surat" style="width:60px; height:60px; transform: scale(2); margin-bottom: 40px;"></div>
-    <div id="welcome-text">This site is made by Kobicer the King!</div>
-    <p>Nappag Yükleniyor...</p>
+    <div id="welcome-text">This site is made by Kobicer the KING</div>
+    <p>Loading Nappag...</p>
 </div>
 
 <div id="auth-pg" class="hidden">
@@ -83,8 +80,8 @@
                 <div class="kare-surat" style="width:40px; height:40px;"></div>
                 <h1 style="margin:0">NAPPAG</h1>
             </div>
-            <input type="text" id="u-name" placeholder="Rumuz"><input type="password" id="u-pass" placeholder="Şifre">
-            <button class="btn-nappag" onclick="handleAuth()">GİRİŞ / KAYDOL</button>
+            <input type="text" id="u-name" placeholder="Username"><input type="password" id="u-pass" placeholder="Password">
+            <button class="btn-nappag" onclick="handleAuth()">LOGIN / SIGN UP</button>
         </div>
     </div>
 </div>
@@ -102,99 +99,98 @@
     <div class="main-layout">
         <div class="side-col">
             <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">ODALAR</h4>
+                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">ROOMS</h4>
                 <div id="comm-list"></div>
-                <button class="btn-nappag" style="margin-top:10px;" onclick="document.getElementById('create-comm-pg').style.display='block'">+ Oda Kur</button>
+                <button class="btn-nappag" style="margin-top:10px;" onclick="document.getElementById('create-comm-pg').style.display='block'">+ Create Room</button>
             </div>
             <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">MESAJLAŞMALAR</h4>
-                <div id="dm-list-sidebar" style="font-size: 13px;">Henüz mesaj yok.</div>
+                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">MESSAGES</h4>
+                <div id="dm-list-sidebar" style="font-size: 13px;">No messages yet.</div>
             </div>
         </div>
         <div class="feed-side">
             <div class="card post-input-card">
-                <b>Paylaş:</b>
-                <textarea id="inp" placeholder="Neler oluyor anon?"></textarea>
+                <b>Share:</b>
+                <textarea id="inp" placeholder="What's happening, anon?"></textarea>
                 <div style="display:flex; gap:10px;">
                     <select id="post-cat" style="flex:1;">
-                        <option value="Genel">Genel</option><option value="Tartışma">Tartışma</option>
-                        <option value="Teknoloji">Teknoloji</option><option value="Sanat">Sanat</option>
-                        <option value="Haber">Haber</option><option value="Oyun">Oyun</option>
-                        <option value="Soru">Soru</option><option value="Duyuru">Duyuru</option>
+                        <option value="General">General</option><option value="Discussion">Discussion</option>
+                        <option value="Tech">Tech</option><option value="Art">Art</option>
+                        <option value="News">News</option><option value="Gaming">Gaming</option>
+                        <option value="Question">Question</option><option value="Announcement">Announcement</option>
                     </select>
                     <input type="file" id="f-up" class="hidden" onchange="prevImg('p-img', 'f-up')">
-                    <label for="f-up" class="btn-nappag" style="flex:1; text-align:center;">[Resim]</label>
+                    <label for="f-up" class="btn-nappag" style="flex:1; text-align:center;">[Image]</label>
                 </div>
                 <img id="p-img" style="width:100%; display:none; border:1px solid #000; margin:10px 0;">
-                <button class="btn-nappag" style="background:var(--maroon); color:white; border:none; margin-top:5px;" onclick="send('global')">PAYLAŞ</button>
+                <button class="btn-nappag" style="background:var(--maroon); color:white; border:none; margin-top:5px;" onclick="send('global')">POST</button>
             </div>
             
             <div class="cat-filter-wrap">
-                <button class="cat-btn active" onclick="filterCat('Hepsi', this)">Hepsi</button>
-                <button class="cat-btn" onclick="filterCat('Genel', this)">Genel</button>
-                <button class="cat-btn" onclick="filterCat('Tartışma', this)">Tartışma</button>
-                <button class="cat-btn" onclick="filterCat('Teknoloji', this)">Teknoloji</button>
-                <button class="cat-btn" onclick="filterCat('Sanat', this)">Sanat</button>
-                <button class="cat-btn" onclick="filterCat('Haber', this)">Haber</button>
-                <button class="cat-btn" onclick="filterCat('Oyun', this)">Oyun</button>
-                <button class="cat-btn" onclick="filterCat('Soru', this)">Soru</button>
+                <button class="cat-btn active" onclick="filterCat('All', this)">All</button>
+                <button class="cat-btn" onclick="filterCat('General', this)">General</button>
+                <button class="cat-btn" onclick="filterCat('Discussion', this)">Discussion</button>
+                <button class="cat-btn" onclick="filterCat('Tech', this)">Tech</button>
+                <button class="cat-btn" onclick="filterCat('Art', this)">Art</button>
+                <button class="cat-btn" onclick="filterCat('News', this)">News</button>
+                <button class="cat-btn" onclick="filterCat('Gaming', this)">Gaming</button>
             </div>
 
             <div id="posts-list"></div>
         </div>
         <div class="side-col">
             <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">KULLANICI ARA</h4>
-                <input type="text" placeholder="Ara..." oninput="searchUsers(this.value)"><div id="user-results"></div>
+                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">SEARCH USER</h4>
+                <input type="text" placeholder="Search..." oninput="searchUsers(this.value)"><div id="user-results"></div>
             </div>
         </div>
     </div>
 </div>
 
 <div id="room-pg" class="overlay">
-    <nav><div class="nav-inner"><div onclick="closeRoom()" style="cursor:pointer"><b>← GERİ</b></div><b id="room-nav-title">ODA</b></div></nav>
+    <nav><div class="nav-inner"><div onclick="closeRoom()" style="cursor:pointer"><b>← BACK</b></div><b id="room-nav-title">ROOM</b></div></nav>
     <div class="main-layout">
         <div class="feed-side">
             <div id="r-banner" class="room-banner" style="background-size:cover; height:150px; background-color:#800000;"></div>
-            <div class="card post-input-card"><textarea id="r-inp" placeholder="Odaya yaz..."></textarea><button class="btn-nappag" onclick="send('room')">ODADA PAYLAŞ</button></div>
+            <div class="card post-input-card"><textarea id="r-inp" placeholder="Write to room..."></textarea><button class="btn-nappag" onclick="send('room')">POST IN ROOM</button></div>
             <div id="room-posts"></div>
         </div>
-        <div class="side-col"><div class="card"><h4>ÜYELER</h4><div id="room-mems"></div></div></div>
+        <div class="side-col"><div class="card"><h4>MEMBERS</h4><div id="room-mems"></div></div></div>
     </div>
 </div>
 
 <div id="discuss-pg" class="overlay">
-    <nav><div class="nav-inner"><div onclick="closeDiscuss()" style="cursor:pointer"><b>← GERİ</b></div><b>TARTIŞMA</b></div></nav>
+    <nav><div class="nav-inner"><div onclick="closeDiscuss()" style="cursor:pointer"><b>← BACK</b></div><b>DISCUSSION</b></div></nav>
     <div id="discuss-content" style="max-width:800px; margin:20px auto;"></div>
 </div>
 
 <div id="profile-pg" class="overlay">
-    <nav><div class="nav-inner"><div onclick="closeP()" style="cursor:pointer"><b>← GERİ</b></div><b>PROFİL</b></div></nav>
+    <nav><div class="nav-inner"><div onclick="closeP()" style="cursor:pointer"><b>← BACK</b></div><b>PROFILE</b></div></nav>
     <div style="max-width:800px; margin:20px auto; padding:20px;" class="card">
         <div style="display:flex; align-items:center; gap:20px;">
             <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
             <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
-                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Düzenle</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Mesaj At</button></div>
+                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
             </div>
         </div>
     </div>
 </div>
 
 <div id="edit-pg" class="overlay">
-    <nav><div class="nav-inner"><div onclick="closeEdit()" style="cursor:pointer"><b>✕</b></div><b>DÜZENLE</b></div></nav>
+    <nav><div class="nav-inner"><div onclick="closeEdit()" style="cursor:pointer"><b>✕</b></div><b>EDIT PROFILE</b></div></nav>
     <div style="max-width:400px; margin:40px auto;" class="card post-input-card">
-        <img id="ed-av-prev" class="avatar" style="width:80px; height:80px; display:block; margin-bottom:10px;"><input type="file" onchange="prevImg('ed-av-prev', this.id)" id="f-edit"><textarea id="ed-bio" placeholder="Bio..."></textarea><button class="btn-nappag" onclick="saveP()">GÜNCELLE</button>
+        <textarea id="ed-bio" placeholder="Bio..."></textarea><button class="btn-nappag" onclick="saveP()">UPDATE</button>
     </div>
 </div>
 
 <div id="dm-ui">
-    <div class="chat-header" style="background:var(--maroon); color:white; padding:10px; display:flex; justify-content:space-between;"><span id="dm-title">Sohbet</span><button onclick="document.getElementById('dm-ui').style.display='none'" style="color:#fff; background:none; border:none;">✕</button></div>
+    <div class="chat-header" style="background:var(--maroon); color:white; padding:10px; display:flex; justify-content:space-between;"><span id="dm-title">Chat</span><button onclick="document.getElementById('dm-ui').style.display='none'" style="color:#fff; background:none; border:none;">✕</button></div>
     <div id="dm-msgs" class="chat-msgs"></div>
     <div style="padding:10px; display:flex; gap:5px;"><input type="text" id="dm-inp" style="margin:0;"><button onclick="sendDM()" class="btn-nappag" style="width:40px;">></button></div>
 </div>
 
 <div id="create-comm-pg" class="overlay">
-    <div style="max-width:400px; margin:100px auto;" class="card post-input-card"><input type="text" id="c-n" placeholder="Oda Adı"><textarea id="c-d" placeholder="Açıklama"></textarea><button class="btn-nappag" onclick="createComm()">KUR</button><button class="btn-nappag" style="margin-top:5px;" onclick="document.getElementById('create-comm-pg').style.display='none'">İPTAL</button></div>
+    <div style="max-width:400px; margin:100px auto;" class="card post-input-card"><input type="text" id="c-n" placeholder="Room Name"><textarea id="c-d" placeholder="Description"></textarea><button class="btn-nappag" onclick="createComm()">CREATE</button><button class="btn-nappag" style="margin-top:5px;" onclick="document.getElementById('create-comm-pg').style.display='none'">CANCEL</button></div>
 </div>
 
 <script type="module">
@@ -204,12 +200,11 @@
 
     const cfg = { apiKey: "AIzaSyBc1oohhXQFNr5QsoPG1VBc5lTMGaMoyos", authDomain: "nappag-8c527.firebaseapp.com", projectId: "nappag-8c527", storageBucket: "nappag-8c527.firebasestorage.app", appId: "1:370496474734:web:172774434cb14af279207f" };
     const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
-    let curRoom = null, activeDM = null, activeCat = 'Hepsi';
+    let curRoom = null, activeDM = null, activeCat = 'All';
 
     const isAdmin = (n) => n === "admin";
-    const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMİN</span>` : '';
+    const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
 
-    // HOŞGELDİN EKRANI VE AUTH KONTROLÜ
     function closeWelcome(user) {
         const welcome = document.getElementById('welcome-screen');
         welcome.style.opacity = '0';
@@ -227,27 +222,26 @@
     }
 
     onAuthStateChanged(auth, u => {
-        setTimeout(() => closeWelcome(u), 2000); // 2 saniye zorunlu bekletme
+        setTimeout(() => closeWelcome(u), 2000);
     });
 
     window.handleAuth = async () => {
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
-        if(!n || !p) return alert("Eksik bilgi!");
+        if(!n || !p) return alert("Missing info!");
         try { await signInWithEmailAndPassword(auth, n+"@nappag.com", p); }
         catch {
             const r = await createUserWithEmailAndPassword(auth, n+"@nappag.com", p);
             const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
             await updateProfile(r.user, { displayName: n, photoURL: pic });
-            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag sakini", ts: serverTimestamp(), activeChats: [] });
+            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", ts: serverTimestamp(), activeChats: [] });
         }
     };
 
-    // TÜM FONKSİYONLARIN (SİLİNMEDEN) BURADA
     window.loadMyDMs = () => {
         onSnapshot(doc(db, "users", auth.currentUser.displayName), d => {
             const chats = d.data()?.activeChats || [];
             const list = document.getElementById('dm-list-sidebar');
-            list.innerHTML = chats.length === 0 ? "Henüz mesaj yok." : chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join("");
+            list.innerHTML = chats.length === 0 ? "No messages yet." : chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join("");
         });
     }
 
@@ -255,7 +249,7 @@
 
     window.send = async (type) => {
         const t = (type==='global') ? document.getElementById('inp').value : document.getElementById('r-inp').value;
-        const cat = (type==='global') ? document.getElementById('post-cat').value : 'Genel';
+        const cat = (type==='global') ? document.getElementById('post-cat').value : 'General';
         const imgTag = document.getElementById('p-img');
         const m = imgTag.style.display === 'block' ? imgTag.src : "";
         if(!t && !m) return;
@@ -268,14 +262,14 @@
 
     window.loadGlobal = () => {
         onSnapshot(query(collection(db, "messages"), orderBy("ts", "desc")), sn => {
-            const posts = sn.docs.filter(d => (!d.data().room || d.data().room === 'global') && (activeCat === 'Hepsi' || d.data().cat === activeCat));
+            const posts = sn.docs.filter(d => (!d.data().room || d.data().room === 'global') && (activeCat === 'All' || d.data().cat === activeCat));
             document.getElementById('posts-list').innerHTML = posts.map(s => renderPost(s)).join("");
         });
     }
 
     function renderPost(s) {
         const d = s.data(), id = s.id, uid = auth.currentUser?.uid;
-        return `<div class="card"><span class="cat-badge">${d.cat || 'Genel'}</span><div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}</div><p style="white-space:pre-wrap;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:1px solid #000; margin-top:10px;">` : ""}<div class="actions"><button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button><button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button><button class="act-btn" onclick="openDiscuss('${id}')">🗨 TARTIŞMA</button></div></div>`;
+        return `<div class="card"><span class="cat-badge">${d.cat || 'General'}</span><div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}</div><p style="white-space:pre-wrap;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:1px solid #000; margin-top:10px;">` : ""}<div class="actions"><button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button><button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button><button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION</button></div></div>`;
     }
 
     window.vote = async (id, type) => {
@@ -287,7 +281,7 @@
     window.openDiscuss = async (id) => {
         const d = (await getDoc(doc(db, "messages", id))).data();
         document.getElementById('discuss-pg').style.display = 'block';
-        document.getElementById('discuss-content').innerHTML = `<div class="card"><h3>Tartışma</h3><p>${d.t}</p><div id="d-list" style="margin:15px 0;"></div><textarea id="d-rep" placeholder="Cevapla..."></textarea><button class="btn-nappag" onclick="addD('${id}')">Gönder</button></div>`;
+        document.getElementById('discuss-content').innerHTML = `<div class="card"><h3>Discussion</h3><p>${d.t}</p><div id="d-list" style="margin:15px 0;"></div><textarea id="d-rep" placeholder="Reply..."></textarea><button class="btn-nappag" onclick="addD('${id}')">Send</button></div>`;
         onSnapshot(doc(db, "messages", id), s => { if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:8px; border-bottom:1px solid #ddd; background:#fff; margin-bottom:5px;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); });
     };
 
@@ -306,7 +300,7 @@
     window.openUser = async (n) => {
         const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
         document.getElementById('profile-pg').style.display='block'; document.getElementById('p-av').src = u.pic; document.getElementById('p-un').innerText = "@"+u.username;
-        document.getElementById('p-bi').innerText = u.bio || "Bio yok.";
+        document.getElementById('p-bi').innerText = u.bio || "No bio.";
         const isMe = (n === auth.currentUser.displayName);
         document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
         document.getElementById('msg-btn').classList.toggle('hidden', isMe);
