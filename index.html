@@ -48,7 +48,7 @@
         
         .cat-badge { position: absolute; top: 15px; right: 15px; font-size: 10px; border: 1px solid #000; padding: 2px 6px; background: #fff; font-weight: bold; }
         .cat-filter-wrap { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .cat-btn { background: #fff; border: 1px solid var(--border); padding: 5px 10px; font-size: 11px; cursor: pointer; white-space: nowrap; }
+        .cat-btn { background: #fff; border: 1px solid var(--border); padding: 5px 12px; font-size: 11px; cursor: pointer; white-space: nowrap; font-weight: bold; }
         .cat-btn.active { background: var(--maroon); color: #fff; }
 
         .actions { display: flex; gap: 5px; border-top: 1px dotted #999; padding-top: 10px; margin-top: 10px; }
@@ -63,8 +63,6 @@
         .m-me { align-self: flex-end; background: var(--nappag-yellow); padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 8px 0px 8px 8px; text-align: right; }
         .m-th { align-self: flex-start; background: #eee; padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 0px 8px 8px 8px; }
         .msg-sender { font-size: 9px; font-weight: bold; display: block; margin-bottom: 3px; color: var(--maroon); text-align: left; }
-        .room-banner { height: 150px; background: #000; border: 2px solid #000; margin-bottom: 15px; background-size: cover; background-position: center; display: flex; align-items: flex-end; }
-        .room-info { background: rgba(0,0,0,0.7); color: #fff; width: 100%; padding: 10px; display: flex; justify-content: space-between; }
         
         @media screen and (max-width: 850px) {
             .main-layout { flex-direction: column !important; padding: 10px !important; }
@@ -103,6 +101,10 @@
                 <div id="comm-list"></div>
                 <button class="btn-nappag" style="margin-top:10px;" onclick="document.getElementById('create-comm-pg').style.display='block'">+ Oda Kur</button>
             </div>
+            <div class="card">
+                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">MESAJLAŞMALAR</h4>
+                <div id="dm-list-sidebar" style="font-size: 13px;">Henüz mesaj yok.</div>
+            </div>
         </div>
         <div class="feed-side">
             <div class="card post-input-card">
@@ -111,7 +113,9 @@
                 <div style="display:flex; gap:10px;">
                     <select id="post-cat" style="flex:1;">
                         <option value="Genel">Genel</option><option value="Tartışma">Tartışma</option>
-                        <option value="Haber">Haber</option><option value="Soru">Soru</option><option value="Duyuru">Duyuru</option>
+                        <option value="Teknoloji">Teknoloji</option><option value="Sanat">Sanat</option>
+                        <option value="Haber">Haber</option><option value="Oyun">Oyun</option>
+                        <option value="Soru">Soru</option><option value="Duyuru">Duyuru</option>
                     </select>
                     <input type="file" id="f-up" class="hidden" onchange="prevImg('p-img', 'f-up')">
                     <label for="f-up" class="btn-nappag" style="flex:1; text-align:center;">[Resim]</label>
@@ -119,13 +123,18 @@
                 <img id="p-img" style="width:100%; display:none; border:1px solid #000; margin:10px 0;">
                 <button class="btn-nappag" style="background:var(--maroon); color:white; border:none; margin-top:5px;" onclick="send('global')">PAYLAŞ</button>
             </div>
+            
             <div class="cat-filter-wrap">
                 <button class="cat-btn active" onclick="filterCat('Hepsi', this)">Hepsi</button>
                 <button class="cat-btn" onclick="filterCat('Genel', this)">Genel</button>
                 <button class="cat-btn" onclick="filterCat('Tartışma', this)">Tartışma</button>
+                <button class="cat-btn" onclick="filterCat('Teknoloji', this)">Teknoloji</button>
+                <button class="cat-btn" onclick="filterCat('Sanat', this)">Sanat</button>
                 <button class="cat-btn" onclick="filterCat('Haber', this)">Haber</button>
+                <button class="cat-btn" onclick="filterCat('Oyun', this)">Oyun</button>
                 <button class="cat-btn" onclick="filterCat('Soru', this)">Soru</button>
             </div>
+
             <div id="posts-list"></div>
         </div>
         <div class="side-col">
@@ -143,7 +152,6 @@
         <div class="feed-side">
             <div id="r-banner" class="room-banner"><div class="room-info"><h2 id="r-name" style="margin:0"></h2><div id="r-admin-tools"></div></div></div>
             <div class="card post-input-card"><textarea id="r-inp" placeholder="Odaya yaz..."></textarea>
-            <select id="r-cat" style="margin-bottom:8px;"><option value="Genel">Genel</option><option value="Duyuru">Duyuru</option></select>
             <button class="btn-nappag" onclick="send('room')">ODADA PAYLAŞ</button></div>
             <div id="room-posts"></div>
         </div>
@@ -202,7 +210,7 @@
             document.getElementById('nav-user').innerHTML = `[ @${u.displayName} ${getSeal(u.displayName)} ]`;
             document.getElementById('auth-pg').classList.add('hidden');
             document.getElementById('main-pg').classList.remove('hidden');
-            loadGlobal(); loadRooms();
+            loadGlobal(); loadRooms(); loadMyDMs();
         }
     });
 
@@ -214,22 +222,34 @@
             const r = await createUserWithEmailAndPassword(auth, n+"@nappag.com", p);
             const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
             await updateProfile(r.user, { displayName: n, photoURL: pic });
-            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag sakini", ts: serverTimestamp() });
+            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag sakini", ts: serverTimestamp(), activeChats: [] });
         }
+    };
+
+    // Mesajlaşılan kişileri yükle
+    function loadMyDMs() {
+        onSnapshot(doc(db, "users", auth.currentUser.displayName), d => {
+            const chats = d.data()?.activeChats || [];
+            const list = document.getElementById('dm-list-sidebar');
+            if(chats.length === 0) list.innerHTML = "Henüz mesaj yok.";
+            else list.innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join("");
+        });
+    }
+
+    window.startDM = (n) => {
+        activeDM = n; 
+        document.getElementById('dm-title').innerText = "@"+n; 
+        document.getElementById('dm-ui').style.display='flex'; 
+        loadDM();
     };
 
     window.send = async (type) => {
         const t = (type==='global') ? document.getElementById('inp').value : document.getElementById('r-inp').value;
-        const cat = (type==='global') ? document.getElementById('post-cat').value : (document.getElementById('r-cat').value || 'Genel');
+        const cat = (type==='global') ? document.getElementById('post-cat').value : 'Genel';
         const imgTag = document.getElementById('p-img');
         const m = imgTag.style.display === 'block' ? imgTag.src : "";
-        
         if(!t && !m) return;
-        await addDoc(collection(db, "messages"), { 
-            t, n: auth.currentUser.displayName, p: auth.currentUser.photoURL, cat,
-            m: m.startsWith('data') ? m : "", room: type==='room' ? curRoom : 'global',
-            ts: serverTimestamp(), likes: [], dislikes: [], comments: [] 
-        });
+        await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: auth.currentUser.photoURL, cat, m: m.startsWith('data') ? m : "", room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
         if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         imgTag.style.display='none'; imgTag.src="";
     };
@@ -245,9 +265,7 @@
         onSnapshot(query(collection(db, "messages"), orderBy("ts", "desc")), sn => {
             const posts = sn.docs.filter(d => {
                 const data = d.data();
-                const isGlobal = !data.room || data.room === 'global';
-                const isCatMatch = activeCat === 'Hepsi' || data.cat === activeCat;
-                return isGlobal && isCatMatch;
+                return (!data.room || data.room === 'global') && (activeCat === 'Hepsi' || data.cat === activeCat);
             });
             document.getElementById('posts-list').innerHTML = posts.map(s => renderPost(s)).join("");
         });
@@ -289,7 +307,6 @@
         curRoom = id; const d = (await getDoc(doc(db, "communities", id))).data();
         document.getElementById('room-pg').style.display='block'; document.getElementById('r-name').innerText = d.name;
         document.getElementById('r-banner').style.backgroundImage = d.img ? `url(${d.img})` : "none";
-        document.getElementById('r-admin-tools').innerHTML = (d.owner === auth.currentUser.displayName || isAdmin(auth.currentUser.displayName)) ? `<button class="btn-nappag" style="width:auto; font-size:11px;" onclick="updateRImg('${id}')">Kapak URL</button>` : "";
         onSnapshot(query(collection(db, "messages"), where("room", "==", id), orderBy("ts", "desc")), sn => {
             document.getElementById('room-posts').innerHTML = sn.docs.map(s => renderPost(s)).join("");
             const mems = [...new Set(sn.docs.map(s => s.data().n))]; document.getElementById('room-mems').innerHTML = mems.map(m => `<div>• @${m}</div>`).join("");
@@ -305,7 +322,7 @@
         const isMe = (n === auth.currentUser.displayName); 
         document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
         document.getElementById('msg-btn').classList.toggle('hidden', isMe);
-        document.getElementById('msg-btn').onclick = () => { activeDM = n; document.getElementById('dm-title').innerText = "@"+n; document.getElementById('dm-ui').style.display='flex'; loadDM(); };
+        document.getElementById('msg-btn').onclick = () => startDM(n);
     };
 
     function loadDM() {
@@ -319,8 +336,18 @@
         });
     }
 
-    window.sendDM = async () => { const i = document.getElementById('dm-inp'), rid = [auth.currentUser.displayName, activeDM].sort().join("_"); if(i.value) { await addDoc(collection(db, "dms", rid, "msgs"), { t: i.value, s: auth.currentUser.displayName, ts: serverTimestamp() }); i.value = ""; } };
-    window.updateRImg = async (id) => { const url = prompt("Foto URL:"); if(url) await updateDoc(doc(db, "communities", id), { img: url }); };
+    window.sendDM = async () => { 
+        const i = document.getElementById('dm-inp'), me = auth.currentUser.displayName, th = activeDM;
+        const rid = [me, th].sort().join("_"); 
+        if(i.value) { 
+            await addDoc(collection(db, "dms", rid, "msgs"), { t: i.value, s: me, ts: serverTimestamp() }); 
+            // Aktif chat listesine ekle
+            await updateDoc(doc(db, "users", me), { activeChats: arrayUnion(th) });
+            await updateDoc(doc(db, "users", th), { activeChats: arrayUnion(me) });
+            i.value = ""; 
+        } 
+    };
+
     window.createComm = async () => { const name = document.getElementById('c-n').value; if(name) { await addDoc(collection(db, "communities"), { name, owner: auth.currentUser.displayName, ts: serverTimestamp(), img: "" }); document.getElementById('create-comm-pg').style.display='none'; } };
     window.saveP = async () => { const pic = document.getElementById('ed-av-prev').src, bio = document.getElementById('ed-bio').value; await updateDoc(doc(db, "users", auth.currentUser.displayName), { pic, bio }); location.reload(); };
     window.searchUsers = async (v) => { if(v.length < 1) return document.getElementById('user-results').innerHTML=""; const sn = await getDocs(collection(db, "users")); document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data()).filter(u => u.username.includes(v.toLowerCase())).map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username} ${getSeal(u.username)}</div>`).join(""); };
