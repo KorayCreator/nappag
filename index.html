@@ -168,7 +168,7 @@
         <div style="display:flex; align-items:center; gap:20px;">
             <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
             <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
-                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
+                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit Profile</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
             </div>
         </div>
     </div>
@@ -176,8 +176,12 @@
 
 <div id="edit-pg" class="overlay">
     <nav><div class="nav-inner"><div onclick="closeEdit()" style="cursor:pointer"><b>✕</b></div><b>EDIT PROFILE</b></div></nav>
-    <div style="max-width:400px; margin:40px auto;" class="card post-input-card">
-        <textarea id="ed-bio" placeholder="Bio..."></textarea><button class="btn-nappag" onclick="saveP()">UPDATE</button>
+    <div style="max-width:400px; margin:40px auto; text-align:center;" class="card post-input-card">
+        <img id="ed-av-prev" class="avatar" style="width:100px; height:100px; margin-bottom:10px; border:2px solid #000;">
+        <input type="file" id="f-av-up" class="hidden" onchange="prevImg('ed-av-prev', 'f-av-up')">
+        <label for="f-av-up" class="btn-nappag" style="display:block; margin-bottom:10px;">[ Change Photo ]</label>
+        <textarea id="ed-bio" placeholder="Bio..."></textarea>
+        <button class="btn-nappag" onclick="saveP()">UPDATE PROFILE</button>
     </div>
 </div>
 
@@ -272,7 +276,12 @@
         const img = document.getElementById('p-img');
         const m = img.style.display === 'block' ? img.src : "";
         if(!t && !m) return;
-        await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: auth.currentUser.photoURL, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
+        
+        // Kullanıcının güncel fotosunu çek
+        const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
+        const userPic = uDoc.data().pic || auth.currentUser.photoURL;
+
+        await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: userPic, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
         if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         img.style.display='none';
     };
@@ -296,7 +305,6 @@
         </div>`;
     }
 
-    // --- ROOMS & DMs (Geri gelen kısımlar) ---
     window.loadRooms = () => { onSnapshot(collection(db, "communities"), sn => { document.getElementById('comm-list').innerHTML = sn.docs.map(d => `<div onclick="openRoom('${d.id}')" style="cursor:pointer; padding:8px; border-bottom:1px dotted #000;"># ${d.data().name}</div>`).join(""); }); };
     window.openRoom = async (id) => {
         curRoom = id; const d = (await getDoc(doc(db, "communities", id))).data();
@@ -309,7 +317,6 @@
     window.closeRoom = () => { document.getElementById('room-pg').style.display='none'; curRoom = null; };
     window.createComm = async () => { const name = document.getElementById('c-n').value; if(name) { await addDoc(collection(db, "communities"), { name, ts: serverTimestamp() }); document.getElementById('create-comm-pg').style.display='none'; } };
 
-    // --- Diğer Orijinal Fonksiyonlar ---
     window.vote = async (id, type) => {
         const r = doc(db, "messages", id), uid = auth.currentUser.uid, d = (await getDoc(r)).data();
         if(type === 'l') await updateDoc(r, { likes: d.likes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), dislikes: arrayRemove(uid) });
@@ -322,6 +329,7 @@
         onSnapshot(doc(db, "messages", id), s => { if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:8px; border-bottom:1px solid #ddd; background:#fff; margin-bottom:5px;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); });
     };
     window.addD = async (id) => { const t = document.getElementById('d-rep').value; if(t) { await updateDoc(doc(db, "messages", id), { comments: arrayUnion({ n: auth.currentUser.displayName, t }) }); document.getElementById('d-rep').value=""; } };
+    
     window.openUser = async (n) => {
         const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
         document.getElementById('profile-pg').style.display='block'; document.getElementById('p-av').src = u.pic; document.getElementById('p-un').innerText = "@"+u.username;
@@ -331,6 +339,27 @@
         document.getElementById('msg-btn').classList.toggle('hidden', isMe);
         document.getElementById('msg-btn').onclick = () => startDM(n);
     };
+
+    window.openEdit = async () => { 
+        const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
+        const u = uDoc.data();
+        document.getElementById('ed-av-prev').src = u.pic;
+        document.getElementById('ed-bio').value = u.bio || "";
+        document.getElementById('edit-pg').style.display='block'; 
+    };
+
+    window.saveP = async () => {
+        const me = auth.currentUser.displayName;
+        const newBio = document.getElementById('ed-bio').value;
+        const newPic = document.getElementById('ed-av-prev').src;
+
+        await updateDoc(doc(db, "users", me), { bio: newBio, pic: newPic });
+        await updateProfile(auth.currentUser, { photoURL: newPic });
+        
+        alert("Profile Updated!");
+        location.reload();
+    };
+
     window.loadMyDMs = () => { onSnapshot(doc(db, "users", auth.currentUser.displayName), d => { const chats = d.data()?.activeChats || []; document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join(""); }); };
     window.startDM = (n) => { activeDM = n; document.getElementById('dm-title').innerText = "@"+n; document.getElementById('dm-ui').style.display='flex'; loadDM(); };
     function loadDM() {
@@ -350,13 +379,23 @@
         }
     };
     window.searchUsers = async (v) => { if(v.length < 1) return; const sn = await getDocs(collection(db, "users")); document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data()).filter(u => u.username.includes(v.toLowerCase())).map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username}</div>`).join(""); };
-    window.prevImg = (i, f) => { const file = document.getElementById(f).files[0]; if(!file) return; const r = new FileReader(); r.onload = () => { const t = document.getElementById(i); t.src = r.result; t.style.display='block'; }; r.readAsDataURL(file); };
-    window.saveP = async () => { await updateDoc(doc(db, "users", auth.currentUser.displayName), { bio: document.getElementById('ed-bio').value }); location.reload(); };
+    
+    window.prevImg = (i, f) => { 
+        const file = document.getElementById(f).files[0]; 
+        if(!file) return; 
+        const r = new FileReader(); 
+        r.onload = () => { 
+            const t = document.getElementById(i); 
+            t.src = r.result; 
+            t.style.display='block'; 
+        }; 
+        r.readAsDataURL(file); 
+    };
+
     window.filterCat = (cat, btn) => { activeCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadGlobal(); };
     window.closeP = () => document.getElementById('profile-pg').style.display='none';
     window.closeEdit = () => document.getElementById('edit-pg').style.display='none';
     window.closeDiscuss = () => document.getElementById('discuss-pg').style.display='none';
-    window.openEdit = () => { document.getElementById('edit-pg').style.display='block'; };
 </script>
 </body>
 </html>
