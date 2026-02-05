@@ -12,7 +12,7 @@
         }
         body { background: var(--bg); font-family: "Times New Roman", Times, serif; margin: 0; color: #1c1e21; overflow-x: hidden; }
         
-        /* ADMIN ÖZEL STİLLER */
+        /* ADMIN TOOLS */
         #admin-nuke-bar { display: none; background: #000; color: #fff; text-align: center; padding: 10px; font-weight: bold; cursor: pointer; border-bottom: 3px solid var(--maroon); z-index: 5000; position: relative; }
         .del-msg-btn { position: absolute; top: 10px; right: 40px; background: #ff4444; color: white; border: 2px solid #000; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10; }
         .ban-btn { background: #800000; color: #fff; border: none; padding: 2px 6px; cursor: pointer; font-size: 10px; font-weight: bold; }
@@ -24,17 +24,8 @@
         .kare-surat::after { content: ''; position: absolute; bottom: 6px; left: 5px; width: 12px; height: 2.5px; background: #000; }
         .logo-text { font-weight: 900; font-size: 22px; color: #000; letter-spacing: -1px; }
 
-        #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-            text-align: center; transition: opacity 0.8s ease;
-        }
-        #welcome-text {
-            font-size: 2.5rem; font-weight: bold; color: var(--maroon);
-            border: 4px solid #000; padding: 20px; background: var(--nappag-yellow);
-            box-shadow: 8px 8px 0px #000; margin: 20px;
-        }
+        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center; transition: opacity 0.8s ease; }
+        #welcome-text { font-size: 2.5rem; font-weight: bold; color: var(--maroon); border: 4px solid #000; padding: 20px; background: var(--nappag-yellow); box-shadow: 8px 8px 0px #000; margin: 20px; }
 
         nav { background: var(--nappag-yellow); border-bottom: 2px solid var(--border); height: 65px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .nav-inner { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
@@ -100,16 +91,15 @@
                 <div class="kare-surat"></div>
                 <div class="logo-text">NAPPAG</div>
             </div>
-            <div id="nav-user" onclick="openUser(auth.currentUser.displayName)" style="cursor:pointer; font-weight:bold;"></div>
+            <div id="nav-user" style="cursor:pointer; font-weight:bold;"></div>
         </div>
     </nav>
     <div class="main-layout">
         <div class="side-col">
             <div class="card" id="admin-user-list-card" style="display:none;">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">USER CONTROL</h4>
-                <div id="admin-user-list" style="font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+                <div id="admin-user-list" style="font-size: 12px;"></div>
             </div>
-
             <div class="card">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">ROOMS</h4>
                 <div id="comm-list"></div>
@@ -137,7 +127,6 @@
                 <img id="p-img" style="width:100%; display:none; border:1px solid #000; margin:10px 0;">
                 <button class="btn-nappag" style="background:var(--maroon); color:white; border:none; margin-top:5px;" onclick="send('global')">POST</button>
             </div>
-            
             <div class="cat-filter-wrap">
                 <button class="cat-btn active" onclick="filterCat('All', this)">All</button>
                 <button class="cat-btn" onclick="filterCat('General', this)">General</button>
@@ -145,7 +134,6 @@
                 <button class="cat-btn" onclick="filterCat('Tech', this)">Tech</button>
                 <button class="cat-btn" onclick="filterCat('Art', this)">Art</button>
             </div>
-
             <div id="posts-list"></div>
         </div>
         <div class="side-col">
@@ -155,6 +143,52 @@
             </div>
         </div>
     </div>
+</div>
+
+<div id="room-pg" class="overlay">
+    <nav><div class="nav-inner"><div onclick="closeRoom()" style="cursor:pointer"><b>← BACK</b></div><b id="room-nav-title">ROOM</b></div></nav>
+    <div class="main-layout">
+        <div class="feed-side">
+            <div id="r-banner" class="room-banner" style="background-size:cover; height:150px; background-color:#800000;"></div>
+            <div class="card post-input-card"><textarea id="r-inp" placeholder="Write to room..."></textarea><button class="btn-nappag" onclick="send('room')">POST IN ROOM</button></div>
+            <div id="room-posts"></div>
+        </div>
+        <div class="side-col"><div class="card"><h4>MEMBERS</h4><div id="room-mems"></div></div></div>
+    </div>
+</div>
+
+<div id="discuss-pg" class="overlay">
+    <nav><div class="nav-inner"><div onclick="closeDiscuss()" style="cursor:pointer"><b>← BACK</b></div><b>DISCUSSION</b></div></nav>
+    <div id="discuss-content" style="max-width:800px; margin:20px auto;"></div>
+</div>
+
+<div id="profile-pg" class="overlay">
+    <nav><div class="nav-inner"><div onclick="closeP()" style="cursor:pointer"><b>← BACK</b></div><b>PROFILE</b></div></nav>
+    <div style="max-width:800px; margin:20px auto; padding:20px;" class="card">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
+            <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
+                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edit-pg" class="overlay">
+    <nav><div class="nav-inner"><div onclick="closeEdit()" style="cursor:pointer"><b>✕</b></div><b>EDIT PROFILE</b></div></nav>
+    <div style="max-width:400px; margin:40px auto;" class="card post-input-card">
+        <textarea id="ed-bio" placeholder="Bio..."></textarea><button class="btn-nappag" onclick="saveP()">UPDATE</button>
+    </div>
+</div>
+
+<div id="dm-ui">
+    <div class="chat-header" style="background:var(--maroon); color:white; padding:10px; display:flex; justify-content:space-between;"><span id="dm-title">Chat</span><button onclick="document.getElementById('dm-ui').style.display='none'" style="color:#fff; background:none; border:none;">✕</button></div>
+    <div id="dm-msgs" class="chat-msgs"></div>
+    <div style="padding:10px; display:flex; gap:5px;"><input type="text" id="dm-inp" style="margin:0;"><button onclick="sendDM()" class="btn-nappag" style="width:40px;">></button></div>
+</div>
+
+<div id="create-comm-pg" class="overlay">
+    <div style="max-width:400px; margin:100px auto;" class="card post-input-card"><input type="text" id="c-n" placeholder="Room Name"><textarea id="c-d" placeholder="Description"></textarea><button class="btn-nappag" onclick="createComm()">CREATE</button><button class="btn-nappag" style="margin-top:5px;" onclick="document.getElementById('create-comm-pg').style.display='none'">CANCEL</button></div>
 </div>
 
 <script type="module">
@@ -172,29 +206,21 @@
     async function closeWelcome(user) {
         if(user) {
             const banCheck = await getDoc(doc(db, "bannedUsers", user.displayName));
-            if(banCheck.exists()) {
-                alert("BANNED: Bu hesaba erişim engellendi!");
-                await signOut(auth);
-                location.reload();
-                return;
-            }
+            if(banCheck.exists()) { alert("BANNED!"); await signOut(auth); location.reload(); return; }
         }
-
-        const welcome = document.getElementById('welcome-screen');
-        welcome.style.opacity = '0';
+        document.getElementById('welcome-screen').style.opacity = '0';
         setTimeout(() => {
-            welcome.style.display = 'none';
+            document.getElementById('welcome-screen').style.display = 'none';
             if (user) {
                 document.getElementById('nav-user').innerHTML = `[ @${user.displayName} ${getSeal(user.displayName)} ]`;
+                document.getElementById('nav-user').onclick = () => openUser(user.displayName);
                 document.getElementById('main-pg').classList.remove('hidden');
                 document.getElementById('auth-pg').classList.add('hidden');
-                
                 if(isAdmin(user.displayName)) {
                     document.getElementById('admin-nuke-bar').style.display = 'block';
                     document.getElementById('admin-user-list-card').style.display = 'block';
                     loadAdminUserList();
                 }
-
                 loadGlobal(); loadRooms(); loadMyDMs();
             } else {
                 document.getElementById('auth-pg').classList.remove('hidden');
@@ -202,61 +228,53 @@
         }, 800);
     }
 
-    onAuthStateChanged(auth, u => {
-        setTimeout(() => closeWelcome(u), 2000);
-    });
+    onAuthStateChanged(auth, u => { setTimeout(() => closeWelcome(u), 1500); });
 
-    // --- ADMIN FONKSİYONLARI ---
-    window.deleteMsg = async (id) => {
-        if(!confirm("Bu mesajı silmek istiyor musun?")) return;
-        await deleteDoc(doc(db, "messages", id));
+    // --- ADMIN TOOLS ---
+    window.deleteMsg = async (id) => { if(confirm("Sil?")) await deleteDoc(doc(db, "messages", id)); };
+    window.banUser = async (un) => {
+        if(!confirm(`@${un} banlansın mı?`)) return;
+        await setDoc(doc(db, "bannedUsers", un), { ts: serverTimestamp() });
+        const q = query(collection(db, "messages"), where("n", "==", un));
+        const sn = await getDocs(q); sn.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
     };
-
-    window.banUser = async (username) => {
-        if(!confirm(`@${username} kullanıcısını banla? Tüm mesajları silinecektir.`)) return;
-        await setDoc(doc(db, "bannedUsers", username), { bannedAt: serverTimestamp() });
-        const q = query(collection(db, "messages"), where("n", "==", username));
-        const sn = await getDocs(q);
-        sn.forEach(async (d) => await deleteDoc(doc(db, "messages", d.id)));
-        alert("Banlandı!");
-    };
-
     window.loadAdminUserList = () => {
         onSnapshot(collection(db, "users"), sn => {
             document.getElementById('admin-user-list').innerHTML = sn.docs.map(d => {
-                const u = d.data().username;
-                if(u === 'admin') return '';
-                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px; border-bottom:1px dotted #999;">
-                    <span>@${u}</span>
-                    <button class="ban-btn" onclick="banUser('${u}')">BAN</button>
-                </div>`;
+                const u = d.id; if(u==='admin') return '';
+                return `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>@${u}</span><button class="ban-btn" onclick="banUser('${u}')">BAN</button></div>`;
             }).join("");
         });
     };
-
     window.nukeAll = async () => {
-        if(!confirm("DİKKAT! Tüm mesajlar ve kullanıcılar (admin hariç) silinecek!")) return;
-        const m = await getDocs(collection(db, "messages"));
-        m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
-        const u = await getDocs(collection(db, "users"));
-        u.forEach(async d => { if(d.id !== 'admin') await deleteDoc(doc(db, "users", d.id)); });
-        alert("Sistem temizlendi.");
-        location.reload();
+        if(!confirm("Her şey silinsin mi?")) return;
+        const m = await getDocs(collection(db, "messages")); m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
+        const u = await getDocs(collection(db, "users")); u.forEach(async d => { if(d.id !== 'admin') await deleteDoc(doc(db, "users", d.id)); });
     };
 
-    // --- SİTE FONKSİYONLARI (SENİN ORİJİNAL KODLARIN) ---
+    // --- CORE LOGIC ---
     window.handleAuth = async () => {
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
-        if(!n || !p) return alert("Missing info!");
-        const banCheck = await getDoc(doc(db, "bannedUsers", n));
-        if(banCheck.exists()) return alert("This username is banned!");
+        if(!n || !p) return;
+        const b = await getDoc(doc(db, "bannedUsers", n)); if(b.exists()) return alert("Banned!");
         try { await signInWithEmailAndPassword(auth, n+"@nappag.com", p); }
         catch {
             const r = await createUserWithEmailAndPassword(auth, n+"@nappag.com", p);
             const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
             await updateProfile(r.user, { displayName: n, photoURL: pic });
-            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", ts: serverTimestamp(), activeChats: [] });
+            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", activeChats: [] });
         }
+    };
+
+    window.send = async (type) => {
+        const t = (type==='global') ? document.getElementById('inp').value : document.getElementById('r-inp').value;
+        const cat = (type==='global') ? document.getElementById('post-cat').value : 'General';
+        const img = document.getElementById('p-img');
+        const m = img.style.display === 'block' ? img.src : "";
+        if(!t && !m) return;
+        await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: auth.currentUser.photoURL, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
+        if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
+        img.style.display='none';
     };
 
     window.loadGlobal = () => {
@@ -268,25 +286,77 @@
 
     function renderPost(s) {
         const d = s.data(), id = s.id, uid = auth.currentUser?.uid;
-        const adminMode = isAdmin(auth.currentUser?.displayName);
+        const am = isAdmin(auth.currentUser?.displayName);
         return `<div class="card">
             <span class="cat-badge">${d.cat || 'General'}</span>
-            ${adminMode ? `<button class="del-msg-btn" onclick="deleteMsg('${id}')">✕</button>` : ''}
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                <img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}
-            </div>
-            <p style="white-space:pre-wrap;">${d.t}</p>
-            ${d.m ? `<img src="${d.m}" style="width:100%; border:1px solid #000; margin-top:10px;">` : ""}
-            <div class="actions">
-                <button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button>
-                <button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button>
-                <button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION</button>
-            </div>
+            ${am ? `<button class="del-msg-btn" onclick="deleteMsg('${id}')">✕</button>` : ''}
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}</div>
+            <p style="white-space:pre-wrap;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:1px solid #000; margin-top:10px;">` : ""}
+            <div class="actions"><button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button><button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button><button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION</button></div>
         </div>`;
     }
 
-    // Geriye kalan fonksiyonlar (vote, openDiscuss, DM sistemleri vb.) kodunda aynen kalmalıdır.
-    // (Yer kaplamaması için özet geçtim ama senin kodunla birebir aynı çalışacaklar)
+    // --- ROOMS & DMs (Geri gelen kısımlar) ---
+    window.loadRooms = () => { onSnapshot(collection(db, "communities"), sn => { document.getElementById('comm-list').innerHTML = sn.docs.map(d => `<div onclick="openRoom('${d.id}')" style="cursor:pointer; padding:8px; border-bottom:1px dotted #000;"># ${d.data().name}</div>`).join(""); }); };
+    window.openRoom = async (id) => {
+        curRoom = id; const d = (await getDoc(doc(db, "communities", id))).data();
+        document.getElementById('room-pg').style.display='block'; document.getElementById('room-nav-title').innerText = d.name;
+        onSnapshot(query(collection(db, "messages"), where("room", "==", id), orderBy("ts", "desc")), sn => {
+            document.getElementById('room-posts').innerHTML = sn.docs.map(s => renderPost(s)).join("");
+            const mems = [...new Set(sn.docs.map(s => s.data().n))]; document.getElementById('room-mems').innerHTML = mems.map(m => `<div>• @${m}</div>`).join("");
+        });
+    };
+    window.closeRoom = () => { document.getElementById('room-pg').style.display='none'; curRoom = null; };
+    window.createComm = async () => { const name = document.getElementById('c-n').value; if(name) { await addDoc(collection(db, "communities"), { name, ts: serverTimestamp() }); document.getElementById('create-comm-pg').style.display='none'; } };
+
+    // --- Diğer Orijinal Fonksiyonlar ---
+    window.vote = async (id, type) => {
+        const r = doc(db, "messages", id), uid = auth.currentUser.uid, d = (await getDoc(r)).data();
+        if(type === 'l') await updateDoc(r, { likes: d.likes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), dislikes: arrayRemove(uid) });
+        else await updateDoc(r, { dislikes: d.dislikes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), likes: arrayRemove(uid) });
+    };
+    window.openDiscuss = async (id) => {
+        const d = (await getDoc(doc(db, "messages", id))).data();
+        document.getElementById('discuss-pg').style.display = 'block';
+        document.getElementById('discuss-content').innerHTML = `<div class="card"><h3>Discussion</h3><p>${d.t}</p><div id="d-list" style="margin:15px 0;"></div><textarea id="d-rep" placeholder="Reply..."></textarea><button class="btn-nappag" onclick="addD('${id}')">Send</button></div>`;
+        onSnapshot(doc(db, "messages", id), s => { if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:8px; border-bottom:1px solid #ddd; background:#fff; margin-bottom:5px;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); });
+    };
+    window.addD = async (id) => { const t = document.getElementById('d-rep').value; if(t) { await updateDoc(doc(db, "messages", id), { comments: arrayUnion({ n: auth.currentUser.displayName, t }) }); document.getElementById('d-rep').value=""; } };
+    window.openUser = async (n) => {
+        const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
+        document.getElementById('profile-pg').style.display='block'; document.getElementById('p-av').src = u.pic; document.getElementById('p-un').innerText = "@"+u.username;
+        document.getElementById('p-bi').innerText = u.bio || "No bio.";
+        const isMe = (n === auth.currentUser.displayName);
+        document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
+        document.getElementById('msg-btn').classList.toggle('hidden', isMe);
+        document.getElementById('msg-btn').onclick = () => startDM(n);
+    };
+    window.loadMyDMs = () => { onSnapshot(doc(db, "users", auth.currentUser.displayName), d => { const chats = d.data()?.activeChats || []; document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join(""); }); };
+    window.startDM = (n) => { activeDM = n; document.getElementById('dm-title').innerText = "@"+n; document.getElementById('dm-ui').style.display='flex'; loadDM(); };
+    function loadDM() {
+        const rid = [auth.currentUser.displayName, activeDM].sort().join("_");
+        onSnapshot(query(collection(db, "dms", rid, "msgs"), orderBy("ts", "asc")), sn => {
+            document.getElementById('dm-msgs').innerHTML = sn.docs.map(d => `<div class="${d.data().s === auth.currentUser.displayName ? 'm-me' : 'm-th'}"><b>@${d.data().s}</b><br>${d.data().t}</div>`).join("");
+            const c = document.getElementById('dm-msgs'); c.scrollTop = c.scrollHeight;
+        });
+    }
+    window.sendDM = async () => {
+        const i = document.getElementById('dm-inp'), me = auth.currentUser.displayName, th = activeDM, rid = [me, th].sort().join("_");
+        if(i.value) {
+            await addDoc(collection(db, "dms", rid, "msgs"), { t: i.value, s: me, ts: serverTimestamp() });
+            await updateDoc(doc(db, "users", me), { activeChats: arrayUnion(th) });
+            await updateDoc(doc(db, "users", th), { activeChats: arrayUnion(me) });
+            i.value = "";
+        }
+    };
+    window.searchUsers = async (v) => { if(v.length < 1) return; const sn = await getDocs(collection(db, "users")); document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data()).filter(u => u.username.includes(v.toLowerCase())).map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username}</div>`).join(""); };
+    window.prevImg = (i, f) => { const file = document.getElementById(f).files[0]; if(!file) return; const r = new FileReader(); r.onload = () => { const t = document.getElementById(i); t.src = r.result; t.style.display='block'; }; r.readAsDataURL(file); };
+    window.saveP = async () => { await updateDoc(doc(db, "users", auth.currentUser.displayName), { bio: document.getElementById('ed-bio').value }); location.reload(); };
+    window.filterCat = (cat, btn) => { activeCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadGlobal(); };
+    window.closeP = () => document.getElementById('profile-pg').style.display='none';
+    window.closeEdit = () => document.getElementById('edit-pg').style.display='none';
+    window.closeDiscuss = () => document.getElementById('discuss-pg').style.display='none';
+    window.openEdit = () => { document.getElementById('edit-pg').style.display='block'; };
 </script>
 </body>
 </html>
