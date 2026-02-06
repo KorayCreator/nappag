@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nappag | Global Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://meet.jit.si/external_api.js"></script>
     <style>
         :root { 
             --nappag-yellow: #FFDB5E; --bg: #F5F1E6; --maroon: #800000;
@@ -55,9 +54,6 @@
         .m-me { align-self: flex-end; background: var(--nappag-yellow); padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 8px 0px 8px 8px; text-align: right; }
         .m-th { align-self: flex-start; background: #eee; padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 0px 8px 8px 8px; }
 
-        /* CALL SCREEN STYLES */
-        #call-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; flex-direction: column; }
-
         @media screen and (max-width: 850px) {
             .main-layout { flex-direction: column; padding: 10px; }
             .side-col { width: 100%; position: static; order: 2; }
@@ -68,14 +64,6 @@
 <body>
 
 <div id="admin-nuke-bar" onclick="nukeAll()">⚠️ GLOBAL NUKE (SIFIRLA) ⚠️</div>
-
-<div id="call-screen">
-    <div style="background:var(--maroon); color:white; padding:10px; display:flex; justify-content:space-between; align-items:center;">
-        <span id="call-status">Calling...</span>
-        <button onclick="endCall()" style="background:red; color:white; border:none; padding:8px 15px; font-weight:bold; cursor:pointer;">END CALL</button>
-    </div>
-    <div id="jitsi-box" style="flex:1;"></div>
-</div>
 
 <div id="welcome-screen">
     <div class="kare-surat" style="width:60px; height:60px; transform: scale(2); margin-bottom: 40px;"></div>
@@ -180,11 +168,7 @@
         <div style="display:flex; align-items:center; gap:20px;">
             <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
             <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit Profile</button>
-                    <button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button>
-                    <button id="call-btn" class="btn-nappag" style="width:auto; background:var(--name-green); color:white;">Call</button>
-                </div>
+                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit Profile</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
             </div>
         </div>
     </div>
@@ -218,24 +202,10 @@
 
     const cfg = { apiKey: "AIzaSyBc1oohhXQFNr5QsoPG1VBc5lTMGaMoyos", authDomain: "nappag-8c527.firebaseapp.com", projectId: "nappag-8c527", storageBucket: "nappag-8c527.firebasestorage.app", appId: "1:370496474734:web:172774434cb14af279207f" };
     const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
-    let curRoom = null, activeDM = null, activeCat = 'All', jApi = null;
+    let curRoom = null, activeDM = null, activeCat = 'All';
 
     const isAdmin = (n) => n === "admin";
     const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
-
-    // --- JITSI ---
-    window.startCall = (target) => {
-        const me = auth.currentUser.displayName;
-        const roomName = "Nappag_Call_" + [me, target].sort().join("_");
-        document.getElementById('call-screen').style.display = 'flex';
-        jApi = new JitsiMeetExternalAPI("meet.jit.si", {
-            roomName: roomName,
-            parentNode: document.getElementById('jitsi-box'),
-            configOverwrite: { disableDeepLinking: true },
-            interfaceConfigOverwrite: { MOBILE_APP_PROMO: false }
-        });
-    };
-    window.endCall = () => { if(jApi) jApi.dispose(); document.getElementById('call-screen').style.display = 'none'; };
 
     async function closeWelcome(user) {
         if(user) {
@@ -264,6 +234,7 @@
 
     onAuthStateChanged(auth, u => { setTimeout(() => closeWelcome(u), 1500); });
 
+    // --- ADMIN TOOLS ---
     window.deleteMsg = async (id) => { if(confirm("Sil?")) await deleteDoc(doc(db, "messages", id)); };
     window.banUser = async (un) => {
         if(!confirm(`@${un} banlansın mı?`)) return;
@@ -285,6 +256,7 @@
         const u = await getDocs(collection(db, "users")); u.forEach(async d => { if(d.id !== 'admin') await deleteDoc(doc(db, "users", d.id)); });
     };
 
+    // --- CORE LOGIC ---
     window.handleAuth = async () => {
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
         if(!n || !p) return;
@@ -304,8 +276,11 @@
         const img = document.getElementById('p-img');
         const m = img.style.display === 'block' ? img.src : "";
         if(!t && !m) return;
+        
+        // Kullanıcının güncel fotosunu çek
         const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
         const userPic = uDoc.data().pic || auth.currentUser.photoURL;
+
         await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: userPic, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
         if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         img.style.display='none';
@@ -357,18 +332,12 @@
     
     window.openUser = async (n) => {
         const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
-        document.getElementById('profile-pg').style.display='block'; 
-        document.getElementById('p-av').src = u.pic; 
-        document.getElementById('p-un').innerText = "@"+u.username;
+        document.getElementById('profile-pg').style.display='block'; document.getElementById('p-av').src = u.pic; document.getElementById('p-un').innerText = "@"+u.username;
         document.getElementById('p-bi').innerText = u.bio || "No bio.";
-        
         const isMe = (n === auth.currentUser.displayName);
         document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
         document.getElementById('msg-btn').classList.toggle('hidden', isMe);
-        document.getElementById('call-btn').classList.toggle('hidden', isMe); // Call butonunu gizle/göster
-
-        document.getElementById('msg-btn').onclick = () => { closeP(); startDM(n); };
-        document.getElementById('call-btn').onclick = () => startCall(n);
+        document.getElementById('msg-btn').onclick = () => startDM(n);
     };
 
     window.openEdit = async () => { 
@@ -383,9 +352,12 @@
         const me = auth.currentUser.displayName;
         const newBio = document.getElementById('ed-bio').value;
         const newPic = document.getElementById('ed-av-prev').src;
+
         await updateDoc(doc(db, "users", me), { bio: newBio, pic: newPic });
         await updateProfile(auth.currentUser, { photoURL: newPic });
-        alert("Profile Updated!"); location.reload();
+        
+        alert("Profile Updated!");
+        location.reload();
     };
 
     window.loadMyDMs = () => { onSnapshot(doc(db, "users", auth.currentUser.displayName), d => { const chats = d.data()?.activeChats || []; document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join(""); }); };
@@ -409,8 +381,15 @@
     window.searchUsers = async (v) => { if(v.length < 1) return; const sn = await getDocs(collection(db, "users")); document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data()).filter(u => u.username.includes(v.toLowerCase())).map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username}</div>`).join(""); };
     
     window.prevImg = (i, f) => { 
-        const file = document.getElementById(f).files[0]; if(!file) return; 
-        const r = new FileReader(); r.onload = () => { const t = document.getElementById(i); t.src = r.result; t.style.display='block'; }; r.readAsDataURL(file); 
+        const file = document.getElementById(f).files[0]; 
+        if(!file) return; 
+        const r = new FileReader(); 
+        r.onload = () => { 
+            const t = document.getElementById(i); 
+            t.src = r.result; 
+            t.style.display='block'; 
+        }; 
+        r.readAsDataURL(file); 
     };
 
     window.filterCat = (cat, btn) => { activeCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadGlobal(); };
