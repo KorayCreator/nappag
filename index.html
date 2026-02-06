@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nappag | Global Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://meet.jit.si/external_api.js"></script>
     <style>
         :root { 
             --nappag-yellow: #FFDB5E; --bg: #F5F1E6; --maroon: #800000;
@@ -35,7 +36,7 @@
         .card { background: var(--post-bg); border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; box-shadow: 1px 1px 0px #fff inset; position: relative; }
         .post-input-card { background: var(--nappag-yellow); border: 2px solid var(--border); }
         input, textarea, select { width: 100%; border: 1px solid var(--border); padding: 8px; box-sizing: border-box; margin-bottom: 8px; font-family: inherit; }
-        .btn-nappag { background: #eee; border: 1px solid #999; padding: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.1s; }
+        .btn-nappag { background: #eee; border: 1px solid #999; padding: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.1s; text-align: center; display: block; text-decoration: none; color: black; }
         .btn-nappag:hover { background: #e0e0e0; }
         .avatar { width: 45px; height: 45px; border: 1.5px solid #000; object-fit: cover; background: #fff; cursor: pointer; }
         .admin-seal { color: var(--maroon); background: var(--gold); padding: 2px 6px; border: 1px solid #000; font-size: 10px; font-weight: bold; margin-left: 5px; box-shadow: 1px 1px 0px #000; }
@@ -54,6 +55,13 @@
         .m-me { align-self: flex-end; background: var(--nappag-yellow); padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 8px 0px 8px 8px; text-align: right; }
         .m-th { align-self: flex-start; background: #eee; padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 0px 8px 8px 8px; }
 
+        /* Arama Sonuçları Stili */
+        .search-res-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px dotted #000; cursor: pointer; transition: 0.2s; }
+        .search-res-item:hover { background: #fff; }
+
+        /* Arama Ekranı */
+        #call-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; }
+
         @media screen and (max-width: 850px) {
             .main-layout { flex-direction: column; padding: 10px; }
             .side-col { width: 100%; position: static; order: 2; }
@@ -69,6 +77,14 @@
     <div class="kare-surat" style="width:60px; height:60px; transform: scale(2); margin-bottom: 40px;"></div>
     <div id="welcome-text">This site is maded by Kobicer The KING!</div>
     <p>Loading Nappag...</p>
+</div>
+
+<div id="call-screen">
+    <div style="background: var(--maroon); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+        <span id="call-title">Voice/Video Call</span>
+        <button onclick="endCall()" style="background: #ff4444; border: 2px solid #fff; color: white; padding: 5px 15px; cursor: pointer; font-weight: bold;">END CALL</button>
+    </div>
+    <div id="jitsi-container" style="flex: 1;"></div>
 </div>
 
 <div id="auth-pg" class="hidden">
@@ -139,7 +155,8 @@
         <div class="side-col">
             <div class="card">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">SEARCH USER</h4>
-                <input type="text" placeholder="Search..." oninput="searchUsers(this.value)"><div id="user-results"></div>
+                <input type="text" placeholder="Type username..." oninput="searchUsers(this.value)">
+                <div id="user-results" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
@@ -168,7 +185,11 @@
         <div style="display:flex; align-items:center; gap:20px;">
             <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
             <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
-                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit Profile</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
+                <div style="display:flex; gap:10px;">
+                    <button id="edit-btn" class="btn-nappag" onclick="openEdit()" style="width:auto;">Edit Profile</button>
+                    <button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button>
+                    <button id="call-btn" class="btn-nappag" style="width:auto; background: #117743; color: white;">📞 Call</button>
+                </div>
             </div>
         </div>
     </div>
@@ -202,7 +223,7 @@
 
     const cfg = { apiKey: "AIzaSyBc1oohhXQFNr5QsoPG1VBc5lTMGaMoyos", authDomain: "nappag-8c527.firebaseapp.com", projectId: "nappag-8c527", storageBucket: "nappag-8c527.firebasestorage.app", appId: "1:370496474734:web:172774434cb14af279207f" };
     const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
-    let curRoom = null, activeDM = null, activeCat = 'All';
+    let curRoom = null, activeDM = null, activeCat = 'All', jitsiApi = null;
 
     const isAdmin = (n) => n === "admin";
     const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
@@ -276,11 +297,8 @@
         const img = document.getElementById('p-img');
         const m = img.style.display === 'block' ? img.src : "";
         if(!t && !m) return;
-        
-        // Kullanıcının güncel fotosunu çek
         const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
         const userPic = uDoc.data().pic || auth.currentUser.photoURL;
-
         await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: userPic, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
         if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         img.style.display='none';
@@ -337,7 +355,9 @@
         const isMe = (n === auth.currentUser.displayName);
         document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
         document.getElementById('msg-btn').classList.toggle('hidden', isMe);
+        document.getElementById('call-btn').classList.toggle('hidden', isMe);
         document.getElementById('msg-btn').onclick = () => startDM(n);
+        document.getElementById('call-btn').onclick = () => startCall(n);
     };
 
     window.openEdit = async () => { 
@@ -352,10 +372,8 @@
         const me = auth.currentUser.displayName;
         const newBio = document.getElementById('ed-bio').value;
         const newPic = document.getElementById('ed-av-prev').src;
-
         await updateDoc(doc(db, "users", me), { bio: newBio, pic: newPic });
         await updateProfile(auth.currentUser, { photoURL: newPic });
-        
         alert("Profile Updated!");
         location.reload();
     };
@@ -378,7 +396,59 @@
             i.value = "";
         }
     };
-    window.searchUsers = async (v) => { if(v.length < 1) return; const sn = await getDocs(collection(db, "users")); document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data()).filter(u => u.username.includes(v.toLowerCase())).map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username}</div>`).join(""); };
+
+    // --- YENİ: GELİŞMİŞ ARAMA ---
+    window.searchUsers = async (v) => { 
+        const container = document.getElementById('user-results');
+        if(v.length < 1) { container.innerHTML = ""; return; } 
+        
+        // Firestore query (Harf duyarlılığı için lowercase kullanılır)
+        const q = query(collection(db, "users"), where("username", ">=", v.toLowerCase()), where("username", "<=", v.toLowerCase() + "\uf8ff"));
+        const sn = await getDocs(q); 
+        
+        container.innerHTML = sn.docs.map(d => {
+            const u = d.data();
+            return `<div class="search-res-item" onclick="openUser('${u.username}')">
+                <img src="${u.pic}" style="width:30px; height:30px; border:1px solid #000;">
+                <b>@${u.username}</b>
+            </div>`;
+        }).join("");
+    };
+
+    // --- YENİ: GÖRÜNTÜLÜ/SESLİ ARAMA ---
+    window.startCall = (targetUser) => {
+        const me = auth.currentUser.displayName;
+        const roomName = "Nappag_Call_" + [me, targetUser].sort().join("_"); // Her iki taraf için aynı oda ismi
+        
+        document.getElementById('call-screen').style.display = 'flex';
+        document.getElementById('call-title').innerText = "In Call with @" + targetUser;
+
+        const options = {
+            roomName: roomName,
+            width: '100%',
+            height: '100%',
+            parentNode: document.querySelector('#jitsi-container'),
+            userInfo: { displayName: "@" + me },
+            configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: false },
+            interfaceConfigOverwrite: {
+                TOOLBAR_BUTTONS: ['microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen', 'fittowidth', 'hangup', 'videoquality', 'filmstrip', 'tileview', 'videobackgroundblur', 'help', 'mute-everyone']
+            }
+        };
+        jitsiApi = new JitsiMeetExternalAPI("meet.jit.si", options);
+        
+        // Kapatma event'i
+        jitsiApi.addEventListeners({
+            readyToClose: () => endCall()
+        });
+    };
+
+    window.endCall = () => {
+        if(jitsiApi) {
+            jitsiApi.dispose();
+            jitsiApi = null;
+        }
+        document.getElementById('call-screen').style.display = 'none';
+    };
     
     window.prevImg = (i, f) => { 
         const file = document.getElementById(f).files[0]; 
