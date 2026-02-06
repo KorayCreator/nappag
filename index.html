@@ -9,8 +9,6 @@
         :root { 
             --nappag-yellow: #FFDB5E; --bg: #F5F1E6; --maroon: #800000;
             --border: #D9BF55; --post-bg: #F0E0D6; --name-green: #117743; --gold: #D4AF37;
-            /* Kozmik Renkler */
-            --space-bg: #0b0b1a; --neon-blue: #00f2ff;
         }
         body { background: var(--bg); font-family: "Times New Roman", Times, serif; margin: 0; color: #1c1e21; overflow-x: hidden; }
         
@@ -42,18 +40,6 @@
         .avatar { width: 45px; height: 45px; border: 1.5px solid #000; object-fit: cover; background: #fff; cursor: pointer; }
         .admin-seal { color: var(--maroon); background: var(--gold); padding: 2px 6px; border: 1px solid #000; font-size: 10px; font-weight: bold; margin-left: 5px; box-shadow: 1px 1px 0px #000; }
         .cat-badge { position: absolute; top: 15px; right: 15px; font-size: 10px; border: 1px solid #000; padding: 2px 6px; background: #fff; font-weight: bold; }
-        
-        /* KOZMİK KATMAN STİLLERİ */
-        #space-hub { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--space-bg); z-index: 99999; display: none; overflow-y: auto; color: white; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--d) infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; }
-        .game-card { background: rgba(255,255,255,0.05); border: 2px solid var(--gold); border-radius: 20px; padding: 25px; text-align: center; backdrop-filter: blur(10px); transition: 0.3s; box-shadow: 0 0 15px rgba(212,175,55,0.1); }
-        .game-card:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(212,175,55,0.3); }
-        .neon-text { text-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold); color: #fff; font-weight: 900; }
-        .space-btn { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
-        .invite-box { position: fixed; top: 20px; right: 20px; background: var(--maroon); border: 2px solid var(--gold); color: white; padding: 15px; z-index: 100000; box-shadow: 0 0 20px rgba(0,0,0,0.5); display: none; }
-
         .cat-filter-wrap { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .cat-btn { background: #fff; border: 1px solid var(--border); padding: 5px 12px; font-size: 11px; cursor: pointer; white-space: nowrap; font-weight: bold; }
         .cat-btn.active { background: var(--maroon); color: #fff; }
@@ -85,14 +71,6 @@
     <p>Loading Nappag...</p>
 </div>
 
-<div id="space-invite" class="invite-box">
-    <div id="invite-msg"></div>
-    <div style="display:flex; gap:10px; margin-top:10px;">
-        <button class="space-btn" id="accept-inv" style="margin:0;">KABUL ET</button>
-        <button class="space-btn" onclick="document.getElementById('space-invite').style.display='none'" style="margin:0; background:#ff4444;">REDDET</button>
-    </div>
-</div>
-
 <div id="auth-pg" class="hidden">
     <div style="max-width:350px; margin: 100px auto; padding: 20px;">
         <div class="card post-input-card" style="text-align:center; border: 3px solid #000; box-shadow: 8px 8px 0px #000;">
@@ -113,10 +91,7 @@
                 <div class="kare-surat"></div>
                 <div class="logo-text">NAPPAG</div>
             </div>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <button class="btn-nappag" onclick="openSpaceHub()" style="background:var(--maroon); color:#fff; border:2px solid var(--gold); width:auto; padding:8px 15px; font-size:12px;">🚀 KOZMİK BOYUT</button>
-                <div id="nav-user" style="cursor:pointer; font-weight:bold;"></div>
-            </div>
+            <div id="nav-user" style="cursor:pointer; font-weight:bold;"></div>
         </div>
     </nav>
     <div class="main-layout">
@@ -165,41 +140,6 @@
             <div class="card">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">SEARCH USER</h4>
                 <input type="text" placeholder="Search..." oninput="searchUsers(this.value)"><div id="user-results"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="space-hub">
-    <div id="stars-container" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
-    <nav style="background:transparent; border-bottom: 1px solid var(--gold);">
-        <div class="nav-inner">
-            <div onclick="closeSpaceHub()" style="cursor:pointer; color:var(--gold);"><b>← DÜNYAYA DÖN</b></div>
-            <div class="neon-text" style="font-size: 20px;">NAPPAG KOZMİK BOYUT</div>
-            <div id="space-coins" style="color:var(--gold); font-weight:bold;">🪙 0 NaCoin</div>
-        </div>
-    </nav>
-    
-    <div style="max-width:1000px; margin: 40px auto; position:relative; z-index:10;">
-        <div style="text-align:center; margin-bottom: 50px;">
-            <h1 class="neon-text" style="font-size: 3rem; margin:0;">GALAXY ARENA</h1>
-            <p style="color:var(--gold);">Burası sınırların bittiği yer. Düello yap ve NaCoin kazan.</p>
-        </div>
-
-        <div class="game-grid">
-            <div class="game-card">
-                <div class="kare-surat" style="width:60px; height:60px; margin: 0 auto 20px; box-shadow: 0 0 20px var(--gold);"></div>
-                <h2 class="neon-text">KOZMİK DÜELLO</h2>
-                <p>Başka bir kullanıcıya meydan oku. Kazanan 500 NaCoin alır!</p>
-                <input type="text" id="duel-target" placeholder="Kullanıcı Adı..." style="background:rgba(0,0,0,0.3); color:white; border:1px solid var(--gold);">
-                <button class="space-btn" onclick="sendSpaceInvite('Düello', 500)">MEYDAN OKU</button>
-            </div>
-
-            <div class="game-card">
-                <div class="kare-surat" style="width:60px; height:60px; margin: 0 auto 20px; background:var(--maroon); border-color:var(--gold);"></div>
-                <h2 class="neon-text">GİZLİ LABORATUVAR</h2>
-                <p>Nappag'ın en gizli deneylerine katıl. Giriş: 100 NaCoin.</p>
-                <button class="space-btn" style="background:gray; cursor:not-allowed;">YAKINDA</button>
             </div>
         </div>
     </div>
@@ -267,67 +207,6 @@
     const isAdmin = (n) => n === "admin";
     const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
 
-    // KOZMİK BOYUT FONKSİYONLARI
-    window.openSpaceHub = async () => {
-        document.getElementById('space-hub').style.display = 'block';
-        const container = document.getElementById('stars-container');
-        container.innerHTML = '';
-        for(let i=0; i<100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.setProperty('--d', (Math.random() * 3 + 1) + 's');
-            container.appendChild(star);
-        }
-        // Coin güncelle
-        const u = await getDoc(doc(db, "users", auth.currentUser.displayName));
-        document.getElementById('space-coins').innerText = `🪙 ${u.data().coin || 0} NaCoin`;
-    };
-
-    window.closeSpaceHub = () => document.getElementById('space-hub').style.display = 'none';
-
-    window.sendSpaceInvite = async (game, prize) => {
-        const target = document.getElementById('duel-target').value.trim().toLowerCase();
-        if(!target) return alert("Kime meydan okuyorsun?");
-        if(target === auth.currentUser.displayName) return alert("Kendine meydan okuyamazsın!");
-        
-        await addDoc(collection(db, "spaceInvites"), {
-            from: auth.currentUser.displayName,
-            to: target,
-            game: game,
-            prize: prize,
-            status: 'pending',
-            ts: serverTimestamp()
-        });
-        alert("Davet ışınlandı! 🚀");
-    };
-
-    function listenToSpaceInvites() {
-        const q = query(collection(db, "spaceInvites"), where("to", "==", auth.currentUser.displayName), where("status", "==", "pending"));
-        onSnapshot(q, sn => {
-            sn.docChanges().forEach(change => {
-                if (change.type === "added") {
-                    const d = change.doc.data();
-                    document.getElementById('invite-msg').innerText = `@${d.from} seni bir ${d.game} arenasına çağırıyor! Ödül: ${d.prize} NaCoin`;
-                    document.getElementById('space-invite').style.display = 'block';
-                    document.getElementById('accept-inv').onclick = async () => {
-                        // Basit kazanç mantığı
-                        const myRef = doc(db, "users", auth.currentUser.displayName);
-                        const u = await getDoc(myRef);
-                        await updateDoc(myRef, { coin: (u.data().coin || 0) + d.prize });
-                        await updateDoc(doc(db, "spaceInvites", change.doc.id), { status: 'accepted' });
-                        alert("Arenaya girdin ve ödülü aldın! 🪙");
-                        document.getElementById('space-invite').style.display = 'none';
-                    };
-                }
-            });
-        });
-    }
-
-    // --- ORİJİNAL LOGIC (DEĞİŞTİRİLMEDİ) ---
     async function closeWelcome(user) {
         if(user) {
             const banCheck = await getDoc(doc(db, "bannedUsers", user.displayName));
@@ -346,7 +225,7 @@
                     document.getElementById('admin-user-list-card').style.display = 'block';
                     loadAdminUserList();
                 }
-                loadGlobal(); loadRooms(); loadMyDMs(); listenToSpaceInvites();
+                loadGlobal(); loadRooms(); loadMyDMs();
             } else {
                 document.getElementById('auth-pg').classList.remove('hidden');
             }
@@ -355,6 +234,7 @@
 
     onAuthStateChanged(auth, u => { setTimeout(() => closeWelcome(u), 1500); });
 
+    // --- ADMIN TOOLS ---
     window.deleteMsg = async (id) => { if(confirm("Sil?")) await deleteDoc(doc(db, "messages", id)); };
     window.banUser = async (un) => {
         if(!confirm(`@${un} banlansın mı?`)) return;
@@ -373,8 +253,10 @@
     window.nukeAll = async () => {
         if(!confirm("Her şey silinsin mi?")) return;
         const m = await getDocs(collection(db, "messages")); m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
+        const u = await getDocs(collection(db, "users")); u.forEach(async d => { if(d.id !== 'admin') await deleteDoc(doc(db, "users", d.id)); });
     };
 
+    // --- CORE LOGIC ---
     window.handleAuth = async () => {
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
         if(!n || !p) return;
@@ -384,7 +266,7 @@
             const r = await createUserWithEmailAndPassword(auth, n+"@nappag.com", p);
             const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
             await updateProfile(r.user, { displayName: n, photoURL: pic });
-            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", activeChats: [], coin: 0 });
+            await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", activeChats: [] });
         }
     };
 
@@ -394,8 +276,11 @@
         const img = document.getElementById('p-img');
         const m = img.style.display === 'block' ? img.src : "";
         if(!t && !m) return;
+        
+        // Kullanıcının güncel fotosunu çek
         const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
         const userPic = uDoc.data().pic || auth.currentUser.photoURL;
+
         await addDoc(collection(db, "messages"), { t, n: auth.currentUser.displayName, p: userPic, cat, m, room: type==='room' ? curRoom : 'global', ts: serverTimestamp(), likes: [], dislikes: [], comments: [] });
         if(type==='global') document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         img.style.display='none';
@@ -467,8 +352,10 @@
         const me = auth.currentUser.displayName;
         const newBio = document.getElementById('ed-bio').value;
         const newPic = document.getElementById('ed-av-prev').src;
+
         await updateDoc(doc(db, "users", me), { bio: newBio, pic: newPic });
         await updateProfile(auth.currentUser, { photoURL: newPic });
+        
         alert("Profile Updated!");
         location.reload();
     };
