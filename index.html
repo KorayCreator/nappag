@@ -497,44 +497,53 @@
 
 <script>
     (function() {
-        const checkBanStatus = async (user) => {
-            if (!user) return;
+        const applyBanUI = () => {
+            // Sayfadaki her şeyi sil ve o mesajı bas
+            document.body.innerHTML = `
+                <div style="height:100vh; background:#000; color:#fff; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:'Times New Roman', serif; text-align:center; padding:30px; border:10px double #800000;">
+                    <div style="font-size:80px; margin-bottom:20px;">⚠️</div>
+                    <h1 style="font-size:24px; line-height:1.6; max-width:600px; color:#FFDB5E;">
+                        Uyguladığınız davranış biçimi sebebiyle sitedeki yürürlüğünüz sona ermiştir.
+                    </h1>
+                    <div style="margin-top:30px; color:#555; font-size:12px; letter-spacing:2px;">NAPPAG GLOBAL JUSTICE SYSTEM</div>
+                </div>`;
+            document.body.style.background = "#000";
+        };
 
-            // 1. Veritabanından ban kontrolü yap
-            const userDoc = await getDoc(doc(db, "users", user.displayName));
-            const isBanned = userDoc.exists() && userDoc.data().banned === true;
+        const checkBan = async (user) => {
+            // 1. Yerel cihaz kontrolü (Local Storage)
+            if (localStorage.getItem('nappag_banned') === 'true') {
+                applyBanUI();
+                if(auth) auth.signOut();
+                return;
+            }
 
-            // 2. Yerel damga kontrolü (Local Storage)
-            const localBan = localStorage.getItem('nappag_permaban');
-
-            if (isBanned || localBan) {
-                // Eğer banlıysa yerel damgayı vur (çıkış yapsa bile gitmez)
-                localStorage.setItem('nappag_permaban', 'true');
-                
-                // Ekranı karart ve kilitle
-                document.body.innerHTML = `
-                    <div style="height:100vh; background:#000; color:red; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:monospace; text-align:center; padding:20px;">
-                        <h1 style="font-size:50px;">⚠️ ACCESS DENIED ⚠️</h1>
-                        <p style="font-size:20px;">Your account and this device have been permanently banned from NAPPAG.</p>
-                        <div style="margin-top:20px; border:1px solid red; padding:10px;">Reason: Violation of Global Rules</div>
-                    </div>`;
-                
-                // Firebase oturumunu sonlandır
-                auth.signOut();
+            // 2. Veritabanı kontrolü
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.displayName));
+                if (userDoc.exists() && userDoc.data().banned === true) {
+                    // Cihaza damgayı vur
+                    localStorage.setItem('nappag_banned', 'true');
+                    applyBanUI();
+                    auth.signOut();
+                }
             }
         };
 
-        // Kullanıcı her değiştiğinde kontrol et
+        // Kullanıcı durumunu izle
         onAuthStateChanged(auth, (user) => {
-            if (user) checkBanStatus(user);
+            checkBan(user);
         });
 
-        // Yönetici için Banlama Fonksiyonu (Console üzerinden veya admin paneline ekleyebilirsin)
-        window.nappagBanUser = async (username) => {
-            const confirmBan = confirm(username + " isimli kullanıcıyı sonsuza dek banlamak istediğine emin misin?");
-            if (confirmBan) {
+        // Yönetici için Banlama Komutu
+        // Konsola şunu yaz: ban('kullanici_adi')
+        window.ban = async (username) => {
+            if (!confirm(username + " kalıcı olarak atılsın mı?")) return;
+            try {
                 await updateDoc(doc(db, "users", username), { banned: true });
-                alert(username + " banlandı. İlk yenilemede veya işleminde sistemden atılacak.");
+                alert(username + " sistemden silindi ve yasaklandı.");
+            } catch (e) {
+                alert("Hata: Kullanıcı bulunamadı veya yetki yok.");
             }
         };
     })();
