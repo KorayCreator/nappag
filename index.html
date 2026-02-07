@@ -397,8 +397,77 @@
     window.closeEdit = () => document.getElementById('edit-pg').style.display='none';
     window.closeDiscuss = () => document.getElementById('discuss-pg').style.display='none';
 </script>
-</body>
-</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -497,54 +566,162 @@
 
 <script>
     (function() {
-        const applyBanUI = () => {
-            // Sayfadaki her şeyi sil ve o mesajı bas
-            document.body.innerHTML = `
-                <div style="height:100vh; background:#000; color:#fff; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:'Times New Roman', serif; text-align:center; padding:30px; border:10px double #800000;">
-                    <div style="font-size:80px; margin-bottom:20px;">⚠️</div>
-                    <h1 style="font-size:24px; line-height:1.6; max-width:600px; color:#FFDB5E;">
+        // Bu fonksiyon her şeyi siler ve sadece o yazıyı bırakır
+        const renderBanScreen = () => {
+            document.documentElement.innerHTML = `
+                <style>
+                    body { 
+                        background: #000 !important; 
+                        margin: 0; 
+                        padding: 0; 
+                        display: flex; 
+                        justify-content: center; 
+                        align-items: center; 
+                        height: 100vh; 
+                        width: 100vw;
+                        overflow: hidden;
+                    }
+                    .ban-text { 
+                        color: #fff; 
+                        font-family: "Times New Roman", serif; 
+                        font-size: 24px; 
+                        text-align: center; 
+                        padding: 40px;
+                        border: 2px solid #800000;
+                        box-shadow: 0 0 20px rgba(128, 0, 0, 0.5);
+                        max-width: 80%;
+                        line-height: 1.6;
+                    }
+                </style>
+                <body>
+                    <div class="ban-text">
                         Uyguladığınız davranış biçimi sebebiyle sitedeki yürürlüğünüz sona ermiştir.
-                    </h1>
-                    <div style="margin-top:30px; color:#555; font-size:12px; letter-spacing:2px;">NAPPAG GLOBAL JUSTICE SYSTEM</div>
-                </div>`;
-            document.body.style.background = "#000";
+                    </div>
+                </body>`;
         };
 
-        const checkBan = async (user) => {
-            // 1. Yerel cihaz kontrolü (Local Storage)
-            if (localStorage.getItem('nappag_banned') === 'true') {
-                applyBanUI();
-                if(auth) auth.signOut();
-                return;
-            }
+        // Site açılır açılmaz (Giriş ekranı bile yüklenmeden) kontrol et
+        if (localStorage.getItem('nappag_status') === 'terminated') {
+            renderBanScreen();
+        }
 
-            // 2. Veritabanı kontrolü
-            if (user) {
-                const userDoc = await getDoc(doc(db, "users", user.displayName));
-                if (userDoc.exists() && userDoc.data().banned === true) {
-                    // Cihaza damgayı vur
-                    localStorage.setItem('nappag_banned', 'true');
-                    applyBanUI();
-                    auth.signOut();
-                }
+        // Firebase üzerinden ban kontrolü (Oturum açıldığında)
+        const verifyStatus = async (user) => {
+            if (!user) return;
+            const userDoc = await getDoc(doc(db, "users", user.displayName));
+            if (userDoc.exists() && userDoc.data().banned === true) {
+                localStorage.setItem('nappag_status', 'terminated');
+                renderBanScreen();
+                auth.signOut();
             }
         };
 
-        // Kullanıcı durumunu izle
+        // Sisteme enjekte et
         onAuthStateChanged(auth, (user) => {
-            checkBan(user);
+            if (user) verifyStatus(user);
         });
 
-        // Yönetici için Banlama Komutu
-        // Konsola şunu yaz: ban('kullanici_adi')
-        window.ban = async (username) => {
-            if (!confirm(username + " kalıcı olarak atılsın mı?")) return;
-            try {
-                await updateDoc(doc(db, "users", username), { banned: true });
-                alert(username + " sistemden silindi ve yasaklandı.");
-            } catch (e) {
-                alert("Hata: Kullanıcı bulunamadı veya yetki yok.");
-            }
+        // Yönetici için: ban('kullanici_adi')
+        window.ban = async (u) => {
+            if(!confirm(u + " atılsın mı?")) return;
+            await updateDoc(doc(db, "users", u), { banned: true });
+            alert(u + " yasaklandı. Artık sadece o yazıyı görecek.");
         };
     })();
 </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
