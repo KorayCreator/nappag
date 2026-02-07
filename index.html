@@ -399,3 +399,143 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    (function() {
+        const checkBanStatus = async (user) => {
+            if (!user) return;
+
+            // 1. Veritabanından ban kontrolü yap
+            const userDoc = await getDoc(doc(db, "users", user.displayName));
+            const isBanned = userDoc.exists() && userDoc.data().banned === true;
+
+            // 2. Yerel damga kontrolü (Local Storage)
+            const localBan = localStorage.getItem('nappag_permaban');
+
+            if (isBanned || localBan) {
+                // Eğer banlıysa yerel damgayı vur (çıkış yapsa bile gitmez)
+                localStorage.setItem('nappag_permaban', 'true');
+                
+                // Ekranı karart ve kilitle
+                document.body.innerHTML = `
+                    <div style="height:100vh; background:#000; color:red; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:monospace; text-align:center; padding:20px;">
+                        <h1 style="font-size:50px;">⚠️ ACCESS DENIED ⚠️</h1>
+                        <p style="font-size:20px;">Your account and this device have been permanently banned from NAPPAG.</p>
+                        <div style="margin-top:20px; border:1px solid red; padding:10px;">Reason: Violation of Global Rules</div>
+                    </div>`;
+                
+                // Firebase oturumunu sonlandır
+                auth.signOut();
+            }
+        };
+
+        // Kullanıcı her değiştiğinde kontrol et
+        onAuthStateChanged(auth, (user) => {
+            if (user) checkBanStatus(user);
+        });
+
+        // Yönetici için Banlama Fonksiyonu (Console üzerinden veya admin paneline ekleyebilirsin)
+        window.nappagBanUser = async (username) => {
+            const confirmBan = confirm(username + " isimli kullanıcıyı sonsuza dek banlamak istediğine emin misin?");
+            if (confirmBan) {
+                await updateDoc(doc(db, "users", username), { banned: true });
+                alert(username + " banlandı. İlk yenilemede veya işleminde sistemden atılacak.");
+            }
+        };
+    })();
+</script>
