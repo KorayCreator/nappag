@@ -564,164 +564,149 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
-    (function() {
-        // Bu fonksiyon her şeyi siler ve sadece o yazıyı bırakır
-        const renderBanScreen = () => {
-            document.documentElement.innerHTML = `
-                <style>
-                    body { 
-                        background: #000 !important; 
-                        margin: 0; 
-                        padding: 0; 
-                        display: flex; 
-                        justify-content: center; 
-                        align-items: center; 
-                        height: 100vh; 
-                        width: 100vw;
-                        overflow: hidden;
-                    }
-                    .ban-text { 
-                        color: #fff; 
-                        font-family: "Times New Roman", serif; 
-                        font-size: 24px; 
-                        text-align: center; 
-                        padding: 40px;
-                        border: 2px solid #800000;
-                        box-shadow: 0 0 20px rgba(128, 0, 0, 0.5);
-                        max-width: 80%;
-                        line-height: 1.6;
-                    }
-                </style>
-                <body>
-                    <div class="ban-text">
-                        Uyguladığınız davranış biçimi sebebiyle sitedeki yürürlüğünüz sona ermiştir.
-                    </div>
-                </body>`;
-        };
+(function() {
+    // 1. DAHA SAYFA YÜKLENİRKEN KONTROL ET (EN KRİTİK KISIM)
+    if (localStorage.getItem('nappag_terminated') === 'true') {
+        document.documentElement.innerHTML = `
+            <style>
+                body { background: #000 !important; margin: 0; display: flex; justify-content: center; 
+                align-items: center; height: 100vh; width: 100vw; overflow: hidden; }
+                .msg { color: #fff; font-family: "Times New Roman", serif; font-size: 24px; text-align: center; 
+                padding: 40px; border: 2px solid #800000; max-width: 80%; line-height: 1.6; }
+            </style>
+            <body>
+                <div class="msg">Uyguladığınız davranış biçimi sebebiyle sitedeki yürürlüğünüz sona ermiştir.</div>
+            </body>`;
+        window.stop(); // Sayfanın geri kalanını yüklemeyi durdur
+    }
 
-        // Site açılır açılmaz (Giriş ekranı bile yüklenmeden) kontrol et
-        if (localStorage.getItem('nappag_status') === 'terminated') {
-            renderBanScreen();
-        }
-
-        // Firebase üzerinden ban kontrolü (Oturum açıldığında)
-        const verifyStatus = async (user) => {
-            if (!user) return;
-            const userDoc = await getDoc(doc(db, "users", user.displayName));
-            if (userDoc.exists() && userDoc.data().banned === true) {
-                localStorage.setItem('nappag_status', 'terminated');
-                renderBanScreen();
-                auth.signOut();
+    // 2. VERİTABANI KONTROLÜ VE DAMGALAMA
+    const securityCheck = async (user) => {
+        if (!user) return;
+        
+        try {
+            const userRef = doc(db, "users", user.displayName);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists() && userSnap.data().banned === true) {
+                // Tarayıcıya geri dönüşü olmayan damgayı vur
+                localStorage.setItem('nappag_terminated', 'true');
+                // Sayfayı yenile ki yukarıdaki 1. adım devreye girsin
+                location.reload();
             }
-        };
+        } catch (e) { console.error("Security verify error"); }
+    };
 
-        // Sisteme enjekte et
-        onAuthStateChanged(auth, (user) => {
-            if (user) verifyStatus(user);
-        });
+    // Firebase durumunu izle
+    const checkInterval = setInterval(() => {
+        if (typeof auth !== 'undefined') {
+            onAuthStateChanged(auth, (user) => {
+                if (user) securityCheck(user);
+            });
+            clearInterval(checkInterval);
+        }
+    }, 500);
 
-        // Yönetici için: ban('kullanici_adi')
-        window.ban = async (u) => {
-            if(!confirm(u + " atılsın mı?")) return;
-            await updateDoc(doc(db, "users", u), { banned: true });
-            alert(u + " yasaklandı. Artık sadece o yazıyı görecek.");
-        };
-    })();
+    // YÖNETİCİ KOMUTU: ban('kullanici_adi')
+    window.ban = async (u) => {
+        if(!confirm(u + " sonsuza dek atılsın mı?")) return;
+        await updateDoc(doc(db, "users", u), { banned: true });
+        alert(u + " yasaklandı. İlk işleminde veya girişinde sistemden silinecek.");
+    };
+})();
 </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
