@@ -9,6 +9,7 @@
         :root { 
             --nappag-yellow: #FFDB5E; --bg: #F5F1E6; --maroon: #800000;
             --border: #D9BF55; --post-bg: #F0E0D6; --name-green: #117743; --gold: #D4AF37;
+            --shadow: 4px 4px 0px #000;
         }
         body { background: var(--bg); font-family: "Times New Roman", Times, serif; margin: 0; color: #1c1e21; overflow-x: hidden; }
         
@@ -16,12 +17,18 @@
         #ban-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #ff4444; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 100000; font-family: serif; }
         .ban-box { border: 5px solid #ff4444; padding: 40px; box-shadow: 0 0 30px #ff4444; background: #111; }
 
+        /* NOTIFICATION SYSTEM */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; }
+        .toast { background: #000; color: #fff; padding: 12px 20px; margin-bottom: 10px; border: 2px solid var(--nappag-yellow); box-shadow: var(--shadow); font-weight: bold; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
         /* ADMIN TOOLS */
         #admin-nuke-bar { display: none; background: #000; color: #fff; text-align: center; padding: 10px; font-weight: bold; cursor: pointer; border-bottom: 3px solid var(--maroon); z-index: 5000; position: relative; }
         .del-msg-btn { position: absolute; top: 10px; right: 40px; background: #ff4444; color: white; border: 2px solid #000; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10; }
-        .ban-btn { background: #800000; color: #fff; border: none; padding: 2px 6px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .ban-btn { background: #800000; color: #fff; border: none; padding: 4px 8px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
+        .ban-btn:hover { background: red; }
 
-        .nappag-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; border: 3px solid #000; padding: 5px 12px; box-shadow: 4px 4px 0px #000; transition: 0.1s; }
+        .nappag-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; border: 3px solid #000; padding: 5px 12px; box-shadow: var(--shadow); transition: 0.1s; }
         .nappag-logo:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
         .kare-surat { width: 25px; height: 25px; background: #FFDB5E; border: 2px solid #000; position: relative; box-sizing: border-box; }
         .kare-surat::before { content: ''; position: absolute; top: 7px; left: 5px; width: 3px; height: 3px; background: #000; box-shadow: 8px 0px 0px #000; }
@@ -36,11 +43,12 @@
         .main-layout { display: flex; max-width: 1200px; margin: 0 auto; gap: 20px; padding: 15px; }
         .side-col { width: 280px; position: sticky; top: 80px; height: fit-content; }
         .feed-side { flex: 1; min-width: 0; }
-        .card { background: var(--post-bg); border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; box-shadow: 1px 1px 0px #fff inset; position: relative; }
+        .card { background: var(--post-bg); border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; box-shadow: 1px 1px 0px #fff inset; position: relative; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
         .post-input-card { background: var(--nappag-yellow); border: 2px solid var(--border); }
         input, textarea, select { width: 100%; border: 1px solid var(--border); padding: 8px; box-sizing: border-box; margin-bottom: 8px; font-family: inherit; }
         .btn-nappag { background: #eee; border: 1px solid #999; padding: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.1s; }
-        .btn-nappag:hover { background: #e0e0e0; }
+        .btn-nappag:hover { background: #e0e0e0; border-color: #000; }
         .avatar { width: 45px; height: 45px; border: 1.5px solid #000; object-fit: cover; background: #fff; cursor: pointer; }
         .admin-seal { color: var(--maroon); background: var(--gold); padding: 2px 6px; border: 1px solid #000; font-size: 10px; font-weight: bold; margin-left: 5px; box-shadow: 1px 1px 0px #000; }
         .cat-badge { position: absolute; top: 15px; right: 15px; font-size: 10px; border: 1px solid #000; padding: 2px 6px; background: #fff; font-weight: bold; }
@@ -60,6 +68,8 @@
     </style>
 </head>
 <body>
+
+<div id="toast-container"></div>
 
 <div id="ban-overlay">
     <div class="ban-box">
@@ -104,7 +114,7 @@
         <div class="side-col">
             <div class="card" id="admin-user-list-card" style="display:none;">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">USER CONTROL</h4>
-                <div id="admin-user-list" style="font-size: 12px;"></div>
+                <div id="admin-user-list" style="font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
             </div>
             <div class="card">
                 <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">ROOMS</h4>
@@ -210,32 +220,42 @@
     const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
     let curRoom = null, activeDM = null, activeCat = 'All';
 
-    const isAdmin = (n) => n === "admin";
+    // --- HELPER FUNCTIONS ---
+    const showToast = (msg) => {
+        const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    };
+
+    const isAdmin = (n) => n === "admin" || n === "kobicer";
     const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
 
-    // --- UTILS & NAVIGATION ---
     const showBanScreen = () => {
         document.getElementById('ban-overlay').style.display = 'flex';
         document.getElementById('main-pg').innerHTML = "";
+        document.getElementById('auth-pg').innerHTML = ""; // Kayıt sayfasını da temizle
         document.body.style.overflow = "hidden";
     };
 
     const checkBanStatus = async (username) => {
-        if (localStorage.getItem("nappag_permanently_sealed") === "true") {
-            showBanScreen(); return true;
+        // 1. ADIM: Tarayıcıdaki kalıcı mühür kontrolü (Kayıt olmasını da engeller)
+        if (localStorage.getItem("nappag_permanently_sealed") === "true") { 
+            showBanScreen(); return true; 
         }
+        
+        // 2. ADIM: Veritabanındaki ban listesi kontrolü
         if (username) {
             const b = await getDoc(doc(db, "bannedUsers", username.toLowerCase()));
             if (b.exists()) {
+                // Tarayıcıyı mühürle ve ban ekranını aç
                 localStorage.setItem("nappag_permanently_sealed", "true");
-                await signOut(auth);
-                showBanScreen(); return true;
+                await signOut(auth); showBanScreen(); return true;
             }
         }
         return false;
     };
 
-    // --- GLOBAL WINDOW ATTACHMENTS (FOR MODULARS) ---
+    // --- GLOBAL WINDOW ATTACHMENTS ---
     window.openUser = async (n) => {
         const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
         document.getElementById('profile-pg').style.display='block'; 
@@ -254,38 +274,41 @@
         else await updateDoc(r, { dislikes: d.dislikes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), likes: arrayRemove(uid) });
     };
 
-    window.deleteMsg = async (id) => { if(confirm("Silmek istiyor musunuz?")) await deleteDoc(doc(db, "messages", id)); };
+    window.deleteMsg = async (id) => { if(confirm("Are you sure you want to delete this post?")) await deleteDoc(doc(db, "messages", id)); };
     
     window.banUser = async (un) => {
-        if(!confirm(`@${un} mühürlensin mi?`)) return;
+        if(!confirm(`Seal @${un} forever? This user will never be able to register again from this device.`)) return;
+        // Veritabanına banla
         await setDoc(doc(db, "bannedUsers", un.toLowerCase()), { ts: serverTimestamp() });
-        alert(`${un} mühürlendi.`);
+        showToast(`User ${un} has been sealed.`);
     };
 
     window.openDiscuss = async (id) => {
-        const d = (await getDoc(doc(db, "messages", id))).data();
+        const dDoc = await getDoc(doc(db, "messages", id));
+        if(!dDoc.exists()) return;
+        const d = dDoc.data();
         document.getElementById('discuss-pg').style.display = 'block';
         document.getElementById('discuss-content').innerHTML = `
             <div class="card">
-                <h3>Discussion</h3><p>${d.t}</p>
-                <div id="d-list" style="margin:15px 0;"></div>
-                <textarea id="d-rep" placeholder="Reply..."></textarea>
-                <button class="btn-nappag" id="send-discuss-btn">Send</button>
+                <h3>Discussion</h3><p style="font-size:18px;">${d.t}</p>
+                <div id="d-list" style="margin:15px 0; border-top: 2px solid #000; padding-top:10px;"></div>
+                <textarea id="d-rep" placeholder="Reply to this thread..."></textarea>
+                <button class="btn-nappag" id="send-discuss-btn" style="background:var(--maroon); color:white;">Send Reply</button>
             </div>`;
         document.getElementById('send-discuss-btn').onclick = () => addD(id);
         onSnapshot(doc(db, "messages", id), s => { 
-            if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:8px; border-bottom:1px solid #ddd; background:#fff; margin-bottom:5px;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); 
+            if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:10px; border:1px solid #000; background:#fff; margin-bottom:8px; box-shadow: 2px 2px 0px #000;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); 
         });
     };
 
     window.openRoom = async (id) => {
         curRoom = id; const d = (await getDoc(doc(db, "communities", id))).data();
         document.getElementById('room-pg').style.display='block'; 
-        document.getElementById('room-nav-title').innerText = d.name;
+        document.getElementById('room-nav-title').innerText = "# " + d.name;
         onSnapshot(query(collection(db, "messages"), where("room", "==", id), orderBy("ts", "desc")), sn => {
             document.getElementById('room-posts').innerHTML = sn.docs.map(s => renderPost(s)).join("");
             const mems = [...new Set(sn.docs.map(s => s.data().n))]; 
-            document.getElementById('room-mems').innerHTML = mems.map(m => `<div>• @${m}</div>`).join("");
+            document.getElementById('room-mems').innerHTML = mems.map(m => `<div style="padding:5px; border-bottom:1px dotted #999;">• @${m}</div>`).join("");
         });
     };
 
@@ -300,7 +323,7 @@
 
     const startDM = (n) => { 
         activeDM = n; 
-        document.getElementById('dm-title').innerText = "@"+n; 
+        document.getElementById('dm-title').innerText = "Chat with @"+n; 
         document.getElementById('dm-ui').style.display='flex'; 
         const rid = [auth.currentUser.displayName, activeDM].sort().join("_");
         onSnapshot(query(collection(db, "dms", rid, "msgs"), orderBy("ts", "asc")), sn => {
@@ -316,11 +339,11 @@
             <span class="cat-badge">${d.cat || 'General'}</span>
             ${am ? `<button class="del-msg-btn" onclick="deleteMsg('${id}')">✕</button>` : ''}
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}</div>
-            <p style="white-space:pre-wrap;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:1px solid #000; margin-top:10px;">` : ""}
+            <p style="white-space:pre-wrap; font-size:1.1rem;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:2px solid #000; margin-top:10px;">` : ""}
             <div class="actions">
                 <button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button>
                 <button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button>
-                <button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION</button>
+                <button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION (${d.comments?.length || 0})</button>
             </div>
         </div>`;
     };
@@ -350,13 +373,20 @@
         });
         if(isGlobal) document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
         img.style.display='none';
+        showToast("Post published!");
     };
 
-    // --- EVENT LISTENERS ---
+    // --- EVENTS ---
     document.getElementById('auth-btn').onclick = async () => {
+        // HERŞEYDEN ÖNCE BAN KONTROLÜ
+        if (await checkBanStatus()) return;
+
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
         if(!n || !p) return;
+        
+        // Kullanıcı adı özelinde ban kontrolü
         if(await checkBanStatus(n)) return;
+
         try { 
             await signInWithEmailAndPassword(auth, n+"@nappag.com", p); 
         } catch {
@@ -365,7 +395,8 @@
                 const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
                 await updateProfile(r.user, { displayName: n, photoURL: pic });
                 await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", activeChats: [] });
-            } catch(e) { alert("Şifre en az 6 karakter olmalı!"); }
+                showToast("Welcome to Nappag!");
+            } catch(e) { alert("Error: Password should be 6+ chars or username taken."); }
         }
     };
 
@@ -375,6 +406,10 @@
     document.getElementById('close-profile-btn').onclick = () => document.getElementById('profile-pg').style.display='none';
     document.getElementById('close-discuss-btn').onclick = () => document.getElementById('discuss-pg').style.display='none';
     document.getElementById('close-edit-btn').onclick = () => document.getElementById('edit-pg').style.display='none';
+    document.getElementById('close-dm-btn').onclick = () => document.getElementById('dm-ui').style.display='none';
+    
+    document.getElementById('dm-inp').onkeydown = (e) => { if(e.key === 'Enter') document.getElementById('send-dm-btn').click(); };
+
     document.getElementById('edit-btn').onclick = async () => {
         const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
         const u = uDoc.data();
@@ -389,7 +424,8 @@
             bio: document.getElementById('ed-bio').value, 
             pic: document.getElementById('ed-av-prev').src 
         });
-        location.reload();
+        showToast("Profile updated!");
+        setTimeout(() => location.reload(), 1000);
     };
 
     document.getElementById('f-up').onchange = (e) => {
@@ -398,12 +434,6 @@
             document.getElementById('p-img').src = reader.result;
             document.getElementById('p-img').style.display = 'block';
         };
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    document.getElementById('f-av-up').onchange = (e) => {
-        const reader = new FileReader();
-        reader.onload = () => { document.getElementById('ed-av-prev').src = reader.result; };
         reader.readAsDataURL(e.target.files[0]);
     };
 
@@ -427,11 +457,11 @@
     };
 
     document.getElementById('user-search-inp').oninput = async (e) => {
-        const v = e.target.value.toLowerCase(); if(v.length < 1) return;
+        const v = e.target.value.toLowerCase(); if(v.length < 1) { document.getElementById('user-results').innerHTML = ""; return; }
         const sn = await getDocs(collection(db, "users"));
         document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data())
             .filter(u => u.username.includes(v))
-            .map(u => `<div style="padding:8px; cursor:pointer;" onclick="openUser('${u.username}')">@${u.username}</div>`).join("");
+            .map(u => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="openUser('${u.username}')">@${u.username}</div>`).join("");
     };
 
     document.getElementById('open-create-room-btn').onclick = () => document.getElementById('create-comm-pg').style.display='block';
@@ -441,19 +471,24 @@
         if(name) {
             await addDoc(collection(db, "communities"), { name, ts: serverTimestamp() });
             document.getElementById('create-comm-pg').style.display='none';
+            showToast("Room created!");
         }
     };
 
     document.getElementById('admin-nuke-bar').onclick = async () => {
-        if(!confirm("TÜM SİTEYİ SIFIRLIYORSUN!")) return;
-        const m = await getDocs(collection(db, "messages")); m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
-        location.reload();
+        if(!confirm("⚠️ THIS WILL DELETE EVERYTHING! ARE YOU SURE? ⚠️")) return;
+        const m = await getDocs(collection(db, "messages")); 
+        m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
+        showToast("The world has been reset.");
+        setTimeout(() => location.reload(), 2000);
     };
 
     // --- AUTH OBSERVER ---
     onAuthStateChanged(auth, async u => {
+        // Uygulama açılırken tarayıcıda mühür var mı bak
+        if (await checkBanStatus(u ? u.displayName : null)) return;
+
         if (u) {
-            if(await checkBanStatus(u.displayName)) return;
             document.getElementById('welcome-screen').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('welcome-screen').style.display = 'none';
@@ -466,7 +501,7 @@
                     document.getElementById('admin-user-list-card').style.display = 'block';
                     onSnapshot(collection(db, "users"), sn => {
                         document.getElementById('admin-user-list').innerHTML = sn.docs.map(d => {
-                            if(d.id==='admin') return '';
+                            if(d.id==='admin' || d.id === 'kobicer') return '';
                             return `<div style="display:flex;justify-content:space-between;margin-bottom:5px; align-items:center; background:#fff; padding:5px; border:1px solid #000;">
                                 <span>@${d.id}</span><button class="ban-btn" onclick="banUser('${d.id}')">BAN</button></div>`;
                         }).join("");
@@ -478,7 +513,7 @@
                 });
                 onSnapshot(doc(db, "users", u.displayName), d => { 
                     const chats = d.data()?.activeChats || []; 
-                    document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:5px; border-bottom:1px dotted #ccc;">• @${c}</div>`).join(""); 
+                    document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:8px; border-bottom:1px dotted #ccc; background:#fff; margin-bottom:2px;">• @${c}</div>`).join(""); 
                 });
             }, 800);
         } else {
