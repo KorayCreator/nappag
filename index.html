@@ -26,6 +26,7 @@
         #admin-nuke-bar { display: none; background: #000; color: #fff; text-align: center; padding: 10px; font-weight: bold; cursor: pointer; border-bottom: 3px solid var(--maroon); z-index: 5000; position: relative; }
         .del-msg-btn { position: absolute; top: 10px; right: 40px; background: #ff4444; color: white; border: 2px solid #000; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10; }
         .ban-btn { background: #800000; color: #fff; border: none; padding: 4px 8px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
+        .unban-btn { background: #117743; color: #fff; border: none; padding: 4px 8px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; margin-left: 5px; }
         .ban-btn:hover { background: red; }
 
         .nappag-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; border: 3px solid #000; padding: 5px 12px; box-shadow: var(--shadow); transition: 0.1s; }
@@ -233,25 +234,29 @@
     const showBanScreen = () => {
         document.getElementById('ban-overlay').style.display = 'flex';
         document.getElementById('main-pg').innerHTML = "";
-        document.getElementById('auth-pg').innerHTML = ""; // Kayıt sayfasını da temizle
+        document.getElementById('auth-pg').innerHTML = ""; 
         document.body.style.overflow = "hidden";
     };
 
     const checkBanStatus = async (username) => {
-        // 1. ADIM: Tarayıcıdaki kalıcı mühür kontrolü (Kayıt olmasını da engeller)
+        // 1. ADIM: Veritabanındaki ban listesi kontrolü
+        if (username) {
+            const b = await getDoc(doc(db, "bannedUsers", username.toLowerCase()));
+            if (b.exists()) {
+                // Eğer veritabanında banlıysa tarayıcıyı da mühürle
+                localStorage.setItem("nappag_permanently_sealed", "true");
+                showBanScreen(); return true;
+            } else {
+                // Eğer veritabanında banlı DEĞİLSE mühürü kaldır (Unban için kritik)
+                localStorage.removeItem("nappag_permanently_sealed");
+            }
+        }
+        
+        // 2. ADIM: Tarayıcıdaki mühür kontrolü (Eski banlılar için)
         if (localStorage.getItem("nappag_permanently_sealed") === "true") { 
             showBanScreen(); return true; 
         }
         
-        // 2. ADIM: Veritabanındaki ban listesi kontrolü
-        if (username) {
-            const b = await getDoc(doc(db, "bannedUsers", username.toLowerCase()));
-            if (b.exists()) {
-                // Tarayıcıyı mühürle ve ban ekranını aç
-                localStorage.setItem("nappag_permanently_sealed", "true");
-                await signOut(auth); showBanScreen(); return true;
-            }
-        }
         return false;
     };
 
@@ -277,10 +282,16 @@
     window.deleteMsg = async (id) => { if(confirm("Are you sure you want to delete this post?")) await deleteDoc(doc(db, "messages", id)); };
     
     window.banUser = async (un) => {
-        if(!confirm(`Seal @${un} forever? This user will never be able to register again from this device.`)) return;
-        // Veritabanına banla
+        if(!confirm(`Seal @${un} forever?`)) return;
         await setDoc(doc(db, "bannedUsers", un.toLowerCase()), { ts: serverTimestamp() });
         showToast(`User ${un} has been sealed.`);
+    };
+
+    // BAN KALDIRMA FONKSİYONU
+    window.unbanUser = async (un) => {
+        if(!confirm(`Unseal @${un}? They will be able to access the site again.`)) return;
+        await deleteDoc(doc(db, "bannedUsers", un.toLowerCase()));
+        showToast(`User ${un} unsealed!`);
     };
 
     window.openDiscuss = async (id) => {
@@ -378,14 +389,10 @@
 
     // --- EVENTS ---
     document.getElementById('auth-btn').onclick = async () => {
-        // HERŞEYDEN ÖNCE BAN KONTROLÜ
-        if (await checkBanStatus()) return;
-
         const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
         if(!n || !p) return;
         
-        // Kullanıcı adı özelinde ban kontrolü
-        if(await checkBanStatus(n)) return;
+        if (await checkBanStatus(n)) return;
 
         try { 
             await signInWithEmailAndPassword(auth, n+"@nappag.com", p); 
@@ -485,7 +492,6 @@
 
     // --- AUTH OBSERVER ---
     onAuthStateChanged(auth, async u => {
-        // Uygulama açılırken tarayıcıda mühür var mı bak
         if (await checkBanStatus(u ? u.displayName : null)) return;
 
         if (u) {
@@ -503,28 +509,30 @@
                         document.getElementById('admin-user-list').innerHTML = sn.docs.map(d => {
                             if(d.id==='admin' || d.id === 'kobicer') return '';
                             return `<div style="display:flex;justify-content:space-between;margin-bottom:5px; align-items:center; background:#fff; padding:5px; border:1px solid #000;">
-                                <span>@${d.id}</span><button class="ban-btn" onclick="banUser('${d.id}')">BAN</button></div>`;
+                                <span>@${d.id}</span>
+                                <div>
+                                    <button class="ban-btn" onclick="banUser('${d.id}')">BAN</button>
+                                    <button class="unban-btn" onclick="unbanUser('${d.id}')">UNBAN</button>
+                                </div>
+                            </div>`;
                         }).join("");
                     });
                 }
                 loadGlobal();
-                onSnapshot(collection(db, "communities"), sn => { 
-                    document.getElementById('comm-list').innerHTML = sn.docs.map(d => `<div onclick="openRoom('${d.id}')" style="cursor:pointer; padding:8px; border-bottom:1px dotted #000;"># ${d.data().name}</div>`).join(""); 
+                onSnapshot(query(collection(db, "communities"), orderBy("ts", "desc")), sn => {
+                    document.getElementById('comm-list').innerHTML = sn.docs.map(d => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="openRoom('${d.id}')"># ${d.data().name}</div>`).join("");
                 });
-                onSnapshot(doc(db, "users", u.displayName), d => { 
-                    const chats = d.data()?.activeChats || []; 
-                    document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div onclick="startDM('${c}')" style="cursor:pointer; padding:8px; border-bottom:1px dotted #ccc; background:#fff; margin-bottom:2px;">• @${c}</div>`).join(""); 
+                onSnapshot(doc(db, "users", u.displayName), s => {
+                    const chats = s.data()?.activeChats || [];
+                    document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="startDM('${c}')">Chat with @${c}</div>`).join("");
                 });
             }, 800);
         } else {
-            setTimeout(() => {
-                document.getElementById('welcome-screen').style.display = 'none';
-                document.getElementById('auth-pg').classList.remove('hidden');
-            }, 1500);
+            document.getElementById('auth-pg').classList.remove('hidden');
+            document.getElementById('main-pg').classList.add('hidden');
+            document.getElementById('welcome-screen').style.display = 'none';
         }
     });
-
 </script>
-
 </body>
 </html>
