@@ -3,215 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eksiksiz Kutsal Kitaplar Kütüphanesi</title>
+    <title>Kutsal Kitaplar Dijital Kütüphanesi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        :root {
+            --bg-color: #0f141c;
+            --book-bg: #fcfaf2; /* Gerçek parşömen/kağıt rengi */
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+            font-family: 'Lora', serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f2f5;
+            background: radial-gradient(circle, #1e2736 0%, var(--bg-color) 100%);
             color: #333;
-        }
-
-        header {
-            background-color: #1a252f;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        h1 { margin: 0; font-size: 26px; }
-
-        #translate_area {
-            margin-top: 15px;
-            padding: 5px;
-            background: #2c3e50;
-            display: inline-block;
-            border-radius: 4px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .book-nav {
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Üst Menü ve Çeviri Alanı */
+        header {
+            background: rgba(15, 20, 28, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: #dfb76c; /* Altın sarısı tonu */
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 2px;
+        }
+
+        #translate_wrapper {
+            background: #1e2736;
+            border: 1px solid #dfb76c;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        /* Ana Alan ve Kitap Seçimi */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
             gap: 15px;
             margin-bottom: 25px;
+            z-index: 10;
         }
 
-        .nav-btn {
+        .tab-btn {
+            font-family: 'Cinzel', serif;
             padding: 12px 25px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
             cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            transition: all 0.3s;
-            color: white;
+            border-radius: 30px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        #btn-torah { background-color: #d35400; }
-        #btn-bible { background-color: #2980b9; }
-        #btn-quran { background-color: #27ae60; }
-
-        .nav-btn:hover { opacity: 0.8; transform: translateY(-2px); }
-
-        .book-content {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            min-height: 400px;
+        .tab-btn:hover, .tab-btn.active {
+            background: #dfb76c;
+            color: #0f141c;
+            border-color: #dfb76c;
+            box-shadow: 0 6px 15px rgba(223, 183, 108, 0.4);
+            transform: translateY(-2px);
         }
 
-        .controls {
-            margin-bottom: 20px;
+        /* Gelişmiş 3D Kitap Görünümü ve Sayfa Çevirme Simülasyonu */
+        .book-wrapper {
+            perspective: 1500px;
+            width: 90%;
+            max-width: 950px;
+            height: 600px;
+            position: relative;
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
             display: flex;
-            gap: 10px;
+            background: var(--book-bg);
+            border-radius: 4px 15px 15px 4px;
+            box-shadow: 0 30px 60px var(--shadow-color), 
+                        inset 5px 0 20px rgba(0,0,0,0.1),
+                        inset -5px 0 20px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Kitabın Ortasındaki Cilt Gölgesi */
+        .book::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.15) 100%);
+            transform: translateX(-50%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Sol ve Sağ Sayfalar */
+        .page {
+            width: 50%;
+            height: 100%;
+            padding: 40px 50px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+            transition: transform 0.6s ease-in-out, opacity 0.4s;
+        }
+
+        .page-left {
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Sayfa Geçiş Animasyon Sınıfları */
+        .page-turn-anim {
+            animation: flipPage 0.7s forwards ease-in-out;
+        }
+
+        @keyframes flipPage {
+            0% { opacity: 0.5; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Kitap İçi Yazı Tasarımları */
+        .book-title {
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px double #dfb76c;
+            padding-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .chapter-controls {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-        }
-
-        select, input {
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .verse-container {
-            margin-top: 20px;
-            font-size: 18px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .verse-line {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.03);
             padding: 10px;
-            background: #f9f9f9;
-            border-radius: 4px;
+            border-radius: 6px;
         }
-        
-        .loading { font-style: italic; color: #7f8c8d; }
+
+        select {
+            padding: 8px 15px;
+            font-family: 'Lora', serif;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .verse-text {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #2c3e50;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        .verse-num {
+            font-weight: bold;
+            color: #b3862b;
+            margin-right: 5px;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Sayfa Çevirme Butonları */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(223, 183, 108, 0.2);
+            border: 1px solid #dfb76c;
+            color: #dfb76c;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+            z-index: 20;
+        }
+
+        .nav-arrow:hover {
+            background: #dfb76c;
+            color: #0f141c;
+            box-shadow: 0 0 15px #dfb76c;
+        }
+
+        .arrow-left { left: -70px; }
+        .arrow-right { right: -70px; }
+
+        /* Kaydırma Çubuğu Özelleştirme */
+        .page::-webkit-scrollbar { width: 4px; }
+        .page::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Kutsal Kitaplar Evrensel Kütüphanesi</h1>
-        <div id="translate_area">
+        <h1><i class="fa-solid fa-book-open"></i> VERITAS</h1>
+        <div id="translate_wrapper">
             <div id="google_translate_element"></div>
         </div>
     </header>
 
-    <div class="container">
-        <div class="book-nav">
-            <button id="btn-torah" class="nav-btn" onclick="loadBook('torah')">Tevrat (Eski Ahit)</button>
-            <button id="btn-bible" class="nav-btn" onclick="loadBook('bible')">İncil (Yeni Ahit)</button>
-            <button id="btn-quran" class="nav-btn" onclick="loadBook('quran')">Kur'an-ı Kerim</button>
+    <div class="main-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchBook('torah', this)">TEVRAT (GENESIS)</button>
+            <button class="tab-btn" onclick="switchBook('bible', this)">İNCİL (MATTHEW)</button>
+            <button class="tab-btn" onclick="switchBook('quran', this)">KUR'AN-I KERİM</button>
         </div>
 
-        <div class="book-content">
-            <h2 id="library-title">Lütfen okumak istediğiniz kitabı seçin</h2>
+        <div class="book-wrapper">
+            <button class="nav-arrow arrow-left" onclick="changeChapter(-1)"><i class="fa-solid fa-chevron-left"></i></button>
             
-            <div id="selector-area" class="controls" style="display: none;">
-                <label id="select-label-1" for="select-1">Bölüm/Sure:</label>
-                <select id="select-1" onchange="fetchVerses()"></select>
+            <div class="book" id="book-canvas">
+                <div class="page page-left">
+                    <h2 class="book-title" id="left-title">Tevrat</h2>
+                    <div class="chapter-controls">
+                        <span>Bölüm / Sure Seçimi:</span>
+                        <select id="chapter-select" onchange="loadChapterData()"></select>
+                    </div>
+                    <div style="text-align: center; margin-top: 40px; opacity: 0.6;">
+                        <i class="fa-solid fa-scroll fa-4x" style="color: #b3862b; margin-bottom: 20px;"></i>
+                        <p>Evrensel Metin Çevirisi ve Akıllı İsim Algılama Sistemi Aktif.</p>
+                    </div>
+                </div>
+
+                <div class="page page-right" id="right-page-content">
+                    </div>
             </div>
 
-            <div id="output" class="verse-container">
-                <p>Yukarıdaki butonları kullanarak kitaplar arasında geçiş yapabilir, sağ üstteki menüden tüm sistemi istediğiniz dile çevirebilirsiniz.</p>
-            </div>
+            <button class="nav-arrow arrow-right" onclick="changeChapter(1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
     </div>
 
     <script>
-        let currentBook = '';
-
-        // Kitapların API yapılandırmaları ve bölümleri
-        const config = {
-            quran: {
-                title: "Kur'an-ı Kerim",
-                chapters: 114, // 114 Sure
-                label: "Sure Seçin:",
-                url: (id) => `https://api.alquran.cloud/v1/surah/${id}/tr.diyanet`
-            },
-            bible: {
-                title: "İncil (Yeni Ahit - Matta)",
-                chapters: 28, // Matta Bölümleri Örneği (API sınırları için kararlı sürüm)
-                label: "Bölüm Seçin:",
-                url: (id) => `https://bible-api.com/matthew+${id}?translation=almeida` // Evrensel altyapı
-            },
-            torah: {
-                title: "Tevrat (Yaratılış / Genesis)",
-                chapters: 50, // Yaratılış Bölümü
-                label: "Bab/Bölüm Seçin:",
-                url: (id) => `https://bible-api.com/genesis+${id}`
-            }
+        let currentBook = 'torah';
+        
+        const booksConfig = {
+            torah: { title: "Tevrat (Yaratılış)", chapters: 50, url: (id) => `https://bible-api.com/genesis+${id}` },
+            bible: { title: "İncil (Matta)", chapters: 28, url: (id) => `https://bible-api.com/matthew+${id}?translation=almeida` },
+            quran: { title: "Kur'an-ı Kerim", chapters: 114, url: (id) => `https://api.alquran.cloud/v1/surah/${id}/tr.diyanet` }
         };
 
-        function loadBook(bookKey) {
+        // Kitap Değiştirme Fonksiyonu
+        function switchBook(bookKey, element) {
             currentBook = bookKey;
-            const book = config[bookKey];
             
-            document.getElementById('library-title').innerText = book.title;
-            document.getElementById('select-label-1').innerText = book.label;
-            
-            const select = document.getElementById('select-1');
+            // Aktif buton görselini güncelle
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Sol sayfa başlığını değiştir
+            document.getElementById('left-title').innerText = booksConfig[bookKey].title;
+
+            // Seçim menüsünü doldur
+            const select = document.getElementById('chapter-select');
             select.innerHTML = '';
-            
-            // Bölüm listesini doldur
-            for(let i = 1; i <= book.chapters; i++) {
-                let option = document.createElement('option');
-                option.value = i;
-                option.text = `${bookKey === 'quran' ? i + '. Sure' : i + '. Bölüm'}`;
-                select.appendChild(option);
+            for(let i = 1; i <= booksConfig[bookKey].chapters; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.text = bookKey === 'quran' ? `${i}. Sure` : `${i}. Bölüm / Bab`;
+                select.appendChild(opt);
             }
-            
-            document.getElementById('selector-area').style.display = 'flex';
-            fetchVerses();
+
+            triggerPageFlipAnim();
+            loadChapterData();
         }
 
-        async function fetchVerses() {
-            const id = document.getElementById('select-1').value;
-            const output = document.getElementById('output');
-            output.innerHTML = '<p class="loading">Kitap verileri yükleniyor, lütfen bekleyin...</p>';
+        // Sayfa Çevrilme Hissini Veren Animasyon Tetikleyici
+        function triggerPageFlipAnim() {
+            const rightPage = document.getElementById('right-page-content');
+            rightPage.classList.remove('page-turn-anim');
+            void rightPage.offsetWidth; // DOM'u resetlemek için ufak hile
+            rightPage.classList.add('page-turn-anim');
+        }
+
+        // Bölüm Değiştirme Okları
+        function changeChapter(direction) {
+            const select = document.getElementById('chapter-select');
+            let newIndex = select.selectedIndex + direction;
+            if(newIndex >= 0 && newIndex < select.options.length) {
+                select.selectedIndex = newIndex;
+                triggerPageFlipAnim();
+                loadChapterData();
+            }
+        }
+
+        // API'den Veri Çekme ve Sayfaya Yazma
+        async function loadChapterData() {
+            const select = document.getElementById('chapter-select');
+            const chapterId = select.value || 1;
+            const rightPage = document.getElementById('right-page-content');
             
+            rightPage.innerHTML = `<p style="text-align:center; margin-top:50%; font-style:italic; color:#7f8c8d;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Sayfa Çevriliyor...</p>`;
+
             try {
-                const response = await fetch(config[currentBook].url(id));
+                const response = await fetch(booksConfig[currentBook].url(chapterId));
                 const data = await response.json();
-                output.innerHTML = ''; // Yükleniyor yazısını kaldır
-                
+                rightPage.innerHTML = '';
+
                 if (currentBook === 'quran') {
-                    // Kur'an API yapısı işleme
                     data.data.ayahs.forEach(ayah => {
-                        output.innerHTML += `<div class="verse-line"><b>${ayah.numberInSurah}.</b> ${ayah.text}</div>`;
+                        rightPage.innerHTML += `<div class="verse-text"><span class="verse-num">[${ayah.numberInSurah}]</span> ${ayah.text}</div>`;
                     });
                 } else {
-                    // Tevrat ve İncil API yapısı işleme
                     data.verses.forEach(verse => {
-                        output.innerHTML += `<div class="verse-line"><b>${verse.verse}.</b> ${verse.text}</div>`;
+                        rightPage.innerHTML += `<div class="verse-text"><span class="verse-num">[${verse.verse}]</span> ${verse.text}</div>`;
                     });
                 }
             } catch (error) {
-                output.innerHTML = '<p style="color:red;">Veri yüklenirken bir hata oluştu. Lütfen internet bağlantınızı kontrol edin.</p>';
+                rightPage.innerHTML = `<p style="color:red; text-align:center; margin-top:50%;">Sayfa yüklenemedi. Lütfen internetinizi kontrol edin.</p>`;
             }
         }
+
+        // Sayfa ilk açıldığında Tevrat'ı yükle
+        window.onload = () => {
+            switchBook('torah', document.querySelectorAll('.tab-btn')[0]);
+        };
     </script>
 
     <script type="text/javascript">
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
-                pageLanguage: 'tr', 
+                pageLanguage: 'tr',
                 layout: google.translate.TranslateElement.InlineLayout.SIMPLE
             }, 'google_translate_element');
         }
