@@ -1,525 +1,402 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kutsal Kitaplar Dijital Kütüphanesi</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Lora:ital,wght@0,500;0,700;1,400&family=Amiri:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <title>Tek Dosya Anlık Sohbet Uygulaması</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Genel Arayüz ve Temel Yapı */
-        :root {
-            --panel-bg: #29241d;
-            --panel-accent: #dfb76c;
-            --text-gold: #b3862b;
-            --page-bg: #f5edd6; /* Gerçekçi eski parşömen rengi */
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: #14110e;
-            font-family: 'Lora', serif;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            color: #fff;
-        }
-
-        /* SOL KONTROL PANELİ (Diyanet Tasarımı) */
-        .sidebar {
-            width: 260px;
-            background: var(--panel-bg);
-            border-right: 2px solid #3d352b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 10px;
-            box-shadow: 5px 0 25px rgba(0,0,0,0.7);
-            z-index: 10;
-        }
-
-        .logo-area {
-            font-family: 'Cinzel', serif;
-            color: var(--panel-accent);
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            border-bottom: 1px solid #3d352b;
-            width: 100%;
-            text-align: center;
-            padding-bottom: 15px;
-        }
-
-        /* Ses ve Oynatma Dairesi */
-        .audio-player-circle {
-            width: 110px;
-            height: 110px;
-            border: 4px solid var(--panel-accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin-bottom: 15px;
-            box-shadow: 0 0 15px rgba(223,183,108,0.3), inset 0 0 15px rgba(0,0,0,0.5);
-            background: #1f1a15;
-        }
-
-        .player-btn {
-            background: none;
-            border: none;
-            color: var(--panel-accent);
-            font-size: 35px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .player-btn:hover { transform: scale(1.1); }
-
-        .player-controls-mini {
-            display: flex;
-            gap: 15px;
-            color: #8c7e6c;
-            margin-bottom: 25px;
-            font-size: 16px;
-        }
-        .player-controls-mini i { cursor: pointer; transition: color 0.2s; }
-        .player-controls-mini i:hover { color: var(--panel-accent); }
-
-        /* Menü Linkleri */
-        .sidebar-menu {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: #c4b9a9;
-            text-decoration: none;
-            font-size: 14px;
-            border-radius: 4px;
-            transition: all 0.3s;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-
-        .menu-item i { width: 20px; text-align: center; color: var(--panel-accent); }
-        .menu-item:hover, .menu-item.active {
-            background: #383127;
-            color: #fff;
-            border-left-color: var(--panel-accent);
-        }
-
-        /* SAĞ ANA ALAN */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* ÜST BAR VE NAVİGASYON */
-        header {
-            height: 60px;
-            background: #211c17;
-            border-bottom: 1px solid #3d352b;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 5;
-        }
-
-        .book-selector-tabs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .book-tab {
-            background: #2d261e;
-            border: 1px solid #4a3f31;
-            color: #c4b9a9;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-
-        .book-tab.active, .book-tab:hover {
-            background: var(--panel-accent);
-            color: #000;
-            border-color: var(--panel-accent);
-            font-weight: bold;
-        }
-
-        .top-dropdowns {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        select {
-            background: #2d261e;
-            color: #fff;
-            border: 1px solid #4a3f31;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        /* GERÇEKÇİ KİTAP ALANI VE ÇİFT SAYFA */
-        .workspace {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            background: radial-gradient(circle, #241f19 0%, #110e0c 100%);
-        }
-
-        .book-container {
-            width: 100%;
-            max-width: 1100px;
-            height: 85vh;
-            max-height: 680px;
-            display: flex;
-            background: var(--page-bg);
-            border-radius: 4px 15px 15px 4px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 
-                        inset 10px 0 30px rgba(0,0,0,0.15);
-            position: relative;
-            color: #2c251e;
-        }
-
-        /* Kitabın Ortasındaki Derin Cilt Gölgesi */
-        .book-spine {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            width: 40px;
-            height: 100%;
-            background: linear-gradient(to right, 
-                rgba(0,0,0,0.2) 0%, 
-                rgba(0,0,0,0.4) 40%, 
-                rgba(0,0,0,0.6) 50%, 
-                rgba(0,0,0,0.4) 60%, 
-                rgba(0,0,0,0.2) 100%);
-            transform: translateX(-50%);
-            z-index: 5;
-        }
-
-        /* Sayfalar */
-        .book-page {
-            width: 50%;
-            height: 100%;
-            padding: 35px 45px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .book-page-left {
-            border-right: 1px solid rgba(0,0,0,0.08);
-        }
-
-        /* DİYANET SÜSLEMELİ TEZHİP BAŞLIĞI */
-        .tezhip-header {
-            border: 4px double var(--text-gold);
-            background: #1e3d59; /* İslami/Klasik mavi tonlu motif arka planı */
-            color: #fff;
-            text-align: center;
-            padding: 12px;
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 10px rgba(255,255,255,0.1);
-            position: relative;
-            border-radius: 2px;
-        }
-
-        /* Çerçeve Süsleme Detayları (Görseldeki Gibi Kenarlık Efekti) */
-        .tezhip-header::before, .tezhip-header::after {
-            content: '✦';
-            color: var(--panel-accent);
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .tezhip-header::before { left: 15px; }
-        .tezhip-header::after { right: 15px; }
-
-        /* Yazı Alanları */
-        .page-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #7a6e5d;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .verse-content {
-            font-size: 17px;
-            line-height: 1.9;
-            text-align: justify;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        /* Arapça Metin Stili */
-        .arabic-text {
-            font-family: 'Amiri', serif;
-            font-size: 26px;
-            direction: rtl;
-            line-height: 2.2;
-            text-align: right;
-        }
-
-        /* Ayet Sonu Numarası (Diyanet Tarzı Yuvarlak İkon) */
-        .verse-number-badge {
-            display: inline-block;
-            width: 26px;
-            height: 26px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23b3862b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>') no-repeat center;
-            background-size: contain;
-            text-align: center;
-            line-height: 26px;
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--text-gold);
-            margin: 0 5px;
-            font-family: 'Cinzel', serif;
-        }
-
-        /* Sayfa Çevirme Okları */
-        .page-nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(41, 36, 29, 0.9);
-            border: 1px solid var(--panel-accent);
-            color: var(--panel-accent);
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: all 0.2s;
-            z-index: 10;
-        }
-        .page-nav-arrow:hover { background: var(--panel-accent); color: #000; }
-        .arrow-prev { left: -22px; }
-        .arrow-next { right: -22px; }
-
-        /* Kaydırma Çubuğu Estetiği */
-        .book-page::-webkit-scrollbar { width: 4px; }
-        .book-page::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
-
-        /* Sayfa Çevirme Animasyonu Sınıfı */
-        .flip-active { animation: pageFlipSim 0.5s ease-in-out; }
-        @keyframes pageFlipSim {
-            0% { opacity: 0.6; transform: scale(0.99); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        /* Özelleştirilmiş kaydırma çubuğu */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #818cf8; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 h-screen flex items-center justify-center font-sans antialiased">
 
-    <div class="sidebar">
-        <div class="logo-area">KUTSAL KÜTÜPHANE</div>
+    <div id="auth-screen" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-gray-100 mx-4">
+        <h2 class="text-3xl font-extrabold mb-2 text-center text-indigo-600 tracking-tight">Sohbet Odası</h2>
+        <p class="text-sm text-gray-500 text-center mb-6">Hesabınızla giriş yapın veya yeni hesap açın.</p>
         
-        <div class="audio-player-circle">
-            <button class="player-btn"><i class="fa-solid fa-play"></i></button>
-        </div>
-        <div class="player-controls-mini">
-            <i class="fa-solid fa-volume-high"></i>
-            <i class="fa-solid fa-list-ul"></i>
-            <i class="fa-solid fa-user"></i>
-        </div>
-
-        <div class="sidebar-menu">
-            <div class="menu-item active"><i class="fa-solid fa-book-open"></i> <span>Ana Sayfa</span></div>
-            <div class="menu-item"><i class="fa-solid fa-magnifying-glass"></i> <span>Arama</span></div>
-            <div class="menu-item"><i class="fa-solid fa-layer-group"></i> <span>Tefsir / Açıklama</span></div>
-            <div class="menu-item"><i class="fa-solid fa-book"></i> <span>Fihrist</span></div>
-            <div class="menu-item"><i class="fa-solid fa-language"></i> <span>Dil Çevirisi Altı</span></div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
+                <input id="auth-username" type="text" placeholder="örn: ahmet123" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Şifre</label>
+                <input id="auth-password" type="password" placeholder="••••••••" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition">
+            </div>
             
-            <div id="google_translate_element" style="margin-top: 15px; padding: 5px;"></div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="login()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 active:scale-95 transition shadow-lg shadow-indigo-100">Giriş Yap</button>
+                <button onclick="register()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 active:scale-95 transition">Kayıt Ol</button>
+            </div>
         </div>
     </div>
 
-    <div class="main-content">
-        <header>
-            <div class="book-selector-tabs">
-                <button class="book-tab active" onclick="changeBook('quran', this)">KUR'AN-I KERİM</button>
-                <button class="book-tab" onclick="changeBook('bible', this)">İNCİL (MATTA)</button>
-                <button class="book-tab" onclick="changeBook('torah', this)">TEVRAT (GENESIS)</button>
+    <div id="app-screen" class="hidden w-full h-full max-w-6xl bg-white shadow-2xl flex flex-col md:flex-row rounded-none md:rounded-2xl md:h-[85vh] overflow-hidden border border-gray-100 mx-4">
+        
+        <div class="w-full md:w-80 border-r border-gray-100 flex flex-col bg-slate-50/50">
+            <div class="p-4 bg-indigo-600 text-white flex flex-col justify-between shadow-md">
+                <div class="flex items-center justify-between mb-1">
+                    <span id="my-name" class="font-bold text-xl tracking-tight">Kullanıcı</span>
+                    <button onclick="toggleProfileModal()" class="text-xs bg-indigo-500/50 hover:bg-indigo-500 px-3 py-1.5 rounded-lg font-medium transition">Profili Düzenle</button>
+                </div>
+                <p id="my-bio" class="text-xs text-indigo-100 italic truncate">Açıklama girilmemiş...</p>
             </div>
 
-            <div class="top-dropdowns">
-                <select id="chapter-select" onchange="loadBookContent()"></select>
+            <div class="p-3 border-b border-gray-100 bg-white">
+                <div class="relative">
+                    <input id="search-input" oninput="searchUsers()" type="text" placeholder="İsim ile kullanıcı ara..." class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition">
+                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">🔍</span>
+                </div>
             </div>
-        </header>
 
-        <div class="workspace">
-            <div class="book-container" id="book-frame">
-                <button class="page-nav-arrow arrow-prev" onclick="navigateChapter(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="book-spine"></div>
-                
-                <div class="book-page book-page-left">
-                    <div class="page-meta">
-                        <span id="left-meta-title">Fâtiha Sûresi</span>
-                        <span>Cüz 1</span>
-                    </div>
-                    <div class="tezhip-header" id="left-tezhip-title">Fâtiha Sûresi</div>
-                    <div class="verse-content" id="left-page-text">
-                        </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-4">
+                <div id="search-section" class="hidden">
+                    <h3 class="text-xs font-bold text-indigo-500 uppercase tracking-wider px-1 mb-2">Arama Sonuçları</h3>
+                    <div id="search-list" class="space-y-1.5"></div>
                 </div>
 
-                <div class="book-page">
-                    <div class="page-meta">
-                        <span id="right-meta-title">سُورةُ الفَاتِحَة</span>
-                        <span>1. Sayfa</span>
-                    </div>
-                    <div class="tezhip-header" id="right-tezhip-title">سُورةُ الفَاتِحَة</div>
-                    <div class="verse-content" id="right-page-text">
-                        </div>
+                <div>
+                    <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider px-1 mb-2">Gelen Sohbet İstekleri</h3>
+                    <div id="requests-list" class="space-y-1.5"></div>
                 </div>
 
-                <button class="page-nav-arrow arrow-next" onclick="navigateChapter(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider px-1 mb-2">Sohbetlerim</h3>
+                    <div id="friends-list" class="space-y-1"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col justify-between bg-white min-w-0">
+            <div id="chat-header" class="p-4 border-b border-gray-100 font-semibold text-gray-700 bg-slate-50/50 flex items-center gap-2">
+                💬 Sohbet etmek için soldan birini seçin veya aratın.
+            </div>
+            
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/30">
+                <div class="text-center text-gray-400 text-sm mt-10">Henüz bir sohbet seçilmedi.</div>
+            </div>
+            
+            <div id="chat-input-area" class="p-3 border-t border-gray-100 flex gap-2 hidden bg-white">
+                <input id="message-input" type="text" placeholder="Mesajınızı buraya yazın..." onkeypress="handleKeyPress(event)" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition">
+                <button onclick="sendMessage()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 active:scale-95 transition">Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl border border-gray-50 mx-4">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Profili Düzenle</h3>
+            
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Yeni Kullanıcı Adı</label>
+                    <input id="edit-username" type="text" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Durum Açıklaması (Bio)</label>
+                    <input id="edit-bio" type="text" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
+                    <input id="edit-password" type="password" placeholder="••••••••" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="saveProfile()" class="flex-1 bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-700 transition">Değişiklikleri Kaydet</button>
+                <button onclick="toggleProfileModal()" class="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-medium hover:bg-gray-200 transition">İptal</button>
             </div>
         </div>
     </div>
 
     <script>
-        let activeBook = 'quran';
+        // LocalStorage'dan kullanıcıları yükle veya boş bir veritabanı oluştur
+        let dbUsers = JSON.parse(localStorage.getItem('chat_users')) || {};
+        let currentUser = null;
+        let activeChatFriend = null;
 
-        const apiRoutes = {
-            quran: { title: "Kur'an-ı Kerim", rightTitle: "سُورةُ الفَاتِحَة", chapters: 114, url: (id) => `https://api.alquran.cloud/v1/surah/${id}/editions/tr.diyanet,ar.alafasy` },
-            bible: { title: "İncil (Matta)", rightTitle: "The Holy Bible", chapters: 28, url: (id) => `https://bible-api.com/matthew+${id}` },
-            torah: { title: "Tevrat (Yaratılış)", rightTitle: "Torah (Genesis)", chapters: 50, url: (id) => `https://bible-api.com/genesis+${id}` }
-        };
+        // --- VERİTABANI YARDIMCILARI ---
+        function saveDB() {
+            localStorage.setItem('chat_users', JSON.stringify(dbUsers));
+        }
 
-        function changeBook(bookKey, element) {
-            activeBook = bookKey;
-            document.querySelectorAll('.book-tab').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
+        // --- GİRİŞ & KAYIT SİSTEMİ ---
+        function register() {
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
 
-            const select = document.getElementById('chapter-select');
-            select.innerHTML = '';
-            for(let i = 1; i <= apiRoutes[bookKey].chapters; i++) {
-                let opt = document.createElement('option');
-                opt.value = i;
-                opt.text = bookKey === 'quran' ? `${i}. Sure` : `${i}. Bölüm / Bab`;
-                select.appendChild(opt);
+            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
+            if (dbUsers[username]) return alert('Bu kullanıcı adı zaten alınmış.');
+
+            dbUsers[username] = {
+                username: username,
+                password: password, // Eğitim amaçlı düz metin (Normalde şifrelenmeli)
+                bio: 'Hey! Ben de buradayım.',
+                friends: [],
+                pendingRequests: [],
+                messages: {} // { 'arkadasAdi': [{from: '...', to: '...', text: '...'}] }
+            };
+            
+            saveDB();
+            alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+        }
+
+        function login() {
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            const user = dbUsers[username];
+            if (!user || user.password !== password) {
+                return alert('Hatalı kullanıcı adı veya şifre!');
             }
-            loadBookContent();
+
+            currentUser = user;
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            
+            renderApp();
+            // Otomatik veri yenileme simülasyonu (Anlık mesaj/istek kontrolü için)
+            setInterval(syncData, 1000);
         }
 
-        function triggerFlipAnimation() {
-            const frame = document.getElementById('book-frame');
-            frame.classList.remove('flip-active');
-            void frame.offsetWidth;
-            frame.classList.add('flip-active');
+        // Arka planda verileri sürekli güncel tutan fonksiyon (Soket yerine simülasyon)
+        function syncData() {
+            if (!currentUser) return;
+            dbUsers = JSON.parse(localStorage.getItem('chat_users')) || {};
+            currentUser = dbUsers[currentUser.username];
+            renderLists();
+            renderMessages();
         }
 
-        function navigateChapter(direction) {
-            const select = document.getElementById('chapter-select');
-            let targetIndex = select.selectedIndex + direction;
-            if (targetIndex >= 0 && targetIndex < select.options.length) {
-                select.selectedIndex = targetIndex;
-                loadBookContent();
+        // --- ARAYÜZ YENİLEME MANTIĞI ---
+        function renderApp() {
+            document.getElementById('my-name').innerText = currentUser.username;
+            document.getElementById('my-bio').innerText = currentUser.bio;
+            renderLists();
+        }
+
+        function renderLists() {
+            // 1. Gelen Sohbet İsteklerini Listele
+            const reqList = document.getElementById('requests-list');
+            reqList.innerHTML = '';
+            if (currentUser.pendingRequests.length === 0) {
+                reqList.innerHTML = '<p class="text-xs text-gray-400 italic px-1">Gelen istek yok.</p>';
+            }
+            currentUser.pendingRequests.forEach(sender => {
+                reqList.innerHTML += `
+                    <div class="flex justify-between items-center bg-amber-50 border border-amber-100 p-2 rounded-xl text-xs">
+                        <span class="text-gray-700"><b>${sender}</b></span>
+                        <button onclick="acceptRequest('${sender}')" class="bg-emerald-600 text-white px-2 py-1 rounded-lg font-medium hover:bg-emerald-700 transition">Kabul Et</button>
+                    </div>`;
+            });
+
+            // 2. Sohbet Edilebilecek Arkadaşları Listele
+            const friendsList = document.getElementById('friends-list');
+            friendsList.innerHTML = '';
+            if (currentUser.friends.length === 0) {
+                friendsList.innerHTML = '<p class="text-xs text-gray-400 italic px-1">Henüz arkadaşınız yok. Yukarıdan birini aratın.</p>';
+            }
+            currentUser.friends.forEach(friend => {
+                const isSelected = activeChatFriend === friend;
+                friendsList.innerHTML += `
+                    <div onclick="startChat('${friend}')" class="p-2.5 rounded-xl cursor-pointer transition flex justify-between items-center ${isSelected ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'hover:bg-gray-200/60 text-gray-700'}">
+                        <div>
+                            <div class="font-semibold text-sm">${friend}</div>
+                            <div class="text-[11px] opacity-70 truncate max-w-[150px]">${dbUsers[friend]?.bio || ''}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // --- KULLANICI ARAMA ---
+        function searchUsers() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const searchSection = document.getElementById('search-section');
+            const searchList = document.getElementById('search-list');
+
+            if (!query) {
+                searchSection.classList.add('hidden');
+                return;
+            }
+
+            searchSection.classList.remove('hidden');
+            searchList.innerHTML = '';
+
+            // Kendimiz dışındaki tüm kayıtlı kullanıcıları filtrele
+            const filtered = Object.keys(dbUsers).filter(name => name.toLowerCase().includes(query) && name !== currentUser.username);
+
+            if (filtered.length === 0) {
+                searchList.innerHTML = '<p class="text-xs text-gray-400 italic p-1">Kullanıcı bulunamadı.</p>';
+                return;
+            }
+
+            filtered.forEach(name => {
+                const targetUser = dbUsers[name];
+                const isFriend = currentUser.friends.includes(name);
+                const amIPending = targetUser.pendingRequests.includes(currentUser.username);
+                const isHePending = currentUser.pendingRequests.includes(name);
+
+                let actionBtn = `<button onclick="sendRequest('${name}')" class="bg-indigo-600 text-white px-2 py-1 rounded-lg text-xs font-medium hover:bg-indigo-700 transition">İstek At</button>`;
+                
+                if (isFriend) actionBtn = `<span class="text-xs text-emerald-600 font-bold">✓ Arkadaş</span>`;
+                else if (amIPending) actionBtn = `<span class="text-xs text-gray-400 italic">Beklemede</span>`;
+                else if (isHePending) actionBtn = `<span class="text-xs text-amber-600 font-medium">Sana istek atmış</span>`;
+
+                searchList.innerHTML += `
+                    <div class="flex justify-between items-center p-2 bg-white border border-gray-100 rounded-xl shadow-sm text-xs">
+                        <div class="min-w-0 pr-2">
+                            <div class="font-bold text-gray-800 truncate">${name}</div>
+                            <div class="text-[10px] text-gray-400 truncate">${targetUser.bio}</div>
+                        </div>
+                        ${actionBtn}
+                    </div>`;
+            });
+        }
+
+        // --- İSTEK VE BAĞLANTI İŞLEMLERİ ---
+        function sendRequest(targetName) {
+            if (!dbUsers[targetName].pendingRequests.includes(currentUser.username)) {
+                dbUsers[targetName].pendingRequests.push(currentUser.username);
+                saveDB();
+                searchUsers();
+                alert(`${targetName} kullanıcısına sohbet isteği gönderildi!`);
             }
         }
 
-        async function loadBookContent() {
-            triggerFlipAnimation();
-            const id = document.getElementById('chapter-select').value || 1;
-            const leftPage = document.getElementById('left-page-text');
-            const rightPage = document.getElementById('right-page-text');
+        function acceptRequest(senderName) {
+            // İstek listesinden çıkar
+            currentUser.pendingRequests = currentUser.pendingRequests.filter(u => u !== senderName);
+            
+            // Karşılıklı arkadaş listesine ekle
+            if (!currentUser.friends.includes(senderName)) currentUser.friends.push(senderName);
+            if (!dbUsers[senderName].friends.includes(currentUser.username)) dbUsers[senderName].friends.push(currentUser.username);
 
-            leftPage.innerHTML = `<p style="text-align:center;color:#7a6e5d;margin-top:40%"><i class="fa-solid fa-spinner fa-spin"></i> Sayfa Hazırlanıyor...</p>`;
-            rightPage.innerHTML = leftPage.innerHTML;
+            // Boş mesaj kutularını tanımla
+            if (!currentUser.messages[senderName]) currentUser.messages[senderName] = [];
+            if (!dbUsers[senderName].messages[currentUser.username]) dbUsers[senderName].messages[currentUser.username] = [];
 
-            try {
-                const response = await fetch(apiRoutes[activeBook].url(id));
-                const json = await response.json();
+            saveDB();
+            renderApp();
+        }
 
-                leftPage.innerHTML = '';
-                rightPage.innerHTML = '';
+        // --- SOHBET / MESAJLAŞMA SİSTEMİ ---
+        function startChat(friendName) {
+            activeChatFriend = friendName;
+            document.getElementById('chat-header').innerHTML = `🟢 <span class="font-bold text-gray-800">${friendName}</span> ile sohbet ediliyor`;
+            document.getElementById('chat-input-area').classList.remove('hidden');
+            renderMessages();
+            renderLists();
+        }
 
-                if (activeBook === 'quran') {
-                    const trVerses = json.data[0].ayahs;
-                    const arVerses = json.data[1].ayahs;
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text || !activeChatFriend) return;
 
-                    document.getElementById('left-meta-title').innerText = json.data[0].englishName;
-                    document.getElementById('left-tezhip-title').innerText = json.data[0].name;
-                    document.getElementById('right-meta-title').innerText = json.data[0].englishNameTranslation;
-                    document.getElementById('right-tezhip-title').innerText = json.data[0].name;
+            const msgData = { from: currentUser.username, to: activeChatFriend, text: text };
 
-                    trVerses.forEach((v, index) => {
-                        leftPage.innerHTML += `<div><b>[${v.numberInSurah}]</b> ${v.text}</div><br>`;
-                    });
+            // Mesajı her iki tarafın geçmişine de kaydet
+            if (!currentUser.messages[activeChatFriend]) currentUser.messages[activeChatFriend] = [];
+            if (!dbUsers[activeChatFriend].messages[currentUser.username]) dbUsers[activeChatFriend].messages[currentUser.username] = [];
 
-                    rightPage.classList.add('arabic-text');
-                    arVerses.forEach((v) => {
-                        rightPage.innerHTML += `${v.text} <span class="verse-number-badge">${v.numberInSurah}</span> `;
-                    });
-                } else {
-                    rightPage.classList.remove('arabic-text');
-                    document.getElementById('left-meta-title').innerText = apiRoutes[activeBook].title;
-                    document.getElementById('left-tezhip-title').innerText = `${id}. Bölüm`;
-                    document.getElementById('right-meta-title').innerText = apiRoutes[activeBook].rightTitle;
-                    document.getElementById('right-tezhip-title').innerText = `Chapter ${id}`;
+            currentUser.messages[activeChatFriend].push(msgData);
+            dbUsers[activeChatFriend].messages[currentUser.username].push(msgData);
 
-                    // Tevrat ve İncil için çift taraflı paralel okuma metni
-                    json.verses.forEach(v => {
-                        leftPage.innerHTML += `<div><b>[${v.verse}]</b> ${v.text}</div><br>`;
-                        rightPage.innerHTML += `<div><span class="verse-num">[${v.verse}]</span> ${v.text}</div><br>`;
-                    });
-                }
-            } catch (err) {
-                leftPage.innerHTML = `<p style="color:red;text-align:center;">Hata oluştu.</p>`;
-                rightPage.innerHTML = leftPage.innerHTML;
+            saveDB();
+            input.value = '';
+            renderMessages();
+        }
+
+        function renderMessages() {
+            if (!activeChatFriend) return;
+            const chatMessages = document.getElementById('chat-messages');
+            const history = currentUser.messages[activeChatFriend] || [];
+
+            if (history.length === 0) {
+                chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4">Henüz mesaj yok. İlk mesajı siz yazın!</div>';
+                return;
+            }
+
+            let html = '';
+            history.forEach(msg => {
+                const isMe = msg.from === currentUser.username;
+                html += `
+                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
+                        <div class="${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'} px-4 py-2.5 rounded-2xl max-w-xs shadow-sm text-sm break-words">
+                            ${msg.text}
+                        </div>
+                    </div>`;
+            });
+            
+            // Eğer yeni bir mesaj geldiyse aşağı kaydır
+            const oldScrollHeight = chatMessages.scrollHeight;
+            chatMessages.innerHTML = html;
+            if(chatMessages.scrollHeight > oldScrollHeight){
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
 
-        window.onload = () => {
-            changeBook('quran', document.querySelectorAll('.book-tab')[0]);
-        };
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        // --- PROFİL DÜZENLEME MODAL İŞLEMLERİ ---
+        function toggleProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('edit-username').value = currentUser.username;
+                document.getElementById('edit-bio').value = currentUser.bio;
+                document.getElementById('edit-password').value = '';
+            }
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('edit-username').value.trim();
+            const newBio = document.getElementById('edit-bio').value.trim();
+            const newPass = document.getElementById('edit-password').value.trim();
+
+            if (!newName) return alert('Kullanıcı adı boş bırakılamaz.');
+
+            // İsim değişikliği mantığı
+            if (newName !== currentUser.username) {
+                if (dbUsers[newName]) return alert('Bu kullanıcı adı başka biri tarafından kullanılıyor.');
+                
+                // Eski isim kayıtlarını güncelle
+                dbUsers[newName] = dbUsers[currentUser.username];
+                delete dbUsers[currentUser.username];
+                
+                // Arkadaş listelerindeki ismini güncelle
+                Object.keys(dbUsers).forEach(u => {
+                    dbUsers[u].friends = dbUsers[u].friends.map(f => f === currentUser.username ? newName : f);
+                    dbUsers[u].pendingRequests = dbUsers[u].pendingRequests.map(r => r === currentUser.username ? newName : r);
+                    if (dbUsers[u].messages[currentUser.username]) {
+                        dbUsers[u].messages[newName] = dbUsers[u].messages[currentUser.username];
+                        delete dbUsers[u].messages[currentUser.username];
+                        dbUsers[u].messages[newName].forEach(m => {
+                            if (m.from === currentUser.username) m.from = newName;
+                            if (m.to === currentUser.username) m.to = newName;
+                        });
+                    }
+                });
+
+                currentUser.username = newName;
+            }
+
+            if (newBio) currentUser.bio = newBio;
+            if (newPass) currentUser.password = newPass;
+
+            dbUsers[currentUser.username] = currentUser;
+            saveDB();
+            renderApp();
+            toggleProfileModal();
+            alert('Profil başarıyla güncellendi!');
+        }
     </script>
-
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'tr',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, 'google_translate_element');
-        }
-    </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
 </body>
 </html>
