@@ -2,137 +2,135 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Sıfırdan HTML Yapay Zeka</title>
+    <title>Ücretsiz Yapay Zeka Platformu</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f2f5;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #131314;
+            color: #e3e3e3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
         }
-        canvas {
-            background-color: white;
-            border: 2px solid #333;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        h1 {
+            margin-bottom: 30px;
+            font-weight: 400;
+            color: #ffffff;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
+
+        /* GEMINI BUTONU */
+        .gemini-btn {
+            background: linear-gradient(45deg, #1a73e8, #681da8); /* Gemini'nin modern geçiş renkleri */
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
             cursor: pointer;
-            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
-        button:hover { background-color: #0056b3; }
-        #info { margin-top: 10px; font-weight: bold; }
+
+        .gemini-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(104, 29, 168, 0.6);
+        }
+
+        /* Orijinal Dört Köşeli Gemini Yıldız Logosu */
+        .gemini-logo {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        /* Sohbet Penceresi */
+        #chat-window {
+            margin-top: 25px;
+            width: 90%;
+            max-width: 450px;
+            background-color: #1e1e20;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: none; /* İlk başta gizli */
+            overflow: hidden;
+            border: 1px solid #3c4043;
+        }
+
+        #chat-box {
+            height: 250px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .msg {
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 75%;
+            line-height: 1.4;
+        }
+
+        .user-msg {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .gemini-msg {
+            background-color: #303134;
+            color: #e3e3e3;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #131314;
+            border-top: 1px solid #3c4043;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #3c4043;
+            background-color: #202124;
+            color: white;
+            outline: none;
+            padding-left: 15px;
+        }
+
+        .send-btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            margin-left: 8px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Sıfırdan Yapay Zeka (Tek Hücreli Nöron)</h1>
-    <p>Yapay zeka, kırmızı çizginin <b>üstündeki</b> noktaları mavi, <b>altındaki</b> noktaları turuncu yapmayı öğreniyor.</p>
-    
-    <canvas id="canvas" width="400" height="400"></canvas>
-    <br>
-    <button onclick="egit()">100 Kez Eğit</button>
-    <div id="info">Henüz eğitilmedi.</div>
+    <h1>Yapay Zeka Platformu</h1>
 
-<script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const info = document.getElementById('info');
-
-    // Hedef fonksiyonumuz: y = x (Ekrandaki çapraz çizgi)
-    // Yapay zeka bu çizginin varlığından habersiz, sadece noktaları tahmin etmeye çalışacak.
-    function gercekCizgi(x) { return x; }
-
-    // 1. YAPAY ZEKA YAPISI (Tek bir nöron)
-    // İlk başta rastgele ağırlıklar (weights) veriyoruz
-    let w1 = Math.random() * 2 - 1;
-    let w2 = Math.random() * 2 - 1;
-    let lr = 0.1; // Öğrenme oranı (Learning Rate)
-    let egitimSayisi = 0;
-
-    // Rastgele 100 tane nokta (Veri Seti) oluşturuyoruz
-    let noktalar = [];
-    for (let i = 0; i < 100; i++) {
-        let x = Math.random() * canvas.width;
-        let y = Math.random() * canvas.height;
-        // Gerçek etiket: Çizginin üstündeyse 1, altındaysa -1
-        let dogruEtiket = y < gercekCizgi(x) ? 1 : -1;
-        noktalar.push({x: x, y: y, etiket: dogruEtiket});
-    }
-
-    // Yapay zekanın tahmin fonksiyonu (Aktivasyon Fonksiyonu)
-    function tahminEt(x, y) {
-        let toplam = x * w1 + y * w2;
-        return toplam >= 0 ? 1 : -1;
-    }
-
-    // 2. EĞİTİM FONKSİYONU (Yapay Zeka Hatalarından Öğreniyor)
-    function egit() {
-        for (let i = 0; i < 100; i++) {
-            // Rastgele bir nokta seç
-            let nokta = noktalar[Math.floor(Math.random() * noktalar.length)];
-            
-            // Yapay zekaya sor: "Sence bu noktanın yeri ne?"
-            let tahmin = tahminEt(nokta.x, nokta.y);
-            
-            // Hatayı hesapla (Gerçek değerden tahmini çıkar)
-            let hata = nokta.etiket - tahmin;
-
-            // Eğer hata varsa ağırlıkları düzelt (Geri Yayılım - Backpropagation mantığı)
-            w1 += hata * nokta.x * lr;
-            w2 += hata * nokta.y * lr;
-        }
-        egitimSayisi += 100;
-        info.innerText = `Toplam Eğitim Adımı: ${egitimSayisi}`;
-        ciz();
-    }
-
-    // 3. EKRANA ÇİZME FONKSİYONU
-    function ciz() {
-        // Ekranı temizle
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // İdeal Çizgiyi Çiz (Kırmızı)
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.stroke();
-
-        // Noktaları Çiz
-        noktalar.forEach(nokta => {
-            // Yapay zekanın o anki ağırlıklarına göre tahmini alıyoruz
-            let tahmin = tahminEt(nokta.x, nokta.y);
-
-            ctx.beginPath();
-            ctx.arc(nokta.x, nokta.y, 6, 0, 2 * Math.PI);
-            
-            // Yapay zeka 1 dediyse Maviye, -1 dediyse Turuncuya boya
-            if (tahmin === 1) {
-                ctx.fillStyle = "#007bff"; // Mavi
-            } else {
-                ctx.fillStyle = "#ffc107"; // Turuncu
-            }
-            ctx.fill();
-            
-            // Eğer yapay zeka yanlış bildiyse noktanın etrafına siyah halka koy
-            if (tahmin !== nokta.etiket) {
-                ctx.strokeStyle = "black";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-        });
-    }
-
-    // İlk çizimi yap
-    ciz();
-</script>
-
-</body>
-</html>
+    <button class="gemini-btn" onclick="sohbetiBaslat()">
+        <svg class="gemini-logo" viewBox="0 0 24 24">
+            <path d="M12 2c-.3 0-.6.2-.7.5l-2 5.3-5.3 2c-.3.1-.5.4-.5.7s.2.6.5.7l5.3 2 2 5.3c.1.3.4.5.7.5s.6-.2.7-.5l2-5.3 5.3-2c.3-.1.5-.4.5-.7s-.2-.6-.5-.7l-5.3-2-2-5.3c-.1-.3-.4-.5-.7-.5z"/>
+        </svg>
+        Gem
