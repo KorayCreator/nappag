@@ -1,538 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nappag | Global Edition</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Sıfırdan HTML Yapay Zeka</title>
     <style>
-        :root { 
-            --nappag-yellow: #FFDB5E; --bg: #F5F1E6; --maroon: #800000;
-            --border: #D9BF55; --post-bg: #F0E0D6; --name-green: #117743; --gold: #D4AF37;
-            --shadow: 4px 4px 0px #000;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f2f5;
+            padding: 20px;
         }
-        body { background: var(--bg); font-family: "Times New Roman", Times, serif; margin: 0; color: #1c1e21; overflow-x: hidden; }
-        
-        /* BAN SCREEN STYLE */
-        #ban-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #ff4444; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 100000; font-family: serif; }
-        .ban-box { border: 5px solid #ff4444; padding: 40px; box-shadow: 0 0 30px #ff4444; background: #111; }
-
-        /* NOTIFICATION SYSTEM */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; }
-        .toast { background: #000; color: #fff; padding: 12px 20px; margin-bottom: 10px; border: 2px solid var(--nappag-yellow); box-shadow: var(--shadow); font-weight: bold; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        /* ADMIN TOOLS */
-        #admin-nuke-bar { display: none; background: #000; color: #fff; text-align: center; padding: 10px; font-weight: bold; cursor: pointer; border-bottom: 3px solid var(--maroon); z-index: 5000; position: relative; }
-        .del-msg-btn { position: absolute; top: 10px; right: 40px; background: #ff4444; color: white; border: 2px solid #000; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10; }
-        .ban-btn { background: #800000; color: #fff; border: none; padding: 4px 8px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
-        .unban-btn { background: #117743; color: #fff; border: none; padding: 4px 8px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; margin-left: 5px; }
-        .ban-btn:hover { background: red; }
-
-        .nappag-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; border: 3px solid #000; padding: 5px 12px; box-shadow: var(--shadow); transition: 0.1s; }
-        .nappag-logo:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
-        .kare-surat { width: 25px; height: 25px; background: #FFDB5E; border: 2px solid #000; position: relative; box-sizing: border-box; }
-        .kare-surat::before { content: ''; position: absolute; top: 7px; left: 5px; width: 3px; height: 3px; background: #000; box-shadow: 8px 0px 0px #000; }
-        .kare-surat::after { content: ''; position: absolute; bottom: 6px; left: 5px; width: 12px; height: 2.5px; background: #000; }
-        .logo-text { font-weight: 900; font-size: 22px; color: #000; letter-spacing: -1px; }
-
-        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center; transition: opacity 0.8s ease; }
-        #welcome-text { font-size: 2.5rem; font-weight: bold; color: var(--maroon); border: 4px solid #000; padding: 20px; background: var(--nappag-yellow); box-shadow: 8px 8px 0px #000; margin: 20px; }
-
-        nav { background: var(--nappag-yellow); border-bottom: 2px solid var(--border); height: 65px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .nav-inner { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
-        .main-layout { display: flex; max-width: 1200px; margin: 0 auto; gap: 20px; padding: 15px; }
-        .side-col { width: 280px; position: sticky; top: 80px; height: fit-content; }
-        .feed-side { flex: 1; min-width: 0; }
-        .card { background: var(--post-bg); border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; box-shadow: 1px 1px 0px #fff inset; position: relative; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-2px); }
-        .post-input-card { background: var(--nappag-yellow); border: 2px solid var(--border); }
-        input, textarea, select { width: 100%; border: 1px solid var(--border); padding: 8px; box-sizing: border-box; margin-bottom: 8px; font-family: inherit; }
-        .btn-nappag { background: #eee; border: 1px solid #999; padding: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.1s; }
-        .btn-nappag:hover { background: #e0e0e0; border-color: #000; }
-        .avatar { width: 45px; height: 45px; border: 1.5px solid #000; object-fit: cover; background: #fff; cursor: pointer; }
-        .admin-seal { color: var(--maroon); background: var(--gold); padding: 2px 6px; border: 1px solid #000; font-size: 10px; font-weight: bold; margin-left: 5px; box-shadow: 1px 1px 0px #000; }
-        .cat-badge { position: absolute; top: 15px; right: 15px; font-size: 10px; border: 1px solid #000; padding: 2px 6px; background: #fff; font-weight: bold; }
-        .cat-filter-wrap { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .cat-btn { background: #fff; border: 1px solid var(--border); padding: 5px 12px; font-size: 11px; cursor: pointer; white-space: nowrap; font-weight: bold; }
-        .cat-btn.active { background: var(--maroon); color: #fff; }
-        .actions { display: flex; gap: 5px; border-top: 1px dotted #999; padding-top: 10px; margin-top: 10px; }
-        .act-btn { flex: 1; background: #eee; border: 1px solid #999; padding: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
-        .active-l { background: var(--name-green) !important; color: white; }
-        .active-d { background: var(--maroon) !important; color: white; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: none; overflow-y: auto; }
-        .hidden { display: none !important; }
-        #dm-ui { position: fixed; bottom: 0; right: 20px; width: 320px; height: 420px; background: var(--post-bg); border: 2px solid #000; z-index: 3000; display: none; flex-direction: column; box-shadow: -5px -5px 15px rgba(0,0,0,0.1); }
-        .chat-msgs { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: #fff; margin: 5px; border: 1px solid var(--border); }
-        .m-me { align-self: flex-end; background: var(--nappag-yellow); padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 8px 0px 8px 8px; text-align: right; }
-        .m-th { align-self: flex-start; background: #eee; padding: 8px; border: 1px solid #000; font-size: 13px; max-width: 80%; border-radius: 0px 8px 8px 8px; }
+        canvas {
+            background-color: white;
+            border: 2px solid #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        #info { margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="toast-container"></div>
+    <h1>Sıfırdan Yapay Zeka (Tek Hücreli Nöron)</h1>
+    <p>Yapay zeka, kırmızı çizginin <b>üstündeki</b> noktaları mavi, <b>altındaki</b> noktaları turuncu yapmayı öğreniyor.</p>
+    
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <br>
+    <button onclick="egit()">100 Kez Eğit</button>
+    <div id="info">Henüz eğitilmedi.</div>
 
-<div id="ban-overlay">
-    <div class="ban-box">
-        <h1 style="font-size:50px; margin:0;">ERİŞİM ENGELİ</h1>
-        <p style="font-size:20px; color:#fff; margin-top:20px;">Nappag topluluk kurallarını ihlal ettiğiniz için<br>bu cihaza erişim kapatılmıştır.</p>
-    </div>
-</div>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const info = document.getElementById('info');
 
-<div id="admin-nuke-bar">⚠️ GLOBAL NUKE (SIFIRLA) ⚠️</div>
+    // Hedef fonksiyonumuz: y = x (Ekrandaki çapraz çizgi)
+    // Yapay zeka bu çizginin varlığından habersiz, sadece noktaları tahmin etmeye çalışacak.
+    function gercekCizgi(x) { return x; }
 
-<div id="welcome-screen">
-    <div class="kare-surat" style="width:60px; height:60px; transform: scale(2); margin-bottom: 40px;"></div>
-    <div id="welcome-text">This site is made by Kobicer The KING!</div>
-    <p>Loading Nappag...</p>
-</div>
+    // 1. YAPAY ZEKA YAPISI (Tek bir nöron)
+    // İlk başta rastgele ağırlıklar (weights) veriyoruz
+    let w1 = Math.random() * 2 - 1;
+    let w2 = Math.random() * 2 - 1;
+    let lr = 0.1; // Öğrenme oranı (Learning Rate)
+    let egitimSayisi = 0;
 
-<div id="auth-pg" class="hidden">
-    <div style="max-width:350px; margin: 100px auto; padding: 20px;">
-        <div class="card post-input-card" style="text-align:center; border: 3px solid #000; box-shadow: 8px 8px 0px #000;">
-            <div style="display:inline-flex; align-items:center; gap:10px; margin-bottom:20px;">
-                <div class="kare-surat" style="width:40px; height:40px;"></div>
-                <h1 style="margin:0">NAPPAG</h1>
-            </div>
-            <input type="text" id="u-name" placeholder="Username">
-            <input type="password" id="u-pass" placeholder="Password">
-            <button class="btn-nappag" id="auth-btn">LOGIN / SIGN UP</button>
-        </div>
-    </div>
-</div>
+    // Rastgele 100 tane nokta (Veri Seti) oluşturuyoruz
+    let noktalar = [];
+    for (let i = 0; i < 100; i++) {
+        let x = Math.random() * canvas.width;
+        let y = Math.random() * canvas.height;
+        // Gerçek etiket: Çizginin üstündeyse 1, altındaysa -1
+        let dogruEtiket = y < gercekCizgi(x) ? 1 : -1;
+        noktalar.push({x: x, y: y, etiket: dogruEtiket});
+    }
 
-<div id="main-pg" class="hidden">
-    <nav>
-        <div class="nav-inner">
-            <div class="nappag-logo" onclick="location.reload()">
-                <div class="kare-surat"></div>
-                <div class="logo-text">NAPPAG</div>
-            </div>
-            <div id="nav-user" style="cursor:pointer; font-weight:bold;"></div>
-        </div>
-    </nav>
-    <div class="main-layout">
-        <div class="side-col">
-            <div class="card" id="admin-user-list-card" style="display:none;">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">USER CONTROL</h4>
-                <div id="admin-user-list" style="font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
-            </div>
-            <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">ROOMS</h4>
-                <div id="comm-list"></div>
-                <button class="btn-nappag" style="margin-top:10px;" id="open-create-room-btn">+ Create Room</button>
-            </div>
-            <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">MESSAGES</h4>
-                <div id="dm-list-sidebar" style="font-size: 13px;">No messages yet.</div>
-            </div>
-        </div>
-        <div class="feed-side">
-            <div class="card post-input-card">
-                <b>Share:</b>
-                <textarea id="inp" placeholder="What's happening, anon?"></textarea>
-                <div style="display:flex; gap:10px;">
-                    <select id="post-cat" style="flex:1;">
-                        <option value="General">General</option><option value="Discussion">Discussion</option>
-                        <option value="Tech">Tech</option><option value="Art">Art</option>
-                        <option value="News">News</option><option value="Gaming">Gaming</option>
-                        <option value="Question">Question</option><option value="Announcement">Announcement</option>
-                    </select>
-                    <input type="file" id="f-up" class="hidden">
-                    <label for="f-up" class="btn-nappag" style="flex:1; text-align:center;">[Image]</label>
-                </div>
-                <img id="p-img" style="width:100%; display:none; border:1px solid #000; margin:10px 0;">
-                <button class="btn-nappag" style="background:var(--maroon); color:white; border:none; margin-top:5px;" id="send-global-btn">POST</button>
-            </div>
-            <div class="cat-filter-wrap" id="cat-filters">
-                <button class="cat-btn active" data-cat="All">All</button>
-                <button class="cat-btn" data-cat="General">General</button>
-                <button class="cat-btn" data-cat="Discussion">Discussion</button>
-                <button class="cat-btn" data-cat="Tech">Tech</button>
-                <button class="cat-btn" data-cat="Art">Art</button>
-            </div>
-            <div id="posts-list"></div>
-        </div>
-        <div class="side-col">
-            <div class="card">
-                <h4 style="color:var(--maroon); border-bottom: 2px solid #000;">SEARCH USER</h4>
-                <input type="text" id="user-search-inp" placeholder="Search..."><div id="user-results"></div>
-            </div>
-        </div>
-    </div>
-</div>
+    // Yapay zekanın tahmin fonksiyonu (Aktivasyon Fonksiyonu)
+    function tahminEt(x, y) {
+        let toplam = x * w1 + y * w2;
+        return toplam >= 0 ? 1 : -1;
+    }
 
-<div id="room-pg" class="overlay">
-    <nav><div class="nav-inner"><div id="close-room-btn" style="cursor:pointer"><b>← BACK</b></div><b id="room-nav-title">ROOM</b></div></nav>
-    <div class="main-layout">
-        <div class="feed-side">
-            <div id="r-banner" class="room-banner" style="background-size:cover; height:150px; background-color:#800000;"></div>
-            <div class="card post-input-card"><textarea id="r-inp" placeholder="Write to room..."></textarea><button class="btn-nappag" id="send-room-btn">POST IN ROOM</button></div>
-            <div id="room-posts"></div>
-        </div>
-        <div class="side-col"><div class="card"><h4>MEMBERS</h4><div id="room-mems"></div></div></div>
-    </div>
-</div>
+    // 2. EĞİTİM FONKSİYONU (Yapay Zeka Hatalarından Öğreniyor)
+    function egit() {
+        for (let i = 0; i < 100; i++) {
+            // Rastgele bir nokta seç
+            let nokta = noktalar[Math.floor(Math.random() * noktalar.length)];
+            
+            // Yapay zekaya sor: "Sence bu noktanın yeri ne?"
+            let tahmin = tahminEt(nokta.x, nokta.y);
+            
+            // Hatayı hesapla (Gerçek değerden tahmini çıkar)
+            let hata = nokta.etiket - tahmin;
 
-<div id="discuss-pg" class="overlay">
-    <nav><div class="nav-inner"><div id="close-discuss-btn" style="cursor:pointer"><b>← BACK</b></div><b>DISCUSSION</b></div></nav>
-    <div id="discuss-content" style="max-width:800px; margin:20px auto;"></div>
-</div>
+            // Eğer hata varsa ağırlıkları düzelt (Geri Yayılım - Backpropagation mantığı)
+            w1 += hata * nokta.x * lr;
+            w2 += hata * nokta.y * lr;
+        }
+        egitimSayisi += 100;
+        info.innerText = `Toplam Eğitim Adımı: ${egitimSayisi}`;
+        ciz();
+    }
 
-<div id="profile-pg" class="overlay">
-    <nav><div class="nav-inner"><div id="close-profile-btn" style="cursor:pointer"><b>← BACK</b></div><b>PROFILE</b></div></nav>
-    <div style="max-width:800px; margin:20px auto; padding:20px;" class="card">
-        <div style="display:flex; align-items:center; gap:20px;">
-            <img id="p-av" class="avatar" style="width:120px; height:120px; border:2px solid #000;">
-            <div style="flex:1;"><h2 id="p-un" style="margin:0;"></h2><span id="p-adm"></span><p id="p-bi" style="font-style:italic;"></p>
-                <div style="display:flex; gap:10px;"><button id="edit-btn" class="btn-nappag" style="width:auto;">Edit Profile</button><button id="msg-btn" class="btn-nappag" style="width:auto;">Message</button></div>
-            </div>
-        </div>
-    </div>
-</div>
+    // 3. EKRANA ÇİZME FONKSİYONU
+    function ciz() {
+        // Ekranı temizle
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-<div id="edit-pg" class="overlay">
-    <nav><div class="nav-inner"><div id="close-edit-btn" style="cursor:pointer"><b>✕</b></div><b>EDIT PROFILE</b></div></nav>
-    <div style="max-width:400px; margin:40px auto; text-align:center;" class="card post-input-card">
-        <img id="ed-av-prev" class="avatar" style="width:100px; height:100px; margin-bottom:10px; border:2px solid #000;">
-        <input type="file" id="f-av-up" class="hidden">
-        <label for="f-av-up" class="btn-nappag" style="display:block; margin-bottom:10px;">[ Change Photo ]</label>
-        <textarea id="ed-bio" placeholder="Bio..."></textarea>
-        <button class="btn-nappag" id="save-profile-btn">UPDATE PROFILE</button>
-    </div>
-</div>
+        // İdeal Çizgiyi Çiz (Kırmızı)
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.stroke();
 
-<div id="dm-ui">
-    <div class="chat-header" style="background:var(--maroon); color:white; padding:10px; display:flex; justify-content:space-between;"><span id="dm-title">Chat</span><button id="close-dm-btn" style="color:#fff; background:none; border:none;">✕</button></div>
-    <div id="dm-msgs" class="chat-msgs"></div>
-    <div style="padding:10px; display:flex; gap:5px;"><input type="text" id="dm-inp" style="margin:0;"><button id="send-dm-btn" class="btn-nappag" style="width:40px;">></button></div>
-</div>
+        // Noktaları Çiz
+        noktalar.forEach(nokta => {
+            // Yapay zekanın o anki ağırlıklarına göre tahmini alıyoruz
+            let tahmin = tahminEt(nokta.x, nokta.y);
 
-<div id="create-comm-pg" class="overlay">
-    <div style="max-width:400px; margin:100px auto;" class="card post-input-card"><input type="text" id="c-n" placeholder="Room Name"><textarea id="c-d" placeholder="Description"></textarea><button class="btn-nappag" id="do-create-room">CREATE</button><button class="btn-nappag" style="margin-top:5px;" id="cancel-create-room">CANCEL</button></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, arrayUnion, arrayRemove, setDoc, getDoc, getDocs, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-    const cfg = { apiKey: "AIzaSyBc1oohhXQFNr5QsoPG1VBc5lTMGaMoyos", authDomain: "nappag-8c527.firebaseapp.com", projectId: "nappag-8c527", storageBucket: "nappag-8c527.firebasestorage.app", appId: "1:370496474734:web:172774434cb14af279207f" };
-    const app = initializeApp(cfg); const auth = getAuth(app); const db = getFirestore(app);
-    let curRoom = null, activeDM = null, activeCat = 'All';
-
-    // --- HELPER FUNCTIONS ---
-    const showToast = (msg) => {
-        const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
-        document.getElementById('toast-container').appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    };
-
-    const isAdmin = (n) => n === "admin" || n === "kobicer";
-    const getSeal = (n) => isAdmin(n) ? `<span class="admin-seal">ADMIN</span>` : '';
-
-    const showBanScreen = () => {
-        document.getElementById('ban-overlay').style.display = 'flex';
-        document.getElementById('main-pg').innerHTML = "";
-        document.getElementById('auth-pg').innerHTML = ""; 
-        document.body.style.overflow = "hidden";
-    };
-
-    const checkBanStatus = async (username) => {
-        // 1. ADIM: Veritabanındaki ban listesi kontrolü
-        if (username) {
-            const b = await getDoc(doc(db, "bannedUsers", username.toLowerCase()));
-            if (b.exists()) {
-                // Eğer veritabanında banlıysa tarayıcıyı da mühürle
-                localStorage.setItem("nappag_permanently_sealed", "true");
-                showBanScreen(); return true;
+            ctx.beginPath();
+            ctx.arc(nokta.x, nokta.y, 6, 0, 2 * Math.PI);
+            
+            // Yapay zeka 1 dediyse Maviye, -1 dediyse Turuncuya boya
+            if (tahmin === 1) {
+                ctx.fillStyle = "#007bff"; // Mavi
             } else {
-                // Eğer veritabanında banlı DEĞİLSE mühürü kaldır (Unban için kritik)
-                localStorage.removeItem("nappag_permanently_sealed");
+                ctx.fillStyle = "#ffc107"; // Turuncu
             }
-        }
-        
-        // 2. ADIM: Tarayıcıdaki mühür kontrolü (Eski banlılar için)
-        if (localStorage.getItem("nappag_permanently_sealed") === "true") { 
-            showBanScreen(); return true; 
-        }
-        
-        return false;
-    };
-
-    // --- GLOBAL WINDOW ATTACHMENTS ---
-    window.openUser = async (n) => {
-        const uDoc = await getDoc(doc(db, "users", n)); if(!uDoc.exists()) return; const u = uDoc.data();
-        document.getElementById('profile-pg').style.display='block'; 
-        document.getElementById('p-av').src = u.pic; 
-        document.getElementById('p-un').innerText = "@"+u.username;
-        document.getElementById('p-bi').innerText = u.bio || "No bio.";
-        const isMe = (auth.currentUser && n === auth.currentUser.displayName);
-        document.getElementById('edit-btn').classList.toggle('hidden', !isMe);
-        document.getElementById('msg-btn').classList.toggle('hidden', isMe);
-        document.getElementById('msg-btn').onclick = () => startDM(n);
-    };
-
-    window.vote = async (id, type) => {
-        const r = doc(db, "messages", id), uid = auth.currentUser.uid, d = (await getDoc(r)).data();
-        if(type === 'l') await updateDoc(r, { likes: d.likes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), dislikes: arrayRemove(uid) });
-        else await updateDoc(r, { dislikes: d.dislikes?.includes(uid) ? arrayRemove(uid) : arrayUnion(uid), likes: arrayRemove(uid) });
-    };
-
-    window.deleteMsg = async (id) => { if(confirm("Are you sure you want to delete this post?")) await deleteDoc(doc(db, "messages", id)); };
-    
-    window.banUser = async (un) => {
-        if(!confirm(`Seal @${un} forever?`)) return;
-        await setDoc(doc(db, "bannedUsers", un.toLowerCase()), { ts: serverTimestamp() });
-        showToast(`User ${un} has been sealed.`);
-    };
-
-    // BAN KALDIRMA FONKSİYONU
-    window.unbanUser = async (un) => {
-        if(!confirm(`Unseal @${un}? They will be able to access the site again.`)) return;
-        await deleteDoc(doc(db, "bannedUsers", un.toLowerCase()));
-        showToast(`User ${un} unsealed!`);
-    };
-
-    window.openDiscuss = async (id) => {
-        const dDoc = await getDoc(doc(db, "messages", id));
-        if(!dDoc.exists()) return;
-        const d = dDoc.data();
-        document.getElementById('discuss-pg').style.display = 'block';
-        document.getElementById('discuss-content').innerHTML = `
-            <div class="card">
-                <h3>Discussion</h3><p style="font-size:18px;">${d.t}</p>
-                <div id="d-list" style="margin:15px 0; border-top: 2px solid #000; padding-top:10px;"></div>
-                <textarea id="d-rep" placeholder="Reply to this thread..."></textarea>
-                <button class="btn-nappag" id="send-discuss-btn" style="background:var(--maroon); color:white;">Send Reply</button>
-            </div>`;
-        document.getElementById('send-discuss-btn').onclick = () => addD(id);
-        onSnapshot(doc(db, "messages", id), s => { 
-            if(s.exists()) document.getElementById('d-list').innerHTML = (s.data().comments || []).map(c => `<div style="padding:10px; border:1px solid #000; background:#fff; margin-bottom:8px; box-shadow: 2px 2px 0px #000;"><b>@${c.n}:</b> ${c.t}</div>`).join(""); 
+            ctx.fill();
+            
+            // Eğer yapay zeka yanlış bildiyse noktanın etrafına siyah halka koy
+            if (tahmin !== nokta.etiket) {
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
         });
-    };
+    }
 
-    window.openRoom = async (id) => {
-        curRoom = id; const d = (await getDoc(doc(db, "communities", id))).data();
-        document.getElementById('room-pg').style.display='block'; 
-        document.getElementById('room-nav-title').innerText = "# " + d.name;
-        onSnapshot(query(collection(db, "messages"), where("room", "==", id), orderBy("ts", "desc")), sn => {
-            document.getElementById('room-posts').innerHTML = sn.docs.map(s => renderPost(s)).join("");
-            const mems = [...new Set(sn.docs.map(s => s.data().n))]; 
-            document.getElementById('room-mems').innerHTML = mems.map(m => `<div style="padding:5px; border-bottom:1px dotted #999;">• @${m}</div>`).join("");
-        });
-    };
-
-    // --- CORE LOGIC ---
-    const addD = async (id) => { 
-        const t = document.getElementById('d-rep').value; 
-        if(t) { 
-            await updateDoc(doc(db, "messages", id), { comments: arrayUnion({ n: auth.currentUser.displayName, t }) }); 
-            document.getElementById('d-rep').value=""; 
-        } 
-    };
-
-    const startDM = (n) => { 
-        activeDM = n; 
-        document.getElementById('dm-title').innerText = "Chat with @"+n; 
-        document.getElementById('dm-ui').style.display='flex'; 
-        const rid = [auth.currentUser.displayName, activeDM].sort().join("_");
-        onSnapshot(query(collection(db, "dms", rid, "msgs"), orderBy("ts", "asc")), sn => {
-            document.getElementById('dm-msgs').innerHTML = sn.docs.map(d => `<div class="${d.data().s === auth.currentUser.displayName ? 'm-me' : 'm-th'}"><b>@${d.data().s}</b><br>${d.data().t}</div>`).join("");
-            const c = document.getElementById('dm-msgs'); c.scrollTop = c.scrollHeight;
-        });
-    };
-
-    const renderPost = (s) => {
-        const d = s.data(), id = s.id, uid = auth.currentUser?.uid;
-        const am = auth.currentUser && isAdmin(auth.currentUser.displayName);
-        return `<div class="card">
-            <span class="cat-badge">${d.cat || 'General'}</span>
-            ${am ? `<button class="del-msg-btn" onclick="deleteMsg('${id}')">✕</button>` : ''}
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${d.p}" class="avatar" onclick="openUser('${d.n}')"> <b>@${d.n}</b> ${getSeal(d.n)}</div>
-            <p style="white-space:pre-wrap; font-size:1.1rem;">${d.t}</p>${d.m ? `<img src="${d.m}" style="width:100%; border:2px solid #000; margin-top:10px;">` : ""}
-            <div class="actions">
-                <button class="act-btn ${d.likes?.includes(uid)?'active-l':''}" onclick="vote('${id}','l')">👍 ${d.likes?.length || 0}</button>
-                <button class="act-btn ${d.dislikes?.includes(uid)?'active-d':''}" onclick="vote('${id}','d')">👎 ${d.dislikes?.length || 0}</button>
-                <button class="act-btn" onclick="openDiscuss('${id}')">🗨 DISCUSSION (${d.comments?.length || 0})</button>
-            </div>
-        </div>`;
-    };
-
-    const loadGlobal = () => {
-        onSnapshot(query(collection(db, "messages"), orderBy("ts", "desc")), sn => {
-            const posts = sn.docs.filter(d => (!d.data().room || d.data().room === 'global') && (activeCat === 'All' || d.data().cat === activeCat));
-            document.getElementById('posts-list').innerHTML = posts.map(s => renderPost(s)).join("");
-        });
-    };
-
-    const send = async (type) => {
-        const isGlobal = type === 'global';
-        const t = isGlobal ? document.getElementById('inp').value : document.getElementById('r-inp').value;
-        const cat = isGlobal ? document.getElementById('post-cat').value : 'General';
-        const img = document.getElementById('p-img');
-        const m = img.style.display === 'block' ? img.src : "";
-        if(!t && !m) return;
-
-        const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
-        const userPic = uDoc.data()?.pic || auth.currentUser.photoURL;
-
-        await addDoc(collection(db, "messages"), { 
-            t, n: auth.currentUser.displayName, p: userPic, cat, m, 
-            room: isGlobal ? 'global' : curRoom, 
-            ts: serverTimestamp(), likes: [], dislikes: [], comments: [] 
-        });
-        if(isGlobal) document.getElementById('inp').value=""; else document.getElementById('r-inp').value="";
-        img.style.display='none';
-        showToast("Post published!");
-    };
-
-    // --- EVENTS ---
-    document.getElementById('auth-btn').onclick = async () => {
-        const n = document.getElementById('u-name').value.trim().toLowerCase(), p = document.getElementById('u-pass').value;
-        if(!n || !p) return;
-        
-        if (await checkBanStatus(n)) return;
-
-        try { 
-            await signInWithEmailAndPassword(auth, n+"@nappag.com", p); 
-        } catch {
-            try {
-                const r = await createUserWithEmailAndPassword(auth, n+"@nappag.com", p);
-                const pic = `https://ui-avatars.com/api/?name=${n}&background=FFDB5E&color=800000`;
-                await updateProfile(r.user, { displayName: n, photoURL: pic });
-                await setDoc(doc(db, "users", n), { username: n, pic, bio: "Nappag resident", activeChats: [] });
-                showToast("Welcome to Nappag!");
-            } catch(e) { alert("Error: Password should be 6+ chars or username taken."); }
-        }
-    };
-
-    document.getElementById('send-global-btn').onclick = () => send('global');
-    document.getElementById('send-room-btn').onclick = () => send('room');
-    document.getElementById('close-room-btn').onclick = () => document.getElementById('room-pg').style.display='none';
-    document.getElementById('close-profile-btn').onclick = () => document.getElementById('profile-pg').style.display='none';
-    document.getElementById('close-discuss-btn').onclick = () => document.getElementById('discuss-pg').style.display='none';
-    document.getElementById('close-edit-btn').onclick = () => document.getElementById('edit-pg').style.display='none';
-    document.getElementById('close-dm-btn').onclick = () => document.getElementById('dm-ui').style.display='none';
-    
-    document.getElementById('dm-inp').onkeydown = (e) => { if(e.key === 'Enter') document.getElementById('send-dm-btn').click(); };
-
-    document.getElementById('edit-btn').onclick = async () => {
-        const uDoc = await getDoc(doc(db, "users", auth.currentUser.displayName));
-        const u = uDoc.data();
-        document.getElementById('ed-av-prev').src = u.pic;
-        document.getElementById('ed-bio').value = u.bio || "";
-        document.getElementById('edit-pg').style.display='block';
-    };
-    
-    document.getElementById('save-profile-btn').onclick = async () => {
-        const me = auth.currentUser.displayName;
-        await updateDoc(doc(db, "users", me), { 
-            bio: document.getElementById('ed-bio').value, 
-            pic: document.getElementById('ed-av-prev').src 
-        });
-        showToast("Profile updated!");
-        setTimeout(() => location.reload(), 1000);
-    };
-
-    document.getElementById('f-up').onchange = (e) => {
-        const reader = new FileReader();
-        reader.onload = () => { 
-            document.getElementById('p-img').src = reader.result;
-            document.getElementById('p-img').style.display = 'block';
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    document.getElementById('send-dm-btn').onclick = async () => {
-        const i = document.getElementById('dm-inp'), me = auth.currentUser.displayName, th = activeDM, rid = [me, th].sort().join("_");
-        if(i.value) {
-            await addDoc(collection(db, "dms", rid, "msgs"), { t: i.value, s: me, ts: serverTimestamp() });
-            await updateDoc(doc(db, "users", me), { activeChats: arrayUnion(th) });
-            await updateDoc(doc(db, "users", th), { activeChats: arrayUnion(me) });
-            i.value = "";
-        }
-    };
-
-    document.getElementById('cat-filters').onclick = (e) => {
-        if(e.target.classList.contains('cat-btn')) {
-            activeCat = e.target.dataset.cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            loadGlobal();
-        }
-    };
-
-    document.getElementById('user-search-inp').oninput = async (e) => {
-        const v = e.target.value.toLowerCase(); if(v.length < 1) { document.getElementById('user-results').innerHTML = ""; return; }
-        const sn = await getDocs(collection(db, "users"));
-        document.getElementById('user-results').innerHTML = sn.docs.map(d => d.data())
-            .filter(u => u.username.includes(v))
-            .map(u => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="openUser('${u.username}')">@${u.username}</div>`).join("");
-    };
-
-    document.getElementById('open-create-room-btn').onclick = () => document.getElementById('create-comm-pg').style.display='block';
-    document.getElementById('cancel-create-room').onclick = () => document.getElementById('create-comm-pg').style.display='none';
-    document.getElementById('do-create-room').onclick = async () => {
-        const name = document.getElementById('c-n').value;
-        if(name) {
-            await addDoc(collection(db, "communities"), { name, ts: serverTimestamp() });
-            document.getElementById('create-comm-pg').style.display='none';
-            showToast("Room created!");
-        }
-    };
-
-    document.getElementById('admin-nuke-bar').onclick = async () => {
-        if(!confirm("⚠️ THIS WILL DELETE EVERYTHING! ARE YOU SURE? ⚠️")) return;
-        const m = await getDocs(collection(db, "messages")); 
-        m.forEach(async d => await deleteDoc(doc(db, "messages", d.id)));
-        showToast("The world has been reset.");
-        setTimeout(() => location.reload(), 2000);
-    };
-
-    // --- AUTH OBSERVER ---
-    onAuthStateChanged(auth, async u => {
-        if (await checkBanStatus(u ? u.displayName : null)) return;
-
-        if (u) {
-            document.getElementById('welcome-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('welcome-screen').style.display = 'none';
-                document.getElementById('nav-user').innerHTML = `[ @${u.displayName} ${getSeal(u.displayName)} ]`;
-                document.getElementById('nav-user').onclick = () => openUser(u.displayName);
-                document.getElementById('main-pg').classList.remove('hidden');
-                document.getElementById('auth-pg').classList.add('hidden');
-                if(isAdmin(u.displayName)) {
-                    document.getElementById('admin-nuke-bar').style.display = 'block';
-                    document.getElementById('admin-user-list-card').style.display = 'block';
-                    onSnapshot(collection(db, "users"), sn => {
-                        document.getElementById('admin-user-list').innerHTML = sn.docs.map(d => {
-                            if(d.id==='admin' || d.id === 'kobicer') return '';
-                            return `<div style="display:flex;justify-content:space-between;margin-bottom:5px; align-items:center; background:#fff; padding:5px; border:1px solid #000;">
-                                <span>@${d.id}</span>
-                                <div>
-                                    <button class="ban-btn" onclick="banUser('${d.id}')">BAN</button>
-                                    <button class="unban-btn" onclick="unbanUser('${d.id}')">UNBAN</button>
-                                </div>
-                            </div>`;
-                        }).join("");
-                    });
-                }
-                loadGlobal();
-                onSnapshot(query(collection(db, "communities"), orderBy("ts", "desc")), sn => {
-                    document.getElementById('comm-list').innerHTML = sn.docs.map(d => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="openRoom('${d.id}')"># ${d.data().name}</div>`).join("");
-                });
-                onSnapshot(doc(db, "users", u.displayName), s => {
-                    const chats = s.data()?.activeChats || [];
-                    document.getElementById('dm-list-sidebar').innerHTML = chats.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #ddd;" onclick="startDM('${c}')">Chat with @${c}</div>`).join("");
-                });
-            }, 800);
-        } else {
-            document.getElementById('auth-pg').classList.remove('hidden');
-            document.getElementById('main-pg').classList.add('hidden');
-            document.getElementById('welcome-screen').style.display = 'none';
-        }
-    });
+    // İlk çizimi yap
+    ciz();
 </script>
+
 </body>
 </html>
