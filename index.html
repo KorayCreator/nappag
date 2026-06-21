@@ -3,300 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nappag - Mega Social Hub</title>
+    <title>nappag - Gerçek Zamanlı Topluluk Ağı</title>
     <style>
-        /* Modern ve Hibrit Sosyal Medya Tasarımı */
         :root {
             --nappag-orange: #ff6b00;
             --nappag-light-orange: #ff8533;
-            --nappag-dark: #121212;
-            --card-bg: #1e1e1e;
+            --nappag-dark: #0a0a0a;
+            --card-bg: #161616;
             --text-main: #ffffff;
-            --text-secondary: #b3b3b3;
-            --border-color: #333333;
-            --tiktok-red: #fe2c55;
-            --youtube-red: #ff0000;
-            --facebook-blue: #1877f2;
+            --text-secondary: #aaaaaa;
+            --border-color: #262626;
+            --danger-red: #ff3838;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            scrollbar-width: thin;
-            scrollbar-color: var(--nappag-orange) var(--nappag-dark);
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
             background-color: var(--nappag-dark);
             color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* SOL MENÜ - FACEBOOK & YOUTUBE ESİNTİSİ */
-        .sidebar {
-            width: 280px;
-            background-color: #000000;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            justify-content: space-between;
-        }
-
-        .logo-container {
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .nappag-logo {
-            font-size: 36px;
-            font-weight: 900;
-            color: var(--nappag-orange);
-            text-transform: lowercase;
-            letter-spacing: -1.5px;
-            text-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
-            cursor: pointer;
-        }
-
-        .menu-group {
-            margin-bottom: 25px;
-        }
-
-        .menu-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background-color: rgba(255, 107, 0, 0.15);
-            color: var(--nappag-orange);
-        }
-
-        .menu-item span {
-            margin-right: 15px;
-            font-size: 18px;
-        }
-
-        /* ORTA AKIŞ ALANI - INSTAGRAM & TIKTOK & YOUTUBE HİBRİT */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow-y: scroll;
-            background: linear-gradient(180deg, #000000 0%, #121212 100%);
-        }
-
-        /* INSTAGRAM HİKAYELER ALANI */
-        .stories-container {
-            display: flex;
-            gap: 15px;
-            padding: 20px;
-            background-color: rgba(0,0,0,0.4);
-            border-bottom: 1px solid var(--border-color);
-            overflow-x: auto;
-            min-height: 115px;
-        }
-
-        .story-ring {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            padding: 3px;
-            background: linear-gradient(45deg, var(--nappag-orange), #f39c12, var(--tiktok-red));
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
         }
 
-        .story-ring.live {
-            background: linear-gradient(45deg, var(--youtube-red), var(--nappag-orange));
-            animation: pulse 1.5s infinite;
-        }
-
-        .story-ring img {
+        /* GİRİŞ VE KAYIT EKRANI */
+        .auth-container {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #000;
-        }
-
-        .story-user {
-            font-size: 11px;
-            text-align: center;
-            margin-top: 5px;
-            color: var(--text-secondary);
-            max-width: 75px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .live-badge {
-            position: absolute;
-            bottom: -5px;
-            background-color: var(--youtube-red);
-            color: white;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        /* PAYLAŞIM YAPMA PANELİ - FACEBOOK & INSTAGRAM */
-        .creator-box {
+            max-width: 450px;
+            margin: auto;
+            padding: 30px;
             background-color: var(--card-bg);
-            margin: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .auth-logo {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--nappag-orange);
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+        }
+
+        /* ANA UYGULAMA PANELİ */
+        .app-container {
+            display: none; /* Giriş yapılınca açılacak */
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
+            padding: 25px;
+            height: 100vh;
+        }
+
+        /* SOL PANEL (PROFİL & NAVİGASYON) */
+        .left-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
             border-radius: 16px;
             padding: 20px;
             border: 1px solid var(--border-color);
+            text-align: center;
         }
 
-        .creator-header {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .creator-avatar {
-            width: 45px;
-            height: 45px;
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
+            border: 3px solid var(--nappag-orange);
+            margin-bottom: 10px;
+            background: #222;
         }
 
-        .creator-inputs {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* ORTA AKIŞ (GÖNDERİLER VE CANLI YAYINLAR) */
+        .feed-area {
+            overflow-y: auto;
+            padding-right: 10px;
+            height: calc(100vh - 50px);
         }
 
-        .creator-meta-selectors {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        .feed-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .feed-area::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
         }
 
-        /* Gelişmiş Turuncu Form Elemanları */
-        input, textarea, select {
-            background-color: #121212;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--nappag-orange);
-            box-shadow: 0 0 5px rgba(255, 107, 0, 0.4);
-        }
-
-        .creator-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        button {
+        /* TURUNCU KUTU BEYAZ YILDIZ ROZETİ */
+        .star-badge {
             background-color: var(--nappag-orange);
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        button:hover {
-            background-color: var(--nappag-light-orange);
-        }
-
-        /* GÖNDERİ KARTLARI - SÜPER HİBRİT AKIŞ */
-        .feed-container {
-            padding: 0 20px 40px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .nappag-post {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .post-meta-header {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(90deg, #1e1e1e 0%, #151515 100%);
-        }
-
-        .user-info-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-names {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-username-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .user-nickname {
-            font-size: 12px;
-            color: var(--nappag-orange);
-            font-weight: 600;
-            background-color: rgba(255, 107, 0, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        /* 100+ TAKİPÇİ TURUNCU KUTU BEYAZ YILDIZ ROZETİ */
-        .orange-star-badge {
-            background-color: var(--nappag-orange);
-            color: #ffffff;
             font-weight: bold;
             font-size: 11px;
             padding: 2px 6px;
@@ -304,622 +115,615 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 8px rgba(255, 107, 0, 0.5);
+            margin-left: 5px;
+            box-shadow: 0 0 8px rgba(255, 107, 0, 0.4);
         }
 
-        /* MEDYA ALANLARI */
-        .post-media-wrapper {
-            position: relative;
-            background-color: #000;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* GÖNDERİ KARTLARI */
+        .nappag-post {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            overflow: hidden;
         }
 
-        .post-media-wrapper img, .post-media-wrapper video {
-            max-width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-        }
-
-        /* TIKTOK / YOUTUBE LIVE SİMÜLASYONU */
-        .live-stream-overlay {
-            width: 100%;
-            height: 400px;
-            background: linear-gradient(135deg, #0f0c20 0%, #24243e 50%, #300030 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .live-pulse-center {
-            width: 80px;
-            height: 80px;
-            background-color: rgba(255, 0, 0, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulse 2s infinite;
-        }
-
-        /* ETKİLEŞİM BUTONLARI - INSTAGRAM & FACEBOOK */
-        .post-engagement-bar {
+        .post-header {
             padding: 15px;
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .engage-btn {
-            background: none;
-            padding: 0;
-            color: var(--text-secondary);
+        .author-info {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .engage-btn:hover {
-            color: var(--nappag-orange);
-            background: none;
-        }
-
-        .post-description-block {
-            padding: 15px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* YORUMLAR PANELİ */
-        .post-comments-area {
-            background-color: rgba(0,0,0,0.2);
-            padding: 15px;
-        }
-
-        .comment-row {
-            margin-bottom: 10px;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            padding-bottom: 8px;
-        }
-
-        .comment-input-wrapper {
-            display: flex;
             gap: 10px;
-            margin-top: 10px;
         }
 
-        /* SAĞ PANEL - TOPLULUKLAR VE SİMÜLASYON KONTROLÜ */
-        .right-panel {
-            width: 320px;
-            background-color: #000000;
-            border-left: 1px solid var(--border-color);
-            padding: 20px;
-            overflow-y: auto;
+        .author-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
-        .community-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
+        .post-media {
+            width: 100%;
+            background: #000;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            justify-content: center;
         }
 
-        .badge-admin-action {
-            background-color: var(--youtube-red);
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 4px;
+        .post-media img, .post-media video {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
-        }
-
-        .banned-screen {
+        /* CANLI YAYIN EKRANI */
+        .live-screen {
+            background: linear-gradient(135deg, #1e0030 0%, #380000 100%);
+            height: 350px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            color: var(--youtube-red);
-            font-size: 24px;
+            position: relative;
+        }
+
+        .live-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--danger-red);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-weight: bold;
-            text-align: center;
-            padding: 40px;
+            font-size: 12px;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* FORMLAR VE BUTONLAR */
+        input, textarea, select {
+            width: 100%;
+            background-color: #0f0f0f;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--nappag-orange);
+        }
+
+        button {
+            background-color: var(--nappag-orange);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--nappag-light-orange);
+        }
+
+        button.secondary-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        button.danger-btn {
+            background-color: var(--danger-red);
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .nickname-tag {
+            font-size: 12px;
+            color: var(--nappag-orange);
+            background: rgba(255,107,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div>
-            <div class="logo-container">
-                <div class="nappag-logo" onclick="resetFeed()">nappag</div>
-            </div>
-
-            <div class="menu-group">
-                <div class="menu-title">Keşfet</div>
-                <div class="menu-item active"><span>🏠</span> Ana Sayfa (Akış)</div>
-                <div class="menu-item"><span>🔥</span> Trendler (TikTok Modu)</div>
-                <div class="menu-item"><span>📺</span> nappag TV (YouTube Modu)</div>
-                <div class="menu-item"><span>👥</span> Gruplar & Topluluklar</div>
-            </div>
-
-            <div class="menu-group">
-                <div class="menu-title">Uygulama Modu / Hesap Simülasyonu</div>
-                <select id="userSelector" onchange="switchUserContext(this.value)">
-                    <option value="user_alpha">Bora (145 Takipçi - ⭐ Rozetli)</option>
-                    <option value="user_beta">Selin (32 Takipçi)</option>
-                    <option value="user_gamma">Can (500 Takipçi - ⭐ Rozetli)</option>
-                    <option value="admin">@admin (Yönetici / Tek Yetkili)</option>
-                </select>
-            </div>
+    <div class="auth-container" id="authScreen">
+        <div class="auth-logo">nappag</div>
+        
+        <div id="loginForm">
+            <h3 style="margin-bottom: 15px; text-align: center;">Oturum Aç</h3>
+            <input type="text" id="loginUsername" placeholder="Kullanıcı Adı (@ olmadan)">
+            <input type="password" id="loginPassword" placeholder="Şifre">
+            <button onclick="handleLogin()">Giriş Yap</button>
+            <button class="secondary-btn" onclick="toggleAuthView(false)">Hesabın yok mu? Katıl</button>
         </div>
 
-        <div style="font-size: 11px; color: var(--text-secondary); text-align: center; border-top: 1px solid var(--border-color); padding-top: 15px;">
-            nappag Mega Engine v4.0 <br> Secure & Sandbox System
+        <div id="registerForm" style="display: none;">
+            <h3 style="margin-bottom: 15px; text-align: center;">nappag'a Katıl</h3>
+            <input type="text" id="regUsername" placeholder="Kullanıcı Adı (Örn: mert)">
+            <input type="text" id="regNickname" placeholder="Topluluk Lakabı (Örn: KaraŞövalye)">
+            <input type="password" id="regPassword" placeholder="Şifre">
+            <button onclick="handleRegister()">Kayıt Ol ve Başlat</button>
+            <button class="secondary-btn" onclick="toggleAuthView(true)">Zaten üye misin? Giriş Yap</button>
         </div>
     </div>
 
-    <div class="main-content" id="mainContentArea">
+    <div class="app-container" id="appScreen">
         
-        <div class="stories-container">
-            <div style="text-align: center;">
-                <div class="story-ring live"><img src="https://picsum.photos/id/64/150/150"><span class="live-badge">CANLI</span></div>
-                <div class="story-user">@can</div>
-            </div>
-            <div style="text-align: center;">
-                <div class="story-ring"><img src="https://picsum.photos/id/22/150/150"></div>
-                <div class="story-user">@selin [Kral]</div>
-            </div>
-            <div style="text-align: center;">
-                <div class="story-ring"><img src="https://picsum.photos/id/91/150/150"></div>
-                <div class="story-user">@bora [Gezgin]</div>
-            </div>
-            <div style="text-align: center;">
-                <div class="story-ring"><img src="https://picsum.photos/id/102/150/150"></div>
-                <div class="story-user">@admin</div>
-            </div>
-        </div>
-
-        <div class="creator-box">
-            <div class="menu-title" style="margin-bottom: 10px;">Profil Bilgilerini Güncelle (nappag Özellikleri)</div>
-            <div class="creator-meta-selectors">
-                <input type="text" id="inputNickname" placeholder="Topluluk İçi Lakabınız (Örn: Alpha)">
-                <input type="text" id="inputBio" placeholder="Profil Açıklamanız...">
-            </div>
-            <button onclick="updateProfileData()" style="margin-top: 10px; width: 100%;">Değişiklikleri Kaydet</button>
-        </div>
-
-        <div class="creator-box" id="creatorPanel">
-            <div class="creator-header">
-                <img src="https://picsum.photos/id/1025/100/100" class="creator-avatar" id="currentAvatar">
-                <div class="creator-inputs">
-                    <textarea id="postText" placeholder="nappag topluluğuna ne anlatmak istersin? (Küfürler otomatik temizlenir)" rows="3"></textarea>
-                    
-                    <div class="creator-meta-selectors">
-                        <select id="postMediaType" onchange="handleMediaTypeChange()">
-                            <option value="photo">📸 Fotoğraf Paylaş</option>
-                            <option value="video">🎥 Video Yükle (YouTube Tarzı)</option>
-                            <option value="live">🔴 Canlı Yayın Başlat (TikTok Modu)</option>
-                        </select>
-
-                        <select id="coAuthorSelect">
-                            <option value="">🤝 Ortak Gönderi Yap (Yazar Ekle)</option>
-                            <option value="user_beta">Selin</option>
-                            <option value="user_gamma">Can</option>
-                        </select>
-                    </div>
-
-                    <input type="text" id="mediaUrlInput" placeholder="Medya URL'si ekleyin (Boş bırakılırsa sistem otomatik atar)">
+        <div class="left-sidebar">
+            <div class="auth-logo" style="text-align: left; font-size: 32px; margin-bottom: 0;">nappag</div>
+            
+            <div class="profile-card">
+                <img src="" class="profile-avatar" id="myAvatar">
+                <div style="font-weight: bold; display: flex; align-items: center; justify-content: center;">
+                    <span id="myUsername"></span>
+                    <span id="myStarSlot"></span>
                 </div>
+                <div id="myNickname" class="nickname-tag" style="display:inline-block; margin-top:5px;"></div>
+                <p id="myBio" style="font-size: 13px; color: var(--text-secondary); margin-top: 10px; font-style: italic;"></p>
+                
+                <div style="margin-top: 15px; font-size: 12px; color: var(--nappag-orange);" id="myFollowerCount"></div>
             </div>
 
-            <div class="creator-actions">
-                <span style="font-size: 12px; color: var(--text-secondary);">Filtreler Aktif Mod: Güvenli 🛡️</span>
-                <button onclick="publishNewPost()">nappag'da Yayınla</button>
+            <div class="profile-card" style="text-align: left;">
+                <h4 style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase;">Profili Düzenle</h4>
+                <input type="text" id="editNickname" placeholder="Yeni Lakap" style="margin-bottom:8px; padding:8px;">
+                <input type="text" id="editBio" placeholder="Açıklama Ekle/Değiştir" style="margin-bottom:8px; padding:8px;">
+                <input type="text" id="editAvatar" placeholder="Profil Resmi URL" style="margin-bottom:8px; padding:8px;">
+                <input type="number" id="editFollowers" placeholder="Takipçi Sayısı Ayarla" style="margin-bottom:8px; padding:8px;">
+                <button onclick="saveProfileChanges()" style="padding: 8px; font-size: 13px;">Güncelle</button>
+                <button onclick="deleteMyAccount()" style="padding: 8px; font-size: 13px; background:#d63031; margin-top:5px;">Hesabımı Sil</button>
             </div>
+
+            <button onclick="handleLogout()" style="background: #222; border: 1px solid var(--border-color);">Güvenli Çıkış</button>
         </div>
 
-        <div class="feed-container" id="nappagFeed">
+        <div class="feed-area">
+            
+            <div class="profile-card" style="text-align: left; margin-bottom: 25px;">
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--nappag-orange);">Yeni İçerik Paylaş</h3>
+                
+                <textarea id="postContent" placeholder="Neler oluyor? Küfürler otomatik filtrelenir..." rows="2" style="margin-bottom: 10px;"></textarea>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <select id="mediaType" onchange="toggleMediaField()">
+                        <option value="photo">🖼️ Fotoğraf Ekle</option>
+                        <option value="video">🎥 Video Ekle</option>
+                        <option value="live">🔴 Canlı Yayın Başlat</option>
+                    </select>
+
+                    <select id="coAuthorField">
+                        <option value="">🤝 Ortak Yazar Seç (İsteğe Bağlı)</option>
+                        </select>
+                </div>
+                
+                <input type="text" id="mediaUrl" placeholder="Fotoğraf veya Video URL'si girin" style="margin-top: 10px; margin-bottom: 15px;">
+                
+                <button onclick="submitPost()">nappag Akışına Gönder</button>
             </div>
 
-    </div>
-
-    <div class="right-panel">
-        <div class="menu-title" style="margin-bottom: 15px;">Kurulu Topluluklar & Gruplar</div>
-        
-        <div class="community-card">
-            <div>
-                <div style="font-weight: bold; font-size: 14px;">🎮 Oyun Geliştiricileri</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">Bora lakabı: "PixelMaster"</div>
-            </div>
-            <span style="color: var(--nappag-orange); font-size: 12px;">Katıldı</span>
+            <div id="globalFeed"></div>
         </div>
 
-        <div class="community-card">
-            <div>
-                <div style="font-weight: bold; font-size: 14px;">🎨 Dijital Sanat</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">Selin lakabı: "KralMimar"</div>
-            </div>
-            <span style="color: var(--nappag-orange); font-size: 12px;">Katıldı</span>
-        </div>
-
-        <div class="menu-title" style="margin-top: 30px; margin-bottom: 15px;">nappag Güvenlik Duvarı</div>
-        <div style="background-color: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; line-height: 1.6;">
-            <p style="color: #2ed573;">✔ NoSQL Injection Koruması Aktif</p>
-            <p style="color: #2ed573;">✔ XSS Script Engelleme Filtresi Aktif</p>
-            <p style="color: #2ed573;">✔ @admin Kullanıcı Adı Kilitli</p>
-            <p style="color: var(--text-secondary); margin-top: 10px; font-style: italic;">Uygulama bellek korumalı sandbox mimarisindedir, hacklenmesi imkansızdır.</p>
-        </div>
-
-        <div id="adminControlArea" style="display: none; margin-top: 25px;">
-            <div class="menu-title" style="color: var(--youtube-red);">🚨 @admin Kontrol Masası</div>
-            <div style="background-color: rgba(255,0,0,0.05); border: 1px solid var(--youtube-red); padding: 12px; border-radius: 8px;">
-                <p style="font-size: 11px; margin-bottom: 10px;">Sistemdeki tüm güç sizde. İstediğiniz hesabı banlayabilir veya tüm gönderileri temizleyebilirsiniz.</p>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Küfür Filtre Listesi
-        const PROHIBITED_WORDS = ["küfür1", "küfür2", "salak", "aptal", "mal", "gerizekalı"];
+        // Küfür Filtresi Listesi
+        const BAD_WORDS = ["küfür1", "küfür2", "salak", "aptal", "mal", "gerizekalı"];
 
-        // Güvenli Veri Yapısı (Simüle Veri Tabanı)
-        const nappagDatabase = {
-            users: {
-                user_alpha: { username: "bora", nickname: "Gezgin", followers: 145, bio: "Yollar beni bekler", isBanned: false, avatar: "https://picsum.photos/id/64/100/100" },
-                user_beta: { username: "selin", nickname: "Kral", followers: 32, bio: "Tasarım her şeydir", isBanned: false, avatar: "https://picsum.photos/id/22/100/100" },
-                user_gamma: { username: "can", nickname: "Yayıncı", followers: 500, bio: "Canlı yayınlar her akşam burada!", isBanned: false, avatar: "https://picsum.photos/id/91/100/100" },
-                admin: { username: "admin", nickname: "Kurucu Sahibi", followers: 999999, bio: "nappag Resmi Yöneticisi", isBanned: false, avatar: "https://picsum.photos/id/102/100/100" }
-            },
-            posts: [
-                {
-                    id: "p_1",
-                    authors: ["user_alpha", "user_gamma"],
-                    type: "photo",
-                    url: "https://picsum.photos/id/1016/800/500",
-                    description: "Can ile beraber harika bir ortak yayın hazırlığındayız! nappag toplulukları için dev işler geliyor.",
-                    likes: ["user_beta"],
-                    comments: [{ username: "selin", text: "Bekliyoruz sabırsızlıkla! 🔥" }]
-                },
-                {
-                    id: "p_2",
-                    authors: ["user_gamma"],
-                    type: "live",
-                    url: "",
-                    description: "🔴 Teknoloji ve Gelecek Hakkında Konuşuyoruz! Katılın.",
-                    likes: ["user_alpha", "user_beta"],
-                    comments: []
-                }
-            ]
-        };
+        // KALICI VERİ TABANI SİMÜLASYONU (Local Storage)
+        if (!localStorage.getItem("nappag_users")) {
+            localStorage.setItem("nappag_users", JSON.stringify({}));
+        }
+        if (!localStorage.getItem("nappag_posts")) {
+            localStorage.setItem("nappag_posts", JSON.stringify([]));
+        }
 
-        // Derin Dondurma ile Nesne Manipülasyon Engeli (Hacklenme Koruması)
-        Object.defineProperty(window, 'secureSystemActive', { value: true, writable: false, configurable: false });
+        let sessionUser = null;
 
-        let currentActiveUserKey = "user_alpha";
+        // Yardımcı Veri Çekme Fonksiyonları
+        function getUsers() { return JSON.parse(localStorage.getItem("nappag_users")); }
+        function saveUsers(data) { localStorage.setItem("nappag_users", JSON.stringify(data)); }
+        function getPosts() { return JSON.parse(localStorage.getItem("nappag_posts")); }
+        function savePosts(data) { localStorage.setItem("nappag_posts", JSON.stringify(data)); }
 
-        // Küfürleri Temizleme Algoritması
-        function contentFilter(text) {
-            let processedText = text;
-            PROHIBITED_WORDS.forEach(word => {
-                let pattern = new RegExp(word, "gi");
-                processedText = processedText.replace(pattern, "***");
+        // Küfür Filtre Motoru
+        function filterSwearWords(text) {
+            let clean = text;
+            BAD_WORDS.forEach(word => {
+                let regex = new RegExp(word, "gi");
+                clean = clean.replace(regex, "***");
             });
-            return processedText;
+            return clean;
         }
 
-        // Kullanıcı Değiştirme Fonksiyonu
-        function switchUserContext(userKey) {
-            currentActiveUserKey = userKey;
-            
-            // Arayüz Elemanlarını Güncelle
-            const userObj = nappagDatabase.users[userKey];
-            document.getElementById("currentAvatar").src = userObj.avatar;
-            document.getElementById("inputNickname").value = userObj.nickname || "";
-            document.getElementById("inputBio").value = userObj.bio || "";
-
-            // Admin Paneli Gösterimi
-            if (userKey === "admin") {
-                document.getElementById("adminControlArea").style.display = "block";
-            } else {
-                document.getElementById("adminControlArea").style.display = "none";
-            }
-
-            renderNappagFeed();
+        // Giriş/Kayıt Ekranı Değiştirici
+        function toggleAuthView(showLogin) {
+            document.getElementById("loginForm").style.display = showLogin ? "block" : "none";
+            document.getElementById("registerForm").style.display = showLogin ? "none" : "block";
         }
 
-        // Profil Bilgilerini Güncelleme (Lakap, Açıklama vb.)
-        function updateProfileData() {
-            const userObj = nappagDatabase.users[currentActiveUserKey];
-            if (userObj.isBanned) return;
+        // KAYIT OLMA SİSTEMİ
+        function handleRegister() {
+            let username = document.getElementById("regUsername").value.trim().toLowerCase();
+            let nickname = document.getElementById("regNickname").value.trim();
+            let password = document.getElementById("regPassword").value;
 
-            let newNickname = document.getElementById("inputNickname").value;
-            let newBio = document.getElementById("inputBio").value;
-
-            // Güvenlik Duvarı: @admin İsminin Çalınmasını ve Taklit Edilmesini Önler
-            if (newNickname.toLowerCase().includes("admin") && currentActiveUserKey !== "admin") {
-                alert("GÜVENLİK ENGELLENDİ: 'admin' ibaresi içeren lakaplar kilitlidir!");
+            if (!username || !nickname || !password) {
+                alert("Tüm alanları doldurun!");
                 return;
             }
 
-            userObj.nickname = contentFilter(newNickname);
-            userObj.bio = contentFilter(newBio);
-            alert("Profil başarıyla güncellendi!");
-            renderNappagFeed();
-        }
+            let allUsers = getUsers();
 
-        // Medya Seçimine Göre URL Giriş Alanını Düzenleme
-        function handleMediaTypeChange() {
-            const type = document.getElementById("postMediaType").value;
-            const input = document.getElementById("mediaUrlInput");
-            if (type === "live") {
-                input.style.display = "none";
-            } else {
-                input.style.display = "block";
-                input.placeholder = type === "photo" ? "Fotoğraf URL'si ekleyin" : "Video URL'si (.mp4) ekleyin";
-            }
-        }
-
-        // Gönderi Paylaşma Motoru (Ortak Gönderi, Video, Fotoğraf, Canlı Yayın)
-        function publishNewPost() {
-            const userObj = nappagDatabase.users[currentActiveUserKey];
-            if (userObj.isBanned) {
-                alert("Banlı hesaplar içerik üretemez!");
+            // GÜVENLİK: Bir kişi dışında kimse @admin olamaz koruması
+            if (username === "admin" && allUsers["admin"]) {
+                alert("Güvenlik İhlali: @admin hesabı zaten kurulu ve tektir!");
                 return;
             }
 
-            const text = document.getElementById("postText").value;
-            const type = document.getElementById("postMediaType").value;
-            let mediaUrl = document.getElementById("mediaUrlInput").value;
-            const coAuthor = document.getElementById("coAuthorSelect").value;
-
-            if (!text.trim() && type === "photo") {
-                alert("Lütfen bir açıklama ekleyin.");
+            if (allUsers[username]) {
+                alert("Bu kullanıcı adı zaten alınmış!");
                 return;
             }
 
-            // Varsayılan Medya Atamaları
-            if (!mediaUrl.trim()) {
-                if (type === "photo") mediaUrl = "https://picsum.photos/800/500?random=" + Math.floor(Math.random() * 100);
-                if (type === "video") mediaUrl = "https://www.w3schools.com/html/mov_bbb.mp4";
-            }
-
-            const authorsArray = [currentActiveUserKey];
-            if (coAuthor && coAuthor !== currentActiveUserKey) {
-                authorsArray.push(coAuthor);
-            }
-
-            const newPostObj = {
-                id: "p_" + Date.now(),
-                authors: authorsArray,
-                type: type,
-                url: mediaUrl,
-                description: contentFilter(text),
-                likes: [],
-                comments: []
+            // Yeni kullanıcıyı kaydet
+            allUsers[username] = {
+                username: username,
+                nickname: filterSwearWords(nickname),
+                password: password,
+                bio: "nappag topluluğuna yeni katıldı.",
+                avatar: "https://picsum.photos/id/1025/150/150",
+                followers: 0,
+                isBanned: false
             };
 
-            nappagDatabase.posts.unshift(newPostObj);
-            document.getElementById("postText").value = "";
-            document.getElementById("mediaUrlInput").value = "";
-            renderNappagFeed();
+            saveUsers(allUsers);
+            alert("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+            toggleAuthView(true);
         }
 
-        // Gönderi Silme Motoru (Kişi kendi gönderisini, @admin ise her şeyi silebilir)
-        function deletePostItem(postId) {
-            const postIndex = nappagDatabase.posts.findIndex(p => p.id === postId);
-            if (postIndex === -1) return;
+        // GİRİŞ YAPMA SİSTEMİ
+        function handleLogin() {
+            let username = document.getElementById("loginUsername").value.trim().toLowerCase();
+            let password = document.getElementById("loginPassword").value;
 
-            const post = nappagDatabase.posts[postIndex];
+            let allUsers = getUsers();
+            let user = allUsers[username];
 
-            if (currentActiveUserKey === "admin" || post.authors.includes(currentActiveUserKey)) {
-                nappagDatabase.posts.splice(postIndex, 1);
-                renderNappagFeed();
-            } else {
-                alert("YETKİ REDDEDİLDİ: Bu gönderiyi silme izniniz yok!");
-            }
-        }
-
-        // @admin Tarafından Hesap Banlama Fonksiyonu
-        function adminBanAction(userKey) {
-            if (currentActiveUserKey !== "admin") {
-                alert("Hacker Girişimi Engellendi: Sadece @admin banlama yapabilir!");
-                return;
-            }
-            if (userKey === "admin") {
-                alert("Admin kendi kendini banlayamaz!");
+            if (!user || user.password !== password) {
+                alert("Hatalı kullanıcı adı veya şifre!");
                 return;
             }
 
-            nappagDatabase.users[userKey].isBanned = true;
-            alert(`Sistem: @${nappagDatabase.users[userKey].username} hesabı başarıyla banlandı.`);
-            renderNappagFeed();
-        }
-
-        // Beğeni Gönderme Fonksiyonu
-        function likePostItem(postId) {
-            const post = nappagDatabase.posts.find(p => p.id === postId);
-            if (!post) return;
-
-            if (post.likes.includes(currentActiveUserKey)) {
-                post.likes = post.likes.filter(k => k !== currentActiveUserKey);
-            } else {
-                post.likes.push(currentActiveUserKey);
+            if (user.isBanned) {
+                alert("🚨 HESABINIZ @admin TARAFINDAN BANLANMIŞTIR!");
+                return;
             }
+
+            sessionUser = user;
+            initApp();
+        }
+
+        // UYGULAMAYI BAŞLATMA
+        function initApp() {
+            document.getElementById("authScreen").style.display = "none";
+            document.getElementById("appScreen").style.display = "grid";
+
+            // Profil Kartını Doldur
+            updateProfileCardView();
+            
+            // Ortak yazar listesini güncelle
+            refreshCoAuthorList();
+
+            // Akışı Getir
             renderNappagFeed();
         }
 
-        // Yorum Ekleme Fonksiyonu
-        function commentPostItem(postId) {
-            const inputElement = document.getElementById(`comment_in_${postId}`);
-            const text = inputElement.value;
-            if (!text.trim()) return;
+        // PROFİL GÖRÜNTÜSÜNÜ YENİLEME
+        function updateProfileCardView() {
+            document.getElementById("myAvatar").src = sessionUser.avatar;
+            document.getElementById("myUsername").innerText = "@" + sessionUser.username;
+            document.getElementById("myNickname").innerText = sessionUser.nickname || "Lakap Yok";
+            document.getElementById("myBio").innerText = sessionUser.bio || "";
+            document.getElementById("myFollowerCount").innerText = `Takipçi: ${sessionUser.followers}`;
 
-            const post = nappagDatabase.posts.find(p => p.id === postId);
-            if (!post) return;
+            // 100 Takipçiden Fazla Olanlarda Turuncu Kutu Beyaz Yıldız Rozeti
+            let starSlot = document.getElementById("myStarSlot");
+            if (sessionUser.followers > 100) {
+                starSlot.innerHTML = `<span class="star-badge" title="Popüler Hesap">★</span>`;
+            } else {
+                starSlot.innerHTML = "";
+            }
 
-            const currentUserObj = nappagDatabase.users[currentActiveUserKey];
+            // Düzenleme kutularını doldur
+            document.getElementById("editNickname").value = sessionUser.nickname;
+            document.getElementById("editBio").value = sessionUser.bio;
+            document.getElementById("editAvatar").value = sessionUser.avatar;
+            document.getElementById("editFollowers").value = sessionUser.followers;
+        }
 
-            post.comments.push({
-                username: currentUserObj.username,
-                text: contentFilter(text)
+        // PROFİL DEĞİŞİKLİKLERİNİ KAYDETME (LAKAP, AÇIKLAMA, SİLME, DEĞİŞTİRME)
+        function saveProfileChanges() {
+            let allUsers = getUsers();
+            let user = allUsers[sessionUser.username];
+
+            let newNickname = document.getElementById("editNickname").value.trim();
+            
+            // Güvenlik: Admin kelimesini kimse taklit edemez
+            if (newNickname.toLowerCase().includes("admin") && sessionUser.username !== "admin") {
+                alert("Sistem Koruması: Lakapta 'admin' kelimesi geçemez!");
+                return;
+            }
+
+            user.nickname = filterSwearWords(newNickname);
+            user.bio = filterSwearWords(document.getElementById("editBio").value.trim());
+            user.avatar = document.getElementById("editAvatar").value.trim() || user.avatar;
+            user.followers = parseInt(document.getElementById("editFollowers").value) || 0;
+
+            allUsers[sessionUser.username] = user;
+            saveUsers(allUsers);
+            sessionUser = user;
+
+            alert("Profil güncellendi!");
+            updateProfileCardView();
+            renderNappagFeed();
+        }
+
+        // AÇIKLAMA VE GÖNDERİ SİLME (Kullanıcı Kendi Hesabını Silebilir)
+        function deleteMyAccount() {
+            if (sessionUser.username === "admin") {
+                alert("Sistem yöneticisi silinemez!");
+                return;
+            }
+            if (confirm("Hesabınızı kalıcı olarak silmek istediğinize emin misiniz?")) {
+                let allUsers = getUsers();
+                delete allUsers[sessionUser.username];
+                saveUsers(allUsers);
+                handleLogout();
+            }
+        }
+
+        // ORTAK YAZAR SEÇİM LİSTESİNİ DOLDURMA
+        function refreshCoAuthorList() {
+            let select = document.getElementById("coAuthorField");
+            select.innerHTML = '<option value="">🤝 Ortak Yazar Seç (İsteğe Bağlı)</option>';
+            
+            let allUsers = getUsers();
+            for (let username in allUsers) {
+                if (username !== sessionUser.username) {
+                    select.innerHTML += `<option value="${username}">@${username} (${allUsers[username].nickname})</option>`;
+                }
+            }
+        }
+
+        // CANLI YAYIN YA DA MEDYA TÜRÜ DEĞİŞİNCE
+        function toggleMediaField() {
+            let type = document.getElementById("mediaType").value;
+            let field = document.getElementById("mediaUrl");
+            if (type === "live") {
+                field.style.display = "none";
+            } else {
+                field.style.display = "block";
+                field.placeholder = type === "photo" ? "Fotoğraf URL'si girin" : "Video URL'si (.mp4) girin";
+            }
+        }
+
+        // GÖNDERİ VE CANLI YAYIN YAYINLAMA
+        function submitPost() {
+            let text = document.getElementById("postContent").value.trim();
+            let type = document.getElementById("mediaType").value;
+            let url = document.getElementById("mediaUrl").value.trim();
+            let coAuthor = document.getElementById("coAuthorField").value;
+
+            if (!text && type !== "live") {
+                alert("Lütfen bir açıklama veya içerik girin!");
+                return;
+            }
+
+            if (!url && type === "photo") url = "https://picsum.photos/800/500?random=" + Date.now();
+            if (!url && type === "video") url = "https://www.w3schools.com/html/mov_bbb.mp4";
+
+            let authors = [sessionUser.username];
+            if (coAuthor) authors.push(coAuthor);
+
+            let allPosts = getPosts();
+            allPosts.unshift({
+                id: "post_" + Date.now(),
+                authors: authors,
+                type: type,
+                url: url,
+                description: filterSwearWords(text),
+                likes: [],
+                comments: []
             });
 
-            inputElement.value = "";
+            savePosts(allPosts);
+            document.getElementById("postContent").value = "";
+            document.getElementById("mediaUrl").value = "";
             renderNappagFeed();
         }
 
-        // Gelişmiş Arayüz Render Motoru
+        // GÖNDERİ VE CANLI YAYIN SİLME (Kullanıcı kendi gönderisini, @admin ise her şeyi silebilir)
+        function removePost(postId) {
+            let allPosts = getPosts();
+            let post = allPosts.find(p => p.id === postId);
+
+            if (sessionUser.username === "admin" || post.authors.includes(sessionUser.username)) {
+                allPosts = allPosts.filter(p => p.id !== postId);
+                savePosts(allPosts);
+                renderNappagFeed();
+            } else {
+                alert("Buna yetkiniz yok!");
+            }
+        }
+
+        // @admin İSTEDİĞİ HESABI BANLAYABİLECEK
+        function adminBanUser(usernameToBan) {
+            if (sessionUser.username !== "admin") {
+                alert("Bu yetki sadece @admin kullanıcısına aittir!");
+                return;
+            }
+            let allUsers = getUsers();
+            if (allUsers[usernameToBan]) {
+                allUsers[usernameToBan].isBanned = true;
+                saveUsers(allUsers);
+                alert(`@${usernameToBan} başarıyla sistemden yasaklandı.`);
+                renderNappagFeed();
+            }
+        }
+
+        // ETKİLEŞİM: BEĞENİ ATMA
+        function likePost(postId) {
+            let allPosts = getPosts();
+            let post = allPosts.find(p => p.id === postId);
+            if (post.likes.includes(sessionUser.username)) {
+                post.likes = post.likes.filter(u => u !== sessionUser.username);
+            } else {
+                post.likes.push(sessionUser.username);
+            }
+            savePosts(allPosts);
+            renderNappagFeed();
+        }
+
+        // ETKİLEŞİM: YORUM ATMA
+        function commentPost(postId) {
+            let input = document.getElementById(`comment_input_${postId}`);
+            let text = input.value.trim();
+            if (!text) return;
+
+            let allPosts = getPosts();
+            let post = allPosts.find(p => p.id === postId);
+
+            post.comments.push({
+                username: sessionUser.username,
+                text: filterSwearWords(text)
+            });
+
+            savePosts(allPosts);
+            input.value = "";
+            renderNappagFeed();
+        }
+
+        // HERKES İÇİN GERÇEK ZAMANLI AKIŞ ÇİZİCİ
         function renderNappagFeed() {
-            const feedContainer = document.getElementById("nappagFeed");
-            const mainArea = document.getElementById("mainContentArea");
+            let feed = document.getElementById("globalFeed");
+            feed.innerHTML = "";
             
-            // Eğer aktif kullanıcı banlanmışsa ekranı kilitle
-            if (nappagDatabase.users[currentActiveUserKey].isBanned) {
-                mainArea.innerHTML = `
-                    <div class="banned-screen">
-                        <div>🚨 HESABINIZ NAPPAG GÜVENLİK DUVARI TARAFINDAN ENGELLENMİŞTİR!</div>
-                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 15px;">Lütfen sistem yöneticisi @admin ile iletişime geçiniz.</div>
-                    </div>
-                `;
+            let allPosts = getPosts();
+            let allUsers = getUsers();
+
+            if (allPosts.length === 0) {
+                feed.innerHTML = `<div class='profile-card' style='text-align:center; color:var(--text-secondary);'>Henüz nappag'da hiç gönderi paylaşılmamış. İlk sen paylaş!</div>`;
                 return;
             }
 
-            // Normal Akışı Geri Getir (Eğer ban ekranından çıkıldıysa diye)
-            if (!document.getElementById("nappagFeed")) {
-                location.reload(); // Sayfayı güvenli duruma sıfırla
-                return;
-            }
+            allPosts.forEach(post => {
+                let card = document.createElement("div");
+                card.className = "nappag-post";
 
-            feedContainer.innerHTML = "";
+                // Ortak yazarların ve rozetlerin HTML inşası
+                let authorsHtml = post.authors.map(userKey => {
+                    let u = allUsers[userKey] || { username: userKey, nickname: "Silinmiş Hesap", followers: 0 };
+                    let starBadge = u.followers > 100 ? `<span class="star-badge">★</span>` : '';
+                    let nickTag = u.nickname ? `<span class="nickname-tag">${u.nickname}</span>` : '';
+                    return `<strong>@${u.username}</strong>${nickTag}${starBadge}`;
+                }).join(" <span style='color:var(--text-secondary); font-size:12px;'>ve</span> ");
 
-            nappagDatabase.posts.forEach(post => {
-                const postCard = document.createElement("div");
-                postCard.className = "nappag-post";
-
-                // Ortak yazarların isimlerini ve 100+ takipçi rozetini işle
-                let authorsHtmlArr = post.authors.map(authKey => {
-                    const u = nappagDatabase.users[authKey];
-                    // 100 Takipçi sınırında Turuncu Kutu Beyaz Yıldız Rozeti Modu
-                    let starBadge = u.followers > 100 ? `<span class="orange-star-badge" title="Popüler Hesap">★</span>` : '';
-                    let nickHtml = u.nickname ? `<span class="user-nickname">${u.nickname}</span>` : '';
-                    
-                    return `
-                        <div class="main-username-wrapper">
-                            <strong>@${u.username}</strong>
-                            ${nickHtml}
-                            ${starBadge}
-                        </div>
-                    `;
-                });
-
-                let authorsFinalHtml = authorsHtmlArr.join("<span style='color: var(--text-secondary); font-size:12px; margin: 0 4px;'>ve</span>");
-
-                // Medya Alanı Şablonlama (Fotoğraf / Video / Canlı Yayın)
-                let mediaSectionHtml = "";
+                // İçerik Türü Kontrolü
+                let mediaHtml = "";
                 if (post.type === "photo") {
-                    mediaSectionHtml = `
-                        <div class="post-media-wrapper">
-                            <img src="${post.url}" alt="nappag Media">
-                        </div>
-                    `;
+                    mediaHtml = `<div class="post-media"><img src="${post.url}"></div>`;
                 } else if (post.type === "video") {
-                    mediaSectionHtml = `
-                        <div class="post-media-wrapper">
-                            <video controls poster="https://picsum.photos/800/500?blur=2">
-                                <source src="${post.url}" type="video/mp4">
-                            </video>
-                        </div>
-                    `;
+                    mediaHtml = `<div class="post-media"><video controls src="${post.url}"></video></div>`;
                 } else if (post.type === "live") {
-                    mediaSectionHtml = `
-                        <div class="live-stream-overlay">
-                            <span class="live-badge" style="top: 15px; left: 15px; bottom: auto; font-size: 12px; padding: 4px 10px;">🔴 CANLI YAYIN</span>
-                            <div class="live-pulse-center">
-                                <span style="font-size: 32px;">📹</span>
-                            </div>
-                            <div style="margin-top: 15px; font-weight: bold; font-size: 14px; text-shadow: 0 2px 4px #000;">Yayın Akışı Dinamik Olarak Sürdürülüyor...</div>
+                    mediaHtml = `
+                        <div class="live-screen">
+                            <span class="live-tag">🔴 CANLI YAYIN</span>
+                            <div style="font-size:48px;">📹</div>
+                            <p style="margin-top:10px; font-weight:bold; font-size:14px;">nappag Canlı Medya Akışı Aktif</p>
                         </div>
                     `;
                 }
 
-                // Silme ve Banlama Butonları Yönetimi
-                let managementButtons = "";
-                if (post.authors.includes(currentActiveUserKey) || currentActiveUserKey === "admin") {
-                    managementButtons += `<button onclick="deletePostItem('${post.id}')" class="badge-admin-action" style="background-color: var(--border-color);">İçeriği Sil</button>`;
+                // Buton Kontrolleri: Admin veya Gönderi Sahibi Silebilir
+                let actionButtons = "";
+                if (post.authors.includes(sessionUser.username) || sessionUser.username === "admin") {
+                    actionButtons += `<button onclick="removePost('${post.id}')" class="danger-btn">Sil</button> `;
                 }
 
-                if (currentActiveUserKey === "admin") {
-                    post.authors.forEach(authKey => {
-                        if (authKey !== "admin" && !nappagDatabase.users[authKey].isBanned) {
-                            managementButtons += ` <button onclick="adminBanAction('${authKey}')" class="badge-admin-action">@${nappagDatabase.users[authKey].username} Banla</button>`;
+                // @admin Kullanıcısına Özel Ban Butonu
+                if (sessionUser.username === "admin") {
+                    post.authors.forEach(userKey => {
+                        if (userKey !== "admin" && allUsers[userKey] && !allUsers[userKey].isBanned) {
+                            actionButtons += `<button onclick="adminBanUser('${userKey}')" class="danger-btn" style="background:#b33939;">@${userKey} Banla</button>`;
                         }
                     });
                 }
 
-                // Yorum Alanlarını Çizdirme
-                let commentsListHtml = post.comments.map(c => `
-                    <div class="comment-row">
-                        <strong style="color: var(--nappag-orange);">@${c.username}:</strong> <span>${c.text}</span>
+                // Yorumlar Listesi
+                let commentsHtml = post.comments.map(c => `
+                    <div style="font-size:13px; margin-bottom:6px; border-bottom:1px solid #1f1f1f; padding-bottom:4px;">
+                        <strong style="color:var(--nappag-orange);">@${c.username}:</strong> ${c.text}
                     </div>
                 `).join("");
 
-                // Kartın Birleştirilmiş HTML Kod Bloğu
-                postCard.innerHTML = `
-                    <div class="post-meta-header">
-                        <div class="user-info-block">
-                            <div class="user-names">${authorsFinalHtml}</div>
-                        </div>
-                        <div style="display:flex; gap:5px;">${managementButtons}</div>
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="author-info"><div>${authorsHtml}</div></div>
+                        <div>${actionButtons}</div>
                     </div>
-                    
-                    ${mediaSectionHtml}
-
-                    <div class="post-engagement-bar">
-                        <button class="engage-btn" onclick="likePostItem('${post.id}')">
-                            <span>❤️</span> Beğen (${post.likes.length})
+                    ${mediaHtml}
+                    <div style="padding:15px;">
+                        <p style="font-size:15px; margin-bottom:15px; line-height:1.4;">${post.description}</p>
+                        <button onclick="likePost('${post.id}')" style="width:auto; padding:6px 12px; font-size:12px; background:#222; border:1px solid var(--border-color);">
+                            ❤️ Beğen (${post.likes.length})
                         </button>
-                        <button class="engage-btn">
-                            <span>💬</span> Yorum Yap (${post.comments.length})
-                        </button>
-                        <button class="engage-btn">
-                            <span>🚀</span> Paylaş
-                        </button>
-                    </div>
-
-                    <div class="post-description-block">
-                        <p>${post.description}</p>
-                    </div>
-
-                    <div class="post-comments-area">
-                        <div id="comments_box_${post.id}">${commentsListHtml}</div>
-                        <div class="comment-input-wrapper">
-                            <input type="text" id="comment_in_${post.id}" placeholder="Küfürsüz, temiz bir yorum ekle...">
-                            <button onclick="commentPostItem('${post.id}')" style="padding: 8px 15px; font-size: 12px;">Gönder</button>
+                        <div style="background:#0f0f0f; padding:12px; border-radius:10px; margin-top:15px;">
+                            <div id="comments_area_${post.id}">${commentsHtml}</div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <input type="text" id="comment_input_${post.id}" placeholder="Yorum yaz..." style="margin-bottom:0; padding:8px;">
+                                <button onclick="commentPost('${post.id}')" style="width:auto; padding:8px 15px; font-size:13px;">Gönder</button>
+                            </div>
                         </div>
                     </div>
                 `;
-
-                feedContainer.appendChild(postCard);
+                feed.appendChild(card);
             });
         }
 
-        // İlk başlatma durumu
-        switchUserContext("user_alpha");
+        // GÜVENLİ ÇIKIŞ
+        function handleLogout() {
+            sessionUser = null;
+            document.getElementById("appScreen").style.display = "none";
+            document.getElementById("authScreen").style.display = "block";
+            document.getElementById("loginUsername").value = "";
+            document.getElementById("loginPassword").value = "";
+        }
     </script>
 </body>
 </html>
