@@ -3,400 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tek Dosya Anlık Sohbet Uygulaması</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>nappag - Özgür Topluluk Ağı</title>
     <style>
-        /* Özelleştirilmiş kaydırma çubuğu */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #818cf8; }
+        :root {
+            --primary-color: #6c5ce7;
+            --admin-color: #ff7675;
+            --badge-color: #FF8C00;
+            --bg-color: #f8f9fa;
+            --dark-color: #2d3436;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--dark-color); padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        header { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 900; color: var(--primary-color); letter-spacing: -1px; }
+        .logo span { color: var(--badge-color); }
+        
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h3 { margin-bottom: 15px; font-size: 16px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .flex-group { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 8px; font-size: 14px; background: #fdfdfd; transition: all 0.3s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-color); background: #white; }
+        button { background: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+        button:hover { opacity: 0.9; }
+        button.admin-btn { background: var(--admin-color); }
+
+        /* Turuncu Kutu İçinde Beyaz Yıldız Rozeti */
+        .star-badge {
+            background-color: var(--badge-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-left: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+        }
+
+        .post { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 6px solid var(--primary-color); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .post.admin-post { border-left-color: var(--admin-color); }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .authors { font-weight: bold; color: var(--dark-color); display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .nickname { font-size: 12px; color: #a0aec0; background: #edf2f7; padding: 2px 6px; border-radius: 4px; margin-left: 4px; }
+        .post-content img, .post-content video { max-width: 100%; border-radius: 10px; margin-top: 12px; max-height: 400px; width: 100%; object-fit: cover; }
+        
+        .comments-section { margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; }
+        .comment { font-size: 13px; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+        .comment:last-child { border-bottom: none; }
+
+        .live-indicator { background: #ff7675; color: white; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: bold; animation: blink 1s infinite; display: inline-block; }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
+        
+        .banned-msg { color: var(--admin-color); font-weight: bold; text-align: center; padding: 30px; border: 2px dashed var(--admin-color); }
     </style>
 </head>
-<body class="bg-slate-100 h-screen flex items-center justify-center font-sans antialiased">
+<body>
 
-    <div id="auth-screen" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-gray-100 mx-4">
-        <h2 class="text-3xl font-extrabold mb-2 text-center text-indigo-600 tracking-tight">Sohbet Odası</h2>
-        <p class="text-sm text-gray-500 text-center mb-6">Hesabınızla giriş yapın veya yeni hesap açın.</p>
-        
-        <div class="space-y-4">
+<div class="container">
+    <!-- nappag Üst Menü -->
+    <header>
+        <div class="logo">nappag<span>.</span></div>
+        <div>
+            <label style="font-size: 11px; font-weight: bold; color: #718096; display: block; margin-bottom: 4px;">Kullanıcı Simülasyonu:</label>
+            <select id="currentUserSelect" onchange="switchUser(this.value)" style="width: auto; padding: 6px 12px;">
+                <option value="user1">Can (150 Takipçi - ⭐ Rozetli)</option>
+                <option value="user2">Merve (30 Takipçi)</option>
+                <option value="user3">Arda (Ortak Yazar)</option>
+                <option value="admin">@admin (Sistem Sahibi)</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Profil Bilgileri / Lakap Sistemi -->
+    <div class="card" id="profileCard">
+        <h3>nappag Profil Ayarları</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
             <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kullanıcı Adı</label>
-                <input id="auth-username" type="text" placeholder="örn: ahmet123" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition">
+                <label style="font-size: 12px; color: #718096;">Topluluk İçi Lakap:</label>
+                <input type="text" id="profNickname" placeholder="Örn: KahveSever">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Şifre</label>
-                <input id="auth-password" type="password" placeholder="••••••••" class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition">
-            </div>
-            
-            <div class="flex gap-3 pt-2">
-                <button onclick="login()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 active:scale-95 transition shadow-lg shadow-indigo-100">Giriş Yap</button>
-                <button onclick="register()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 active:scale-95 transition">Kayıt Ol</button>
+                <label style="font-size: 12px; color: #718096;">Profil Açıklaması:</label>
+                <input type="text" id="profBio" placeholder="Kendinden bahset...">
             </div>
         </div>
+        <button onclick="updateProfile()" style="margin-top: 15px; width: 100%;">Değişiklikleri Kaydet</button>
     </div>
 
-    <div id="app-screen" class="hidden w-full h-full max-w-6xl bg-white shadow-2xl flex flex-col md:flex-row rounded-none md:rounded-2xl md:h-[85vh] overflow-hidden border border-gray-100 mx-4">
+    <!-- Gönderi ve Canlı Yayın Paylaşma -->
+    <div class="card" id="publishCard">
+        <h3>nappag'da Paylaş</h3>
+        <div class="flex-group" style="margin-top: 10px;">
+            <select id="postType" onchange="toggleMediaInput()">
+                <option value="photo">🖼️ Fotoğraf Yükle</option>
+                <option value="video">🎥 Video Yükle</option>
+                <option value="live">🔴 Canlı Yayın Başlat</option>
+            </select>
+            <select id="coAuthor">
+                <option value="">🤝 Ortak Gönderi (Yazar Seç)</option>
+                <option value="user2">Merve</option>
+                <option value="user3">Arda</option>
+            </select>
+        </div>
+        <input type="text" id="mediaUrl" placeholder="Görsel URL'si (örn: https://picsum.photos/600/400)" style="margin-bottom: 10px;">
+        <textarea id="postDesc" placeholder="Neler oluyor? (Küfürler filtrelenir...)" rows="2"></textarea>
+        <button onclick="createPost()" style="margin-top: 10px; width: 100%;">Gönderiyi Yayınla</button>
+    </div>
+
+    <!-- Akış (Feed) -->
+    <div id="feed"></div>
+</div>
+
+<script>
+    // Güvenlik Koruması: Küfür Filtre Listesi
+    const KUFUR_FILTRESI = ["küfür1", "küfür2", "salak", "aptal", "mal"]; 
+
+    // Veri Yapısı (Local State)
+    let users = {
+        user1: { username: "can", nickname: "Gezgin", followers: 150, bio: "nappag kaşifi", isBanned: false },
+        user2: { username: "merve", nickname: "SiberMimar", followers: 30, bio: "Tasarım ve kod", isBanned: false },
+        user3: { username: "arda", nickname: "PixelArt", followers: 85, bio: "Çizim dünyası", isBanned: false },
+        admin: { username: "admin", nickname: "Kurucu", followers: 99999, bio: "nappag Resmi Admin Hesabı", isBanned: false }
+    };
+
+    let posts = [
+        {
+            id: 1,
+            authors: ["user1", "user3"], // Ortak Gönderi Örneği
+            type: "photo",
+            url: "https://picsum.photos/id/1015/600/400",
+            desc: "Arda ile beraber nappag için tasarladığımız ilk topluluk görseli!",
+            likes: [],
+            comments: [{ username: "merve", text: "Harika görünüyor, topluluğa hoş geldiniz!" }]
+        }
+    ];
+
+    let currentUserId = "user1";
+
+    // Filtreleme Algoritması
+    function filtrele(metin) {
+        let temizMetin = metin;
+        KUFUR_FILTRESI.forEach(kufur => {
+            let regex = new RegExp(kufur, "gi");
+            temizMetin = temizMetin.replace(regex, "***");
+        });
+        return temizMetin;
+    }
+
+    // Kullanıcı Değiştirici
+    function switchUser(userId) {
+        currentUserId = userId;
+        document.getElementById("profNickname").value = users[currentUserId].nickname;
+        document.getElementById("profBio").value = users[currentUserId].bio;
+        renderFeed();
+    }
+
+    // Profil Yönetimi (Admin İsmi Koruma Güvenliği)
+    function updateProfile() {
+        let yeniLakap = document.getElementById("profNickname").value;
         
-        <div class="w-full md:w-80 border-r border-gray-100 flex flex-col bg-slate-50/50">
-            <div class="p-4 bg-indigo-600 text-white flex flex-col justify-between shadow-md">
-                <div class="flex items-center justify-between mb-1">
-                    <span id="my-name" class="font-bold text-xl tracking-tight">Kullanıcı</span>
-                    <button onclick="toggleProfileModal()" class="text-xs bg-indigo-500/50 hover:bg-indigo-500 px-3 py-1.5 rounded-lg font-medium transition">Profili Düzenle</button>
-                </div>
-                <p id="my-bio" class="text-xs text-indigo-100 italic truncate">Açıklama girilmemiş...</p>
-            </div>
+        // HACK/SPOOF ENGELİ: Admin ismi manipülasyonu engelleme
+        if(yeniLakap.toLowerCase().includes("admin") && currentUserId !== 'admin') {
+            alert("Sistem Güvenliği: '@admin' ismi veya türevleri taklit edilemez!");
+            return;
+        }
+        
+        users[currentUserId].nickname = filtrele(yeniLakap);
+        users[currentUserId].bio = filtrele(document.getElementById("profBio").value);
+        alert("nappag profiliniz güncellendi!");
+        renderFeed();
+    }
 
-            <div class="p-3 border-b border-gray-100 bg-white">
-                <div class="relative">
-                    <input id="search-input" oninput="searchUsers()" type="text" placeholder="İsim ile kullanıcı ara..." class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition">
-                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">🔍</span>
-                </div>
-            </div>
+    function toggleMediaInput() {
+        let type = document.getElementById("postType").value;
+        let mediaUrlInput = document.getElementById("mediaUrl");
+        if(type === "live") {
+            mediaUrlInput.style.display = "none";
+            document.getElementById("postDesc").placeholder = "Canlı yayın açıklaması girin...";
+        } else {
+            mediaUrlInput.style.display = "block";
+            mediaUrlInput.placeholder = type === "photo" ? "Fotoğraf URL'si girin" : "Video URL'si (.mp4) girin";
+        }
+    }
 
-            <div class="flex-1 overflow-y-auto p-3 space-y-4">
-                <div id="search-section" class="hidden">
-                    <h3 class="text-xs font-bold text-indigo-500 uppercase tracking-wider px-1 mb-2">Arama Sonuçları</h3>
-                    <div id="search-list" class="space-y-1.5"></div>
-                </div>
+    // Gönderi Paylaşma
+    function createPost() {
+        if(users[currentUserId].isBanned) return;
 
-                <div>
-                    <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider px-1 mb-2">Gelen Sohbet İstekleri</h3>
-                    <div id="requests-list" class="space-y-1.5"></div>
-                </div>
+        let type = document.getElementById("postType").value;
+        let url = document.getElementById("mediaUrl").value || "https://picsum.photos/id/1043/600/400";
+        let desc = document.getElementById("postDesc").value;
+        let coAuthor = document.getElementById("coAuthor").value;
 
-                <div>
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider px-1 mb-2">Sohbetlerim</h3>
-                    <div id="friends-list" class="space-y-1"></div>
-                </div>
-            </div>
-        </div>
+        let authors = [currentUserId];
+        if(coAuthor) authors.push(coAuthor); // Ortak Gönderi Bağlantısı
 
-        <div class="flex-1 flex flex-col justify-between bg-white min-w-0">
-            <div id="chat-header" class="p-4 border-b border-gray-100 font-semibold text-gray-700 bg-slate-50/50 flex items-center gap-2">
-                💬 Sohbet etmek için soldan birini seçin veya aratın.
-            </div>
+        posts.unshift({
+            id: Date.now(),
+            authors: authors,
+            type: type,
+            url: type === "live" ? "" : url,
+            desc: filtrele(desc),
+            likes: [],
+            comments: []
+        });
+
+        document.getElementById("postDesc").value = "";
+        renderFeed();
+    }
+
+    // Gönderi Silme Sistemi
+    function deletePost(postId) {
+        let postIndex = posts.findIndex(p => p.id === postId);
+        let post = posts[postIndex];
+
+        // Yetki Kontrolü: Kişi kendi gönderisini silebilir, @admin ise HER ŞEYİ silebilir.
+        if(currentUserId === 'admin' || post.authors.includes(currentUserId)) {
+            posts.splice(postIndex, 1);
+            renderFeed();
+        } else {
+            alert("Güvenlik Hatası: Bu içeriği silmeye yetkiniz yok.");
+        }
+    }
+
+    // Özel @admin Ban Yetkisi
+    function banUser(userId) {
+        if(currentUserId !== 'admin') {
+            alert("Bu işlem sadece @admin yetkisindedir!");
+            return;
+        }
+        users[userId].isBanned = true;
+        alert(`Kullanıcı banlandı ve nappag sisteminden uzaklaştırıldı.`);
+        renderFeed();
+    }
+
+    function likePost(postId) {
+        let post = posts.find(p => p.id === postId);
+        if(!post.likes.includes(currentUserId)) {
+            post.likes.push(currentUserId);
+        } else {
+            post.likes = post.likes.filter(id => id !== currentUserId);
+        }
+        renderFeed();
+    }
+
+    function addComment(postId, text) {
+        if(!text.trim()) return;
+        let post = posts.find(p => p.id === postId);
+        post.comments.push({
+            username: users[currentUserId].username,
+            text: filtrele(text)
+        });
+        renderFeed();
+    }
+
+    // Arayüz Çizimi (Render Engine)
+    function renderFeed() {
+        let feed = document.getElementById("feed");
+        feed.innerHTML = "";
+
+        // Ban Kontrolü
+        if(users[currentUserId].isBanned) {
+            feed.innerHTML = "<div class='card banned-msg'>🚨 Hesabınız Kurallara Uymadığı İçin @admin Tarafından Engellenmiştir.</div>";
+            document.getElementById("publishCard").style.display = "none";
+            document.getElementById("profileCard").style.display = "none";
+            return;
+        } else {
+            document.getElementById("publishCard").style.display = "block";
+            document.getElementById("profileCard").style.display = "block";
+        }
+
+        posts.forEach(post => {
+            let postEl = document.createElement("div");
+            postEl.className = `post ${post.authors.includes('admin') ? 'admin-post' : ''}`;
+
+            // Yazarlar, Lakaplar ve Turuncu Kutu Rozeti Algoritması
+            let authorsHtml = post.authors.map(authId => {
+                let u = users[authId];
+                // 100 Takipçi Şartı: Turuncu Kutu İçinde Beyaz Yıldız
+                let badge = u.followers > 100 ? `<span class="star-badge" title="Popüler nappag Üyesi">★</span>` : '';
+                let nicknameHtml = u.nickname ? `<span class="nickname">${u.nickname}</span>` : '';
+                return `<span><strong>@${u.username}</strong>${nicknameHtml}${badge}</span>`;
+            }).join(" <span style='color:#a0aec0; margin:0 5px;'>ve</span> ");
+
+            // İçerik Türü Filtreleme
+            let mediaHtml = "";
+            if(post.type === "photo") {
+                mediaHtml = `<div class="post-content"><img src="${post.url}" alt="nappag"></div>`;
+            } else if(post.type === "video") {
+                mediaHtml = `<div class="post-content"><video controls src="${post.url}"></video></div>`;
+            } else if(post.type === "live") {
+                mediaHtml = `<div class="post-content" style="background:#1e272e; color:#fff; padding:50px 20px; text-align:center; border-radius:12px; margin-top:12px; border: 2px solid #ff7675;">
+                                <span class="live-indicator">🔴 CANLI YAYIN</span><br><br style="margin-bottom:10px;">nappag Canlı Yayın Medya Akışı Başlatıldı...
+                             </div>`;
+            }
+
+            // Moderasyon Butonları
+            let actionButtons = "";
+            if(post.authors.includes(currentUserId) || currentUserId === 'admin') {
+                actionButtons += `<button onclick="deletePost(${post.id})" class="admin-btn" style="padding:5px 10px; font-size:12px;">Gönderiyi Sil</button>`;
+            }
             
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/30">
-                <div class="text-center text-gray-400 text-sm mt-10">Henüz bir sohbet seçilmedi.</div>
-            </div>
-            
-            <div id="chat-input-area" class="p-3 border-t border-gray-100 flex gap-2 hidden bg-white">
-                <input id="message-input" type="text" placeholder="Mesajınızı buraya yazın..." onkeypress="handleKeyPress(event)" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 transition">
-                <button onclick="sendMessage()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 active:scale-95 transition">Gönder</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl border border-gray-50 mx-4">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Profili Düzenle</h3>
-            
-            <div class="space-y-3 mb-5">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Yeni Kullanıcı Adı</label>
-                    <input id="edit-username" type="text" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Durum Açıklaması (Bio)</label>
-                    <input id="edit-bio" type="text" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
-                    <input id="edit-password" type="password" placeholder="••••••••" class="w-full p-2.5 border border-gray-200 rounded-xl outline-none focus:border-indigo-500">
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <button onclick="saveProfile()" class="flex-1 bg-emerald-600 text-white py-2.5 rounded-xl font-medium hover:bg-emerald-700 transition">Değişiklikleri Kaydet</button>
-                <button onclick="toggleProfileModal()" class="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl font-medium hover:bg-gray-200 transition">İptal</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // LocalStorage'dan kullanıcıları yükle veya boş bir veritabanı oluştur
-        let dbUsers = JSON.parse(localStorage.getItem('chat_users')) || {};
-        let currentUser = null;
-        let activeChatFriend = null;
-
-        // --- VERİTABANI YARDIMCILARI ---
-        function saveDB() {
-            localStorage.setItem('chat_users', JSON.stringify(dbUsers));
-        }
-
-        // --- GİRİŞ & KAYIT SİSTEMİ ---
-        function register() {
-            const username = document.getElementById('auth-username').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
-
-            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
-            if (dbUsers[username]) return alert('Bu kullanıcı adı zaten alınmış.');
-
-            dbUsers[username] = {
-                username: username,
-                password: password, // Eğitim amaçlı düz metin (Normalde şifrelenmeli)
-                bio: 'Hey! Ben de buradayım.',
-                friends: [],
-                pendingRequests: [],
-                messages: {} // { 'arkadasAdi': [{from: '...', to: '...', text: '...'}] }
-            };
-            
-            saveDB();
-            alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
-        }
-
-        function login() {
-            const username = document.getElementById('auth-username').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
-
-            const user = dbUsers[username];
-            if (!user || user.password !== password) {
-                return alert('Hatalı kullanıcı adı veya şifre!');
-            }
-
-            currentUser = user;
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            
-            renderApp();
-            // Otomatik veri yenileme simülasyonu (Anlık mesaj/istek kontrolü için)
-            setInterval(syncData, 1000);
-        }
-
-        // Arka planda verileri sürekli güncel tutan fonksiyon (Soket yerine simülasyon)
-        function syncData() {
-            if (!currentUser) return;
-            dbUsers = JSON.parse(localStorage.getItem('chat_users')) || {};
-            currentUser = dbUsers[currentUser.username];
-            renderLists();
-            renderMessages();
-        }
-
-        // --- ARAYÜZ YENİLEME MANTIĞI ---
-        function renderApp() {
-            document.getElementById('my-name').innerText = currentUser.username;
-            document.getElementById('my-bio').innerText = currentUser.bio;
-            renderLists();
-        }
-
-        function renderLists() {
-            // 1. Gelen Sohbet İsteklerini Listele
-            const reqList = document.getElementById('requests-list');
-            reqList.innerHTML = '';
-            if (currentUser.pendingRequests.length === 0) {
-                reqList.innerHTML = '<p class="text-xs text-gray-400 italic px-1">Gelen istek yok.</p>';
-            }
-            currentUser.pendingRequests.forEach(sender => {
-                reqList.innerHTML += `
-                    <div class="flex justify-between items-center bg-amber-50 border border-amber-100 p-2 rounded-xl text-xs">
-                        <span class="text-gray-700"><b>${sender}</b></span>
-                        <button onclick="acceptRequest('${sender}')" class="bg-emerald-600 text-white px-2 py-1 rounded-lg font-medium hover:bg-emerald-700 transition">Kabul Et</button>
-                    </div>`;
-            });
-
-            // 2. Sohbet Edilebilecek Arkadaşları Listele
-            const friendsList = document.getElementById('friends-list');
-            friendsList.innerHTML = '';
-            if (currentUser.friends.length === 0) {
-                friendsList.innerHTML = '<p class="text-xs text-gray-400 italic px-1">Henüz arkadaşınız yok. Yukarıdan birini aratın.</p>';
-            }
-            currentUser.friends.forEach(friend => {
-                const isSelected = activeChatFriend === friend;
-                friendsList.innerHTML += `
-                    <div onclick="startChat('${friend}')" class="p-2.5 rounded-xl cursor-pointer transition flex justify-between items-center ${isSelected ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'hover:bg-gray-200/60 text-gray-700'}">
-                        <div>
-                            <div class="font-semibold text-sm">${friend}</div>
-                            <div class="text-[11px] opacity-70 truncate max-w-[150px]">${dbUsers[friend]?.bio || ''}</div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // --- KULLANICI ARAMA ---
-        function searchUsers() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const searchSection = document.getElementById('search-section');
-            const searchList = document.getElementById('search-list');
-
-            if (!query) {
-                searchSection.classList.add('hidden');
-                return;
-            }
-
-            searchSection.classList.remove('hidden');
-            searchList.innerHTML = '';
-
-            // Kendimiz dışındaki tüm kayıtlı kullanıcıları filtrele
-            const filtered = Object.keys(dbUsers).filter(name => name.toLowerCase().includes(query) && name !== currentUser.username);
-
-            if (filtered.length === 0) {
-                searchList.innerHTML = '<p class="text-xs text-gray-400 italic p-1">Kullanıcı bulunamadı.</p>';
-                return;
-            }
-
-            filtered.forEach(name => {
-                const targetUser = dbUsers[name];
-                const isFriend = currentUser.friends.includes(name);
-                const amIPending = targetUser.pendingRequests.includes(currentUser.username);
-                const isHePending = currentUser.pendingRequests.includes(name);
-
-                let actionBtn = `<button onclick="sendRequest('${name}')" class="bg-indigo-600 text-white px-2 py-1 rounded-lg text-xs font-medium hover:bg-indigo-700 transition">İstek At</button>`;
-                
-                if (isFriend) actionBtn = `<span class="text-xs text-emerald-600 font-bold">✓ Arkadaş</span>`;
-                else if (amIPending) actionBtn = `<span class="text-xs text-gray-400 italic">Beklemede</span>`;
-                else if (isHePending) actionBtn = `<span class="text-xs text-amber-600 font-medium">Sana istek atmış</span>`;
-
-                searchList.innerHTML += `
-                    <div class="flex justify-between items-center p-2 bg-white border border-gray-100 rounded-xl shadow-sm text-xs">
-                        <div class="min-w-0 pr-2">
-                            <div class="font-bold text-gray-800 truncate">${name}</div>
-                            <div class="text-[10px] text-gray-400 truncate">${targetUser.bio}</div>
-                        </div>
-                        ${actionBtn}
-                    </div>`;
-            });
-        }
-
-        // --- İSTEK VE BAĞLANTI İŞLEMLERİ ---
-        function sendRequest(targetName) {
-            if (!dbUsers[targetName].pendingRequests.includes(currentUser.username)) {
-                dbUsers[targetName].pendingRequests.push(currentUser.username);
-                saveDB();
-                searchUsers();
-                alert(`${targetName} kullanıcısına sohbet isteği gönderildi!`);
-            }
-        }
-
-        function acceptRequest(senderName) {
-            // İstek listesinden çıkar
-            currentUser.pendingRequests = currentUser.pendingRequests.filter(u => u !== senderName);
-            
-            // Karşılıklı arkadaş listesine ekle
-            if (!currentUser.friends.includes(senderName)) currentUser.friends.push(senderName);
-            if (!dbUsers[senderName].friends.includes(currentUser.username)) dbUsers[senderName].friends.push(currentUser.username);
-
-            // Boş mesaj kutularını tanımla
-            if (!currentUser.messages[senderName]) currentUser.messages[senderName] = [];
-            if (!dbUsers[senderName].messages[currentUser.username]) dbUsers[senderName].messages[currentUser.username] = [];
-
-            saveDB();
-            renderApp();
-        }
-
-        // --- SOHBET / MESAJLAŞMA SİSTEMİ ---
-        function startChat(friendName) {
-            activeChatFriend = friendName;
-            document.getElementById('chat-header').innerHTML = `🟢 <span class="font-bold text-gray-800">${friendName}</span> ile sohbet ediliyor`;
-            document.getElementById('chat-input-area').classList.remove('hidden');
-            renderMessages();
-            renderLists();
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            if (!text || !activeChatFriend) return;
-
-            const msgData = { from: currentUser.username, to: activeChatFriend, text: text };
-
-            // Mesajı her iki tarafın geçmişine de kaydet
-            if (!currentUser.messages[activeChatFriend]) currentUser.messages[activeChatFriend] = [];
-            if (!dbUsers[activeChatFriend].messages[currentUser.username]) dbUsers[activeChatFriend].messages[currentUser.username] = [];
-
-            currentUser.messages[activeChatFriend].push(msgData);
-            dbUsers[activeChatFriend].messages[currentUser.username].push(msgData);
-
-            saveDB();
-            input.value = '';
-            renderMessages();
-        }
-
-        function renderMessages() {
-            if (!activeChatFriend) return;
-            const chatMessages = document.getElementById('chat-messages');
-            const history = currentUser.messages[activeChatFriend] || [];
-
-            if (history.length === 0) {
-                chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4">Henüz mesaj yok. İlk mesajı siz yazın!</div>';
-                return;
-            }
-
-            let html = '';
-            history.forEach(msg => {
-                const isMe = msg.from === currentUser.username;
-                html += `
-                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
-                        <div class="${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'} px-4 py-2.5 rounded-2xl max-w-xs shadow-sm text-sm break-words">
-                            ${msg.text}
-                        </div>
-                    </div>`;
-            });
-            
-            // Eğer yeni bir mesaj geldiyse aşağı kaydır
-            const oldScrollHeight = chatMessages.scrollHeight;
-            chatMessages.innerHTML = html;
-            if(chatMessages.scrollHeight > oldScrollHeight){
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        // --- PROFİL DÜZENLEME MODAL İŞLEMLERİ ---
-        function toggleProfileModal() {
-            const modal = document.getElementById('profile-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                document.getElementById('edit-username').value = currentUser.username;
-                document.getElementById('edit-bio').value = currentUser.bio;
-                document.getElementById('edit-password').value = '';
-            }
-        }
-
-        function saveProfile() {
-            const newName = document.getElementById('edit-username').value.trim();
-            const newBio = document.getElementById('edit-bio').value.trim();
-            const newPass = document.getElementById('edit-password').value.trim();
-
-            if (!newName) return alert('Kullanıcı adı boş bırakılamaz.');
-
-            // İsim değişikliği mantığı
-            if (newName !== currentUser.username) {
-                if (dbUsers[newName]) return alert('Bu kullanıcı adı başka biri tarafından kullanılıyor.');
-                
-                // Eski isim kayıtlarını güncelle
-                dbUsers[newName] = dbUsers[currentUser.username];
-                delete dbUsers[currentUser.username];
-                
-                // Arkadaş listelerindeki ismini güncelle
-                Object.keys(dbUsers).forEach(u => {
-                    dbUsers[u].friends = dbUsers[u].friends.map(f => f === currentUser.username ? newName : f);
-                    dbUsers[u].pendingRequests = dbUsers[u].pendingRequests.map(r => r === currentUser.username ? newName : r);
-                    if (dbUsers[u].messages[currentUser.username]) {
-                        dbUsers[u].messages[newName] = dbUsers[u].messages[currentUser.username];
-                        delete dbUsers[u].messages[currentUser.username];
-                        dbUsers[u].messages[newName].forEach(m => {
-                            if (m.from === currentUser.username) m.from = newName;
-                            if (m.to === currentUser.username) m.to = newName;
-                        });
+            // @admin Kullanıcısına Özel Ban Butonları
+            if(currentUserId === 'admin') {
+                post.authors.forEach(authId => {
+                    if(authId !== 'admin' && !users[authId].isBanned) {
+                        actionButtons += ` <button onclick="banUser('${authId}')" class="admin-btn" style="padding:5px 10px; font-size:12px; background:#d63031;">@${users[authId].username} Kullanıcısını Banla</button>`;
                     }
                 });
-
-                currentUser.username = newName;
             }
 
-            if (newBio) currentUser.bio = newBio;
-            if (newPass) currentUser.password = newPass;
+            let commentsHtml = post.comments.map(c => `
+                <div class="comment"><strong>@${c.username}:</strong> ${c.text}</div>
+            `).join("");
 
-            dbUsers[currentUser.username] = currentUser;
-            saveDB();
-            renderApp();
-            toggleProfileModal();
-            alert('Profil başarıyla güncellendi!');
-        }
-    </script>
+            postEl.innerHTML = `
+                <div class="post-header">
+                    <div class="authors">${authorsHtml}</div>
+                    <div>${actionButtons}</div>
+                </div>
+                <p style="font-size: 15px; line-height: 1.5;">${post.desc}</p>
+                ${mediaHtml}
+                <div style="margin-top:15px;">
+                    <button onclick="likePost(${post.id})" style="background:#f1f2f6; color:#2d3436; font-size:13px; padding:8px 14px;">
+                        ❤️ Beğen (${post.likes.length})
+                    </button>
+                </div>
+                <div class="comments-section">
+                    ${commentsHtml}
+                    <div class="flex-group" style="margin-top:10px;">
+                        <input type="text" placeholder="Yorum ekle..." id="comment_input_${post.id}">
+                        <button onclick="addComment(${post.id}, document.getElementById('comment_input_${post.id}').value)" style="padding:8px 15px; font-size:13px;">Yorumla</button>
+                    </div>
+                </div>
+            `;
+            feed.appendChild(postEl);
+        });
+    }
+
+    // Başlangıç Ayarı
+    switchUser("user1");
+</script>
+
 </body>
 </html>
