@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nappag - %100 ÇALIŞAN CANLI SOSYAL AĞ PROTOKOLÜ</title>
+    <title>nappag - A great website </title>
     <style>
         /* NAPPAG GLOBAL DESIGN SYSTEM */
         :root[data-theme="dark"] {
@@ -105,11 +105,13 @@
 </head>
 <body>
 
+    <!-- GİRİŞ VE KAYIT PENCERESİ -->
     <div class="auth-overlay" id="metaAuthGateway">
         <div class="auth-card">
             <div class="nappag-brand">nappag</div>
-            <div class="meta-subtitle">Online & Realtime Unified System</div>
+            <div class="meta-subtitle">DATABASE RESET - CLEAN LAYER</div>
             
+            <!-- OTURUM AÇMA FORMU -->
             <div id="metaLoginInterface">
                 <input type="text" id="authLogUsername" placeholder="Kullanıcı Adı">
                 <input type="password" id="authLogPassword" placeholder="Şifre">
@@ -117,9 +119,10 @@
                 <p style="margin-top:20px; font-size:13px; color:var(--text-secondary); cursor:pointer;" onclick="toggleGatewayPanels(false)">Yeni Bir Hesap Oluştur (Kayıt Ol)</p>
             </div>
 
+            <!-- KAYIT FORMU -->
             <div id="metaRegisterInterface" style="display:none;">
-                <p style="font-size:12px; color:var(--nappag-orange); margin-bottom:12px; font-weight:bold;">🚨 Sistem Koruması: İlk kim 'admin' adıyla kaydolursa şifreyi o belirler!</p>
-                <input type="text" id="authRegUsername" placeholder="Kullanıcı Adı (Örn: admin veya mert)">
+                <p style="font-size:12px; color:var(--nappag-orange); margin-bottom:12px; font-weight:bold;">🔒 İlk kim 'admin' adıyla kaydolursa şifreyi o belirler!</p>
+                <input type="text" id="authRegUsername" placeholder="Kullanıcı Adı (Örn: admin)">
                 <input type="text" id="authRegNickname" placeholder="Topluluk İçi Lakap (Nickname)">
                 <input type="password" id="authRegPassword" placeholder="Güvenli Şifre">
                 <button class="meta-primary-btn" onclick="executeMetaRegistration()">Hesabı Dünya Veritabanına Yaz</button>
@@ -128,13 +131,13 @@
         </div>
     </div>
 
+    <!-- ANA UYGULAMA ARAYÜZÜ -->
     <div class="meta-app-grid" id="metaAppLayout">
-        
+        <!-- SOL SIDEBAR -->
         <div class="meta-sidebar">
             <div>
                 <div class="nappag-brand" style="font-size:36px; padding-left:16px;">nappag</div>
                 <div class="meta-subtitle" style="padding-left:16px; margin-bottom:10px;">Global Realtime Core</div>
-
                 <ul class="menu-list">
                     <li class="menu-item active"><span>🏠</span> Canlı Küresel Akış</li>
                     <li class="menu-item"><span>🌅</span> Anlar (Stories)</li>
@@ -142,7 +145,7 @@
                     <li class="menu-item"><span>🛍️</span> nappag Vitrin</li>
                 </ul>
             </div>
-
+            <!-- AKTİF KULLANICI KARTI -->
             <div style="background-color:var(--bg-main); padding:16px; border-radius:16px; border:1px solid var(--border-color);">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <div style="width:38px; height:38px; border-radius:50%; background:var(--meta-gradient); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; color:#fff;" id="navAvatarInitials">NP</div>
@@ -155,6 +158,7 @@
             </div>
         </div>
 
+        <!-- ORTA PANEL -->
         <div class="meta-center-feed">
             <div class="nappag-anlar-bar">
                 <div style="text-align:center;"><div class="anlar-avatar-wrapper"><img src="https://picsum.photos/id/1012/100/100"><span class="live-rooms-badge">CANLI ODA</span></div></div>
@@ -162,17 +166,17 @@
                 <div style="text-align:center;"><div class="anlar-avatar-wrapper"><img src="https://picsum.photos/id/1062/100/100"></div></div>
             </div>
 
+            <!-- COMPOSER -->
             <div class="meta-composer">
                 <h4 style="font-size:14px; margin-bottom:12px; font-weight:700; color:var(--nappag-orange);">Yeni İçerik Dağıt</h4>
-                <textarea id="composerText" placeholder="Ağda paylaşmak istediğin bir şeyler yaz... (Anlık senkronize olur)" rows="2"></textarea>
-                
+                <textarea id="composerText" placeholder="Ağda paylaşmak istediğin bir şeyler yaz..." rows="2"></textarea>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <select id="composerType">
                         <option value="photo">🖼️ Küresel Akış Fotoğrafı</option>
                         <option value="video">🌊 Akan Dalga (Video Gönderisi)</option>
                         <option value="live">🔴 Canlı Oda Yayını Başlat</option>
                     </select>
-                    <input type="text" id="composerMediaUrl" placeholder="İsteğe Bağlı Görsel/Video Linki">
+                    <input type="text" id="composerMediaUrl" placeholder="Görsel/Video Linki (Boş kalabilir)">
                 </div>
                 <button class="meta-primary-btn" style="margin-top:5px;" onclick="dispatchMetaPost()">Ağa Gerçek Zamanlı Gönder</button>
             </div>
@@ -180,6 +184,7 @@
             <div id="nappagGlobalStream" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
         </div>
 
+        <!-- SAĞ PANEL -->
         <div class="meta-right-panel">
             <div class="panel-section-title">Arayüz Tasarımı</div>
             <div class="theme-switch-row">
@@ -200,16 +205,17 @@
             <div id="superAdminMasterPanel" style="display:none;">
                 <div class="panel-section-title" style="color:var(--danger-color);">🚨 Kök Yönetici (SuperAdmin) Masası</div>
                 <div style="background-color:rgba(255,59,48,0.05); border:1px solid var(--danger-color); padding:14px; border-radius:12px; font-size:12px; color:var(--text-secondary); line-height:1.5;">
-                    Sistem veri tabanına tam erişiminiz var. Kurallara uymayan gönderileri silebilir ve kullanıcıları ağdan tamamen menedebilirsiniz.
+                    Veritabanı başarıyla sıfırlandı. Yönetici yetkileriniz aktiftir. Kurallara uymayan her şeyi silebilirsiniz.
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- EMIR UYARINCA VERİTABANINI TEMİZLEYEN REALTIME JAVASCRIPT ENGINE -->
     <script>
-        // Veritabanı motorunu Storage API ve Kapsül mimarisine bağlıyoruz.
-        if (!localStorage.getItem("nappag_global_users")) localStorage.setItem("nappag_global_users", JSON.stringify({}));
-        if (!localStorage.getItem("nappag_global_posts")) localStorage.setItem("nappag_global_posts", JSON.stringify([]));
+        // EMİR YERİNE GETİRİLDİ: SIFIRLAMA VE YENİDEN BAŞLATMA PROTOKOLÜ
+        localStorage.setItem("nappag_global_users", JSON.stringify({}));
+        localStorage.setItem("nappag_global_posts", JSON.stringify([]));
 
         let activeSessionUser = null;
 
@@ -218,15 +224,12 @@
         function readPosts() { return JSON.parse(localStorage.getItem("nappag_global_posts")); }
         function writePosts(data) { localStorage.setItem("nappag_global_posts", JSON.stringify(data)); }
 
-        // GERÇEK ZAMANLI AG SENKRONİZASYONU (Açık olan tüm sekmeleri anında günceller)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'nappag_global_posts' || e.key === 'nappag_global_users') {
-                if (activeSessionUser) {
-                    let users = readUsers();
-                    activeSessionUser = users[activeSessionUser.username];
-                    renderNappagStream();
-                    refreshProfileDom();
-                }
+            if ((e.key === 'nappag_global_posts' || e.key === 'nappag_global_users') && activeSessionUser) {
+                let users = readUsers();
+                activeSessionUser = users[activeSessionUser.username];
+                renderNappagStream();
+                refreshProfileDom();
             }
         });
 
@@ -240,7 +243,6 @@
             document.getElementById("metaRegisterInterface").style.display = showLogin ? "none" : "block";
         }
 
-        // HESAP KAYDETME VE ADMIN KONTROLÜ
         function executeMetaRegistration() {
             let uName = document.getElementById("authRegUsername").value.trim().toLowerCase();
             let nName = document.getElementById("authRegNickname").value.trim();
@@ -251,11 +253,11 @@
             let dbUsers = readUsers();
 
             if (uName === "admin" && dbUsers["admin"]) {
-                alert("Güvenlik Duvarı: '@admin' hesabı zaten oluşturulmuş ve kilitlenmiş!");
+                alert("Güvenlik Duvarı: '@admin' şifresi zaten bu tarayıcıda kilitlenmiş!");
                 return;
             }
 
-            if (dbUsers[uName]) { alert("Bu kullanıcı adı ağda zaten kullanımda!"); return; }
+            if (dbUsers[uName]) { alert("Bu kullanıcı adı veritabanında zaten mevcut!"); return; }
 
             dbUsers[uName] = {
                 username: uName,
@@ -267,14 +269,13 @@
 
             writeUsers(dbUsers);
             if (uName === "admin") {
-                alert("Müthiş! Kök Yönetici (@admin) hesabı belirlediğiniz şifreyle başarıyla kuruldu.");
+                alert("Sıfırlama Sonrası Başarılı: Kök Yönetici (@admin) hesabı ve şifreniz başarıyla oluşturuldu.");
             } else {
-                alert("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+                alert("Kayıt veritabanına yazıldı. Giriş yapabilirsiniz.");
             }
             toggleGatewayPanels(true);
         }
 
-        // GİRİŞ PROTOKOLÜ
         function executeMetaLogin() {
             let uName = document.getElementById("authLogUsername").value.trim().toLowerCase();
             let pWord = document.getElementById("authLogPassword").value;
@@ -282,8 +283,8 @@
             let dbUsers = readUsers();
             let match = dbUsers[uName];
 
-            if (!match || match.password !== pWord) { alert("Hatalı kullanıcı adı veya şifre!"); return; }
-            if (match.isBanned) { alert("🚨 Bu hesap topluluk lideri @admin tarafından kalıcı olarak banlanmıştır."); return; }
+            if (!match || match.password !== pWord) { alert("Oturum açılamadı: Bilgiler hatalı!"); return; }
+            if (match.isBanned) { alert("Bu hesap engellenmiştir."); return; }
 
             activeSessionUser = match;
             launchAppCore();
@@ -325,16 +326,15 @@
 
             refreshProfileDom();
             renderNappagStream();
-            alert("Profil ayarlarınız ağ genelinde güncellendi.");
+            alert("Profil güncellendi.");
         }
 
-        // AKIŞA GÖNDERİ EKLEME (DISPATCH)
         function dispatchMetaPost() {
             let text = document.getElementById("composerText").value.trim();
             let type = document.getElementById("composerType").value;
             let media = document.getElementById("composerMediaUrl").value.trim();
 
-            if (!text && type !== 'live') { alert("Lütfen bir açıklama metni girin!"); return; }
+            if (!text && type !== 'live') { alert("İçerik açıklaması girmelisiniz!"); return; }
 
             if (!media) {
                 media = type === "photo" ? "https://picsum.photos/800/500?random=" + Math.floor(Math.random()*50) : "https://www.w3schools.com/html/mov_bbb.mp4";
@@ -383,18 +383,16 @@
             if(dbUsers[targetUser]) {
                 dbUsers[targetUser].isBanned = true;
                 writeUsers(dbUsers);
-                alert(`@${targetUser} kullanıcısı ağdan kalıcı olarak uzaklaştırıldı.`);
+                alert(`@${targetUser} banlandı.`);
                 renderNappagStream();
             }
         }
 
-        // AKIŞI EKRANA YANSITMA MOTORU (RENDER)
         function renderNappagStream() {
             let stream = document.getElementById("nappagGlobalStream");
             let dbUsers = readUsers();
             let dbPosts = readPosts();
 
-            // Eğer anlık olarak banlandıysa uygulamadan at
             if(dbUsers[activeSessionUser.username].isBanned) {
                 document.getElementById("metaAppLayout").innerHTML = `<div class="ban-lockout">🚨 GÜVENLİK PROTOKOLÜ: HESABINIZ @admin TARAFINDAN ENGELLEMİŞTİR.</div>`;
                 return;
@@ -403,7 +401,7 @@
             stream.innerHTML = "";
 
             if (dbPosts.length === 0) {
-                stream.innerHTML = `<div class="nappag-unified-card" style="padding:40px; text-align:center; color:var(--text-secondary);">Ağ akışı bomboş. Yukarıdaki panelden ilk Dalga veya Fotoğrafı siz gönderin!</div>`;
+                stream.innerHTML = `<div class="nappag-unified-card" style="padding:40px; text-align:center; color:var(--text-secondary);">Veritabanı temiz. Paylaşılan akış veya dalga yok. İlk gönderiyi yayınlayın!</div>`;
                 return;
             }
 
@@ -425,12 +423,10 @@
                         <div class="nappag-waves-view">
                             <span class="live-rooms-badge" style="top:20px; font-size:12px; padding:4px 12px;">🔴 CANLI ODA AKIŞI AKTİF</span>
                             <span style="font-size:48px;">🎥</span>
-                            <div style="font-size:12px; font-weight:700; margin-top:10px;">NAPPAG LIVE BROADCST LAYER</div>
                         </div>
                     `;
                 }
 
-                // Yetki Butonları
                 let actions = "";
                 if(post.username === activeSessionUser.username || activeSessionUser.username === "admin") {
                     actions += `<button onclick="removePost('${post.id}')" class="action-icon-btn" style="color:var(--danger-color); font-size:12px;">Kaldır</button>`;
