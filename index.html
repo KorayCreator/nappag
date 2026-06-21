@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nappag - Meta Global Unified Platform</title>
+    <title>nappag - A great site</title>
     <style>
-        /* META DESIGN SYSTEM & NAPPAG ORANGE THEME */
+        /* NAPPAG ORANGE THEME & META SYSTEM */
         :root[data-theme="dark"] {
             --nappag-orange: #ff6b00;
             --nappag-orange-hover: #ff8533;
@@ -51,7 +51,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* GİRİŞ & KAYIT EKRANI (META STYLE AUTH) */
+        /* GATEWAY AUTH */
         .auth-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -91,15 +91,14 @@
             font-weight: 700;
         }
 
-        /* MAIN UNIFIED INTERFACE */
+        /* LAYOUT CONFIG */
         .meta-app-grid {
-            display: none; /* Giriş sonrası aktifleşir */
+            display: none;
             width: 100%;
             height: 100vh;
             grid-template-columns: 280px 1fr 340px;
         }
 
-        /* 1. KISIM: SOL NAVİGASYON */
         .meta-sidebar {
             background-color: var(--bg-surface);
             border-right: 1px solid var(--border-color);
@@ -132,7 +131,6 @@
             color: var(--nappag-orange);
         }
 
-        /* 2. KISIM: ORTA AKIŞ PANELİ */
         .meta-center-feed {
             height: 100vh;
             overflow-y: scroll;
@@ -142,8 +140,8 @@
             align-items: center;
         }
 
-        /* INSTAGRAM HİKAYELER BAR */
-        .instagram-stories {
+        /* NAPPAG ANLAR (STORIES) */
+        .nappag-anlar-bar {
             width: 100%;
             max-width: 680px;
             background-color: var(--bg-surface);
@@ -156,7 +154,7 @@
             margin-bottom: 24px;
         }
 
-        .story-avatar-wrapper {
+        .anlar-avatar-wrapper {
             position: relative;
             width: 66px;
             height: 66px;
@@ -166,11 +164,11 @@
             cursor: pointer;
         }
 
-        .story-avatar-wrapper.live {
+        .anlar-avatar-wrapper.live {
             animation: live-pulse 1.5s infinite;
         }
 
-        .story-avatar-wrapper img {
+        .anlar-avatar-wrapper img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
@@ -179,7 +177,7 @@
             border: 2px solid var(--bg-surface);
         }
 
-        .story-live-badge {
+        .live-rooms-badge {
             position: absolute;
             bottom: -4px; left: 50%;
             transform: translateX(-50%);
@@ -191,7 +189,7 @@
             border-radius: 4px;
         }
 
-        /* FACEBOOK / INSTAGRAM COMPOSER BOX */
+        /* COMPOSER */
         .meta-composer {
             width: 100%;
             max-width: 680px;
@@ -202,7 +200,7 @@
             margin-bottom: 24px;
         }
 
-        /* SUPER UNIFIED CARDS */
+        /* NAPPAG UNIFIED CARD SYSTEM */
         .nappag-unified-card {
             width: 100%;
             max-width: 680px;
@@ -226,14 +224,6 @@
             gap: 12px;
         }
 
-        .user-avatar-main {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--border-color);
-        }
-
         .username-row {
             display: flex;
             align-items: center;
@@ -242,13 +232,6 @@
             font-size: 14px;
         }
 
-        .co-author-divider {
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 400;
-        }
-
-        /* 100+ TAKİPÇI TURUNCU KUTU BEYAZ YILDIZ ROZETI */
         .orange-star-box {
             background-color: var(--nappag-orange);
             color: #ffffff;
@@ -259,7 +242,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(255,107,0,0.3);
         }
 
         .nickname-capsule {
@@ -271,7 +253,6 @@
             font-weight: 600;
         }
 
-        /* MEDIA CONTEXT */
         .media-context-container {
             width: 100%;
             background-color: #000000;
@@ -287,8 +268,8 @@
             object-fit: contain;
         }
 
-        /* TIKTOK / YOUTUBE CANLI YAYIN SIMULATOR */
-        .tiktok-live-view {
+        /* AKAN DALGALAR VIDEO STREAM */
+        .nappag-waves-view {
             width: 100%;
             height: 420px;
             background: linear-gradient(180deg, #111111 0%, #2c1a04 100%);
@@ -317,11 +298,8 @@
             gap: 6px;
         }
 
-        .action-icon-btn:hover {
-            color: var(--nappag-orange);
-        }
+        .action-icon-btn:hover { color: var(--nappag-orange); }
 
-        /* 3. KISIM: SAĞ PANEL */
         .meta-right-panel {
             background-color: var(--bg-surface);
             border-left: 1px solid var(--border-color);
@@ -338,18 +316,6 @@
             margin-bottom: 16px;
         }
 
-        .facebook-group-item {
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* TEKNİK FORM ELEMENTLERİ */
         input, textarea, select {
             width: 100%;
             background-color: var(--input-bg);
@@ -359,7 +325,6 @@
             border-radius: 10px;
             font-size: 14px;
             margin-bottom: 12px;
-            transition: border-color 0.2s;
         }
 
         input:focus, textarea:focus, select:focus {
@@ -376,13 +341,11 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
         }
 
-        button.meta-primary-btn:hover {
-            background-color: var(--nappag-orange-hover);
-        }
+        button.meta-primary-btn:hover { background-color: var(--nappag-orange-hover); }
 
+        /* THEME TOGGLER ENGINE */
         .theme-switch-row {
             display: flex;
             justify-content: space-between;
@@ -426,13 +389,11 @@
 </head>
 <body>
 
-    <!-- ADIM 1: GLOBAL UNIFIED AUTHENTICATION GATEWAY -->
     <div class="auth-overlay" id="metaAuthGateway">
         <div class="auth-card">
             <div class="nappag-brand">nappag</div>
             <div class="meta-subtitle">Meta Platform Architecture</div>
             
-            <!-- LOGIN PANEL -->
             <div id="metaLoginInterface">
                 <input type="text" id="authLogUsername" placeholder="Kullanıcı Adı">
                 <input type="password" id="authLogPassword" placeholder="Hesap Şifresi">
@@ -440,37 +401,33 @@
                 <p style="margin-top:20px; font-size:13px; color:var(--text-secondary); cursor:pointer;" onclick="toggleGatewayPanels(false)">Yeni Bir Hesap Oluştur</p>
             </div>
 
-            <!-- REGISTER PANEL -->
             <div id="metaRegisterInterface" style="display:none;">
-                <p style="font-size:12px; color:var(--nappag-orange); margin-bottom:10px; font-weight:bold;">Tüyo: İlk kim 'admin' adıyla kaydolursa şifresini o belirler!</p>
+                <p style="font-size:12px; color:var(--nappag-orange); margin-bottom:10px; font-weight:bold;">İlk kim 'admin' adıyla kaydolursa şifreyi o belirler!</p>
                 <input type="text" id="authRegUsername" placeholder="Kullanıcı Adı (@ olmadan)">
                 <input type="text" id="authRegNickname" placeholder="Topluluk İçi Lakap (Nickname)">
                 <input type="password" id="authRegPassword" placeholder="Güvenli Şifre">
                 <button class="meta-primary-btn" onclick="executeMetaRegistration()">nappag Ağına Katıl</button>
-                <p style="margin-top:20px; font-size:13px; color:var(--text-secondary); cursor:pointer;" onclick="toggleGatewayPanels(true)">Zaten Bir Hesabın Var Mı?</p>
+                <p style="margin-top:20px; font-size:13px; color:var(--text-secondary); cursor:pointer;" onclick="toggleGatewayPanels(true)">Hesabın Var Mı?</p>
             </div>
         </div>
     </div>
 
-    <!-- ADIM 2: UNIFIED MEGA APP PANEL -->
     <div class="meta-app-grid" id="metaAppLayout">
         
-        <!-- SOL SIDEBAR: NAVIGATION CONSOLE -->
         <div class="meta-sidebar">
             <div>
                 <div class="nappag-brand" style="font-size:36px; padding-left:16px;">nappag</div>
                 <div class="meta-subtitle" style="padding-left:16px; margin-bottom:10px;">Meta Engine Dashboard</div>
 
                 <ul class="menu-list">
-                    <li class="menu-item active"><span>🏠</span> Home Feed</li>
-                    <li class="menu-item"><span>📸</span> Instagram Reels</li>
-                    <li class="menu-item"><span>🎥</span> YouTube Shorts</li>
-                    <li class="menu-item"><span>🎵</span> TikTok Scroll</li>
-                    <li class="menu-item"><span>👥</span> Facebook Groups</li>
+                    <li class="menu-item active"><span>🏠</span> Global Akış</li>
+                    <li class="menu-item"><span>🌅</span> Anlar (Stories)</li>
+                    <li class="menu-item"><span>🌊</span> Akan Dalgalar (Waves)</li>
+                    <li class="menu-item"><span>🔍</span> Keşif Paneli</li>
+                    <li class="menu-item"><span>🛍️</span> nappag Vitrin</li>
                 </ul>
             </div>
 
-            <!-- AKTİF SİSTEM KULLANICI ÖZETİ -->
             <div style="background-color:var(--bg-main); padding:16px; border-radius:16px; border:1px solid var(--border-color);">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <img src="" id="navProfilePic" style="width:38px; height:38px; border-radius:50%; object-fit:cover;">
@@ -479,49 +436,40 @@
                         <div id="navNickname" class="nickname-capsule" style="display:inline-block; margin-top:2px;"></div>
                     </div>
                 </div>
-                <button style="background:none; border:1px solid var(--border-color); color:var(--text-secondary); font-size:11px; margin-top:15px; padding:6px; width:100%; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="executeMetaLogout()">Sistemden Çıkış Yap</button>
+                <button style="background:none; border:1px solid var(--border-color); color:var(--text-secondary); font-size:11px; margin-top:15px; padding:6px; width:100%; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="executeMetaLogout()">Çıkış Yap</button>
             </div>
         </div>
 
-        <!-- ORTA PANEL: HYBRID APP STREAM FEED -->
         <div class="meta-center-feed">
             
-            <!-- INSTAGRAM STORIES SYSTEM -->
-            <div class="instagram-stories">
-                <div style="text-align:center;"><div class="story-avatar-wrapper live"><img src="https://picsum.photos/id/1012/100/100"><span class="story-live-badge">CANLI</span></div></div>
-                <div style="text-align:center;"><div class="story-avatar-wrapper"><img src="https://picsum.photos/id/1027/100/100"></div></div>
-                <div style="text-align:center;"><div class="story-avatar-wrapper"><img src="https://picsum.photos/id/1062/100/100"></div></div>
-                <div style="text-align:center;"><div class="story-avatar-wrapper"><img src="https://picsum.photos/id/1074/100/100"></div></div>
+            <div class="nappag-anlar-bar">
+                <div style="text-align:center;"><div class="anlar-avatar-wrapper live"><img src="https://picsum.photos/id/1012/100/100"><span class="live-rooms-badge">CANLI ODA</span></div></div>
+                <div style="text-align:center;"><div class="anlar-avatar-wrapper"><img src="https://picsum.photos/id/1027/100/100"></div></div>
+                <div style="text-align:center;"><div class="anlar-avatar-wrapper"><img src="https://picsum.photos/id/1062/100/100"></div></div>
             </div>
 
-            <!-- FACEBOOK & INSTAGRAM COMPOSER SYSTEM -->
             <div class="meta-composer">
-                <h4 style="font-size:14px; margin-bottom:12px; font-weight:700; color:var(--nappag-orange);">Meta Unified Composer</h4>
-                <textarea id="composerText" placeholder="nappag ekosisteminde paylaşmak istediğin bir şey yaz... (Küfürler filtrelenir)" rows="2"></textarea>
+                <h4 style="font-size:14px; margin-bottom:12px; font-weight:700; color:var(--nappag-orange);">nappag Motoru Paylaşım Paneli</h4>
+                <textarea id="composerText" placeholder="nappag üzerinde yeni bir iz bırakın... (Küfürler filtrelenir)" rows="2"></textarea>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <select id="composerType" onchange="adjustComposerFields()">
-                        <option value="photo">🖼️ Instagram Fotoğraf Yayını</option>
-                        <option value="video">📺 YouTube Video Yayını</option>
-                        <option value="live">🔴 TikTok Canlı Yayın Yayını</option>
+                        <option value="photo">🖼️ Global Akış Gönderisi</option>
+                        <option value="video">🌊 Akan Dalga Paylaşımı</option>
+                        <option value="live">🔴 Canlı Oda Yayını</option>
                     </select>
-                    <select id="composerCoAuthor">
-                        <option value="">🤝 Meta Ortak Gönderi (Yazar Seç)</option>
-                    </select>
+                    <select id="composerCoAuthor"><option value="">🤝 Ortak Yazar Seçimi</option></select>
                 </div>
-                <input type="text" id="composerMediaUrl" placeholder="Fotoğraf veya Video URL'si girin (İsteğe Bağlı)" style="margin-top:10px; margin-bottom:15px;">
-                <button class="meta-primary-btn" onclick="dispatchMetaPost()">nappag Küresel Akışına Gönder</button>
+                <input type="text" id="composerMediaUrl" placeholder="Medya URL'si girin (İsteğe Bağlı)" style="margin-top:10px; margin-bottom:15px;">
+                <button class="meta-primary-btn" onclick="dispatchMetaPost()">Ağa Dağıt</button>
             </div>
 
-            <!-- GLOBAL FEED STREAM -->
             <div id="nappagGlobalStream" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
         </div>
 
-        <!-- SAĞ PANEL -->
         <div class="meta-right-panel">
             
-            <!-- ARAYÜZ MODU SEÇİCİ -->
-            <div class="panel-section-title">Arayüz Görünümü</div>
+            <div class="panel-section-title">Arayüz Seçenekleri</div>
             <div class="theme-switch-row">
                 <span style="font-size:14px; font-weight:600;">Kara Arayüz (Dark Mode)</span>
                 <label class="switch">
@@ -530,36 +478,24 @@
                 </label>
             </div>
 
-            <!-- DETAYLI PROFİL AYARLARI KONTROLÜ -->
-            <div class="panel-section-title">nappag Hesap Yapılandırması</div>
+            <div class="panel-section-title">nappag Kimlik Kartı</div>
             <div style="background-color:var(--bg-main); padding:16px; border-radius:16px; border:1px solid var(--border-color); margin-bottom:24px;">
-                <input type="text" id="configNickname" placeholder="Lakabımı Değiştir">
-                <input type="text" id="configBio" placeholder="Biyografimi Düzenle">
-                <input type="text" id="configAvatar" placeholder="Profil Fotoğrafı URL'si">
-                <input type="number" id="configFollowers" placeholder="Takipçi Sayısı Tanımla">
-                <button class="meta-primary-btn" style="padding:10px;" onclick="commitProfileConfiguration()">Bilgilerimi Güncelle</button>
-                <button class="meta-primary-btn" style="padding:10px; background-color:var(--danger-color); margin-top:6px;" onclick="terminateAccountPermanently()">Hesabımı Tamamen Sil</button>
+                <input type="text" id="configNickname" placeholder="Lakap Değiştir">
+                <input type="text" id="configBio" placeholder="Biyografi Düzenle">
+                <input type="text" id="configAvatar" placeholder="Profil Resmi URL">
+                <input type="number" id="configFollowers" placeholder="Takipçi Değeri">
+                <button class="meta-primary-btn" style="padding:10px;" onclick="commitProfileConfiguration()">Güncellemeleri Kaydet</button>
             </div>
 
-            <!-- FACEBOOK TARZI TOPLULUKLAR PANELİ -->
-            <div class="panel-section-title">Aktif Meta Toplulukları</div>
-            <div class="facebook-group-item">
-                <div><div style="font-weight:700; font-size:14px;">🤖 Yapay Zeka Dünyası</div><div style="font-size:11px; color:var(--text-secondary);">Grup Tipi: Herkese Açık</div></div>
-                <span style="font-size:12px; color:var(--nappag-orange); font-weight:700;">Bağlı</span>
-            </div>
-
-            <!-- @admin KONTROL ALANI -->
             <div id="superAdminMasterPanel" style="display:none; margin-top:24px;">
                 <div class="panel-section-title" style="color:var(--danger-color);">🚨 SuperAdmin Yetki Alanı</div>
-                <div style="background-color:rgba(255,59,48,0.05); border:1px solid var(--danger-color); padding:14px; border-radius:12px; font-size:12px; color:var(--text-secondary); line-height:1.5;">
-                    Sistem genelinde mutlak yönetimdesiniz. Gönderileri silebilir ve hesapları banlayabilirsiniz.
+                <div style="background-color:rgba(255,59,48,0.05); border:1px solid var(--danger-color); padding:14px; border-radius:12px; font-size:12px;">
+                    @admin hesabı aktif. Gönderi silme ve topluluk üyelerini ağdan banlama yetkileri açıldı.
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- META SECURE STORAGE & DATA ENGINE -->
     <script>
         const PROFANITY_BLOCKLIST = ["küfür1", "küfür2", "salak", "aptal", "mal", "gerizekalı"];
 
@@ -592,44 +528,38 @@
             document.getElementById("metaRegisterInterface").style.display = showLogin ? "none" : "block";
         }
 
-        // Meta Registration Execution (ŞİFREYİ İLK KAYDOLAN BELİRLER)
         function executeMetaRegistration() {
             let uName = document.getElementById("authRegUsername").value.trim().toLowerCase();
             let nName = document.getElementById("authRegNickname").value.trim();
             let pWord = document.getElementById("authRegPassword").value;
 
-            if (!uName || !nName || !pWord) { alert("Lütfen tüm alanları doldurun."); return; }
+            if (!uName || !nName || !pWord) { alert("Boş alanları doldurun."); return; }
 
             let usersStore = fetchAllUsers();
 
-            // Eğer birisi admin olmaya çalışıyorsa ve sistemde zaten bir admin varsa engelle
             if (uName === "admin" && usersStore["admin"]) {
-                alert("Sistem Koruması: '@admin' hesabı zaten kurulu ve şifresi belirlenmiş!");
+                alert("Kritik Hata: @admin hesabı zaten oluşturulmuş!");
                 return;
             }
 
-            if (usersStore[uName]) { alert("Bu kullanıcı adı Meta veritabanında mevcut."); return; }
+            if (usersStore[uName]) { alert("Bu kullanıcı adı veritabanında var."); return; }
 
             usersStore[uName] = {
                 username: uName,
                 nickname: metaCleanFilter(nName),
                 password: pWord,
-                bio: uName === "admin" ? "nappag Kurucusu ve Yöneticisi." : "nappag Meta kullanıcısı.",
-                avatar: "https://picsum.photos/id/1062/150/150",
-                followers: uName === "admin" ? 9999 : 0,
+                bio: uName === "admin" ? "nappag Ağ Kurucusu." : "nappag Üyesi.",
+                avatar: "https://picsum.photos/id/64/150/150",
+                followers: uName === "admin" ? 1000 : 0,
                 isBanned: false
             };
 
             saveAllUsers(usersStore);
-            if(uName === "admin") {
-                alert("Tebrikler! Kurucu @admin hesabı şifrenizle başarıyla oluşturuldu.");
-            } else {
-                alert("Kayıt işleminiz gerçekleştirildi! Giriş yapabilirsiniz.");
-            }
+            if(uName === "admin") alert("Tebrikler, @admin hesabının şifresini başarıyla siz belirlediniz!");
+            else alert("Kayıt başarılı.");
             toggleGatewayPanels(true);
         }
 
-        // Meta Login Execution
         function executeMetaLogin() {
             let uName = document.getElementById("authLogUsername").value.trim().toLowerCase();
             let pWord = document.getElementById("authLogPassword").value;
@@ -637,8 +567,8 @@
             let usersStore = fetchAllUsers();
             let match = usersStore[uName];
 
-            if (!match || match.password !== pWord) { alert("Hatalı hesap bilgileri!"); return; }
-            if (match.isBanned) { alert("🚨 Hesabınız kurallar gereği @admin tarafından askıya alınmıştır."); return; }
+            if (!match || match.password !== pWord) { alert("Giriş bilgileri hatalı!"); return; }
+            if (match.isBanned) { alert("Bu hesap @admin tarafından süresiz gölgelendi (banlandı)."); return; }
 
             activeSessionUser = match;
             bootMetaSystem();
@@ -647,7 +577,6 @@
         function bootMetaSystem() {
             document.getElementById("metaAuthGateway").style.display = "none";
             document.getElementById("metaAppLayout").style.display = "grid";
-
             refreshProfileDomElements();
             populateCoAuthorDropdown();
             renderNappagStream();
@@ -660,21 +589,15 @@
             
             let starField = document.getElementById("navStarBadge");
             if (activeSessionUser.followers > 100) {
-                starField.innerHTML = `<span class="orange-star-box" title="Meta Onaylı Hesap">★</span>`;
-            } else {
-                starField.innerHTML = "";
-            }
+                starField.innerHTML = `<span class="orange-star-box" title="Onaylı Profil">★</span>`;
+            } else { starField.innerHTML = ""; }
 
             document.getElementById("configNickname").value = activeSessionUser.nickname;
             document.getElementById("configBio").value = activeSessionUser.bio;
             document.getElementById("configAvatar").value = activeSessionUser.avatar;
             document.getElementById("configFollowers").value = activeSessionUser.followers;
 
-            if (activeSessionUser.username === "admin") {
-                document.getElementById("superAdminMasterPanel").style.display = "block";
-            } else {
-                document.getElementById("superAdminMasterPanel").style.display = "none";
-            }
+            document.getElementById("superAdminMasterPanel").style.display = activeSessionUser.username === "admin" ? "block" : "none";
         }
 
         function commitProfileConfiguration() {
@@ -683,7 +606,7 @@
 
             let desiredNick = document.getElementById("configNickname").value.trim();
             if (desiredNick.toLowerCase().includes("admin") && activeSessionUser.username !== "admin") {
-                alert("Güvenlik Duvarı: Lakap parametresi 'admin' ibaresi barındıramaz!");
+                alert("Güvenlik ihlali: 'admin' takma adı kullanılamaz.");
                 return;
             }
 
@@ -696,28 +619,18 @@
             saveAllUsers(usersStore);
             activeSessionUser = me;
 
-            alert("Meta profil verileri başarıyla işlendi.");
+            alert("Veriler güncellendi.");
             refreshProfileDomElements();
             renderNappagStream();
         }
 
-        function terminateAccountPermanently() {
-            if (activeSessionUser.username === "admin") { alert("Kök yönetici hesabı yok edilemez."); return; }
-            if (confirm("nappag hesabınızı tamamen silmek istediğinize emin misiniz?")) {
-                let usersStore = fetchAllUsers();
-                delete usersStore[activeSessionUser.username];
-                saveAllUsers(usersStore);
-                executeMetaLogout();
-            }
-        }
-
         function populateCoAuthorDropdown() {
             let box = document.getElementById("composerCoAuthor");
-            box.innerHTML = '<option value="">🤝 Meta Ortak Gönderi (Yazar Seç)</option>';
+            box.innerHTML = '<option value="">🤝 Ortak Yazar Seçimi</option>';
             let usersStore = fetchAllUsers();
             for (let k in usersStore) {
                 if (k !== activeSessionUser.username) {
-                    box.innerHTML += `<option value="${k}">@${k} (${usersStore[k].nickname})</option>`;
+                    box.innerHTML += `<option value="${k}">@${k}</option>`;
                 }
             }
         }
@@ -728,7 +641,7 @@
             if (t === "live") m.style.display = "none";
             else {
                 m.style.display = "block";
-                m.placeholder = t === "photo" ? "Instagram Görsel Bağlantısı (.jpg / .png)" : "YouTube Medya Bağlantısı (.mp4)";
+                m.placeholder = t === "photo" ? "Görsel URL'si (.jpg / .png)" : "Dalga Video URL'si (.mp4)";
             }
         }
 
@@ -738,18 +651,18 @@
             let link = document.getElementById("composerMediaUrl").value.trim();
             let secondaryAuthor = document.getElementById("composerCoAuthor").value;
 
-            if (!desc && type !== "live") { alert("Metin girmeden içerik aktarılamaz."); return; }
+            if (!desc && type !== "live") { alert("İçerik açıklaması boş bırakılamaz."); return; }
 
-            if (!link && type === "photo") link = "https://picsum.photos/800/530?random=" + Math.floor(Math.random()*50);
+            if (!link && type === "photo") link = "https://picsum.photos/800/530?random=" + Math.floor(Math.random()*20);
             if (!link && type === "video") link = "https://www.w3schools.com/html/mov_bbb.mp4";
 
-            let structuralAuthors = [activeSessionUser.username];
-            if (secondaryAuthor) structuralAuthors.push(secondaryAuthor);
+            let authorsArray = [activeSessionUser.username];
+            if (secondaryAuthor) authorsArray.push(secondaryAuthor);
 
             let postStore = fetchAllPosts();
             postStore.unshift({
-                id: "meta_p_" + Date.now(),
-                authors: structuralAuthors,
+                id: "post_" + Date.now(),
+                authors: authorsArray,
                 type: type,
                 url: link,
                 description: metaCleanFilter(desc),
@@ -766,13 +679,10 @@
         function scrapMetaPost(postId) {
             let postStore = fetchAllPosts();
             let match = postStore.find(p => p.id === postId);
-
             if (activeSessionUser.username === "admin" || match.authors.includes(activeSessionUser.username)) {
                 postStore = postStore.filter(p => p.id !== postId);
                 saveAllPosts(postStore);
                 renderNappagStream();
-            } else {
-                alert("Bunu gerçekleştirmek için yetki protokolünüz yetersiz.");
             }
         }
 
@@ -782,7 +692,7 @@
             if (usersStore[targetUser]) {
                 usersStore[targetUser].isBanned = true;
                 saveAllUsers(usersStore);
-                alert(`Sistem: @${targetUser} hesabı askıya alındı.`);
+                alert(`@${targetUser} ağdan engellendi.`);
                 renderNappagStream();
             }
         }
@@ -792,9 +702,7 @@
             let match = postStore.find(p => p.id === postId);
             if (match.likes.includes(activeSessionUser.username)) {
                 match.likes = match.likes.filter(x => x !== activeSessionUser.username);
-            } else {
-                match.likes.push(activeSessionUser.username);
-            }
+            } else { match.likes.push(activeSessionUser.username); }
             saveAllPosts(postStore);
             renderNappagStream();
         }
@@ -806,12 +714,7 @@
 
             let postStore = fetchAllPosts();
             let match = postStore.find(p => p.id === postId);
-
-            match.comments.push({
-                username: activeSessionUser.username,
-                text: metaCleanFilter(text)
-            });
-
+            match.comments.push({ username: activeSessionUser.username, text: metaCleanFilter(text) });
             saveAllPosts(postStore);
             selector.value = "";
             renderNappagStream();
@@ -820,25 +723,18 @@
         function renderNappagStream() {
             let targetStream = document.getElementById("nappagGlobalStream");
             let appLayout = document.getElementById("metaAppLayout");
-            
             let usersStore = fetchAllUsers();
             let postStore = fetchAllPosts();
 
             if (usersStore[activeSessionUser.username].isBanned) {
                 appLayout.className = "";
-                appLayout.innerHTML = `
-                    <div class="ban-lockout">
-                        <div>🚨 BU HESAP NAPPAG GLOBAL SECURITY TARAFINDAN ENGELLENMİŞTIR.</div>
-                        <div style="font-size:13px; color:var(--text-secondary); margin-top:10px; font-weight:400;">Detaylar için ağ yöneticisi @admin ile görüşün.</div>
-                    </div>
-                `;
+                appLayout.innerHTML = `<div class="ban-lockout">🚨 HESABINIZ TOPLULUK LIDERLERI TARAFINDAN GÖLGELENMIŞTIR.</div>`;
                 return;
             }
 
             targetStream.innerHTML = "";
-
             if (postStore.length === 0) {
-                targetStream.innerHTML = `<div class="nappag-unified-card" style="padding:40px; text-align:center; color:var(--text-secondary);">nappag ağında henüz bir Meta akışı bulunmuyor.</div>`;
+                targetStream.innerHTML = `<div class="nappag-unified-card" style="padding:40px; text-align:center; color:var(--text-secondary);">nappag ağında henüz paylaşılan bir dalga veya akış bulunmuyor.</div>`;
                 return;
             }
 
@@ -847,11 +743,11 @@
                 node.className = "nappag-unified-card";
 
                 let structuralHtml = post.authors.map(authorKey => {
-                    let instance = usersStore[authorKey] || { username: authorKey, nickname: "Bilinmeyen Hesap", followers: 0 };
+                    let instance = usersStore[authorKey] || { username: authorKey, nickname: "Kullanıcı", followers: 0 };
                     let star = instance.followers > 100 ? `<span class="orange-star-box">★</span>` : '';
                     let nick = instance.nickname ? `<span class="nickname-capsule">${instance.nickname}</span>` : '';
                     return `<span><strong>@${instance.username}</strong> ${nick} ${star}</span>`;
-                }).join("<span class=\"co-author-divider\"> ve </span>");
+                }).join(" & ");
 
                 let finalMediaContent = "";
                 if (post.type === "photo") {
@@ -860,57 +756,47 @@
                     finalMediaContent = `<div class="media-context-container"><video controls src="${post.url}"></video></div>`;
                 } else if (post.type === "live") {
                     finalMediaContent = `
-                        <div class="tiktok-live-view">
-                            <span class="story-live-badge" style="top:20px; font-size:12px; padding:4px 12px; animation: live-pulse 1s infinite;">🔴 TIKTOK CANLI YAYIN</span>
-                            <span style="font-size:56px; margin-bottom:10px;">📹</span>
-                            <div style="font-weight:700; font-size:13px; letter-spacing:0.5px;">NAPPAG LIVE FEED CONNECTED</div>
+                        <div class="nappag-waves-view">
+                            <span class="live-rooms-badge" style="top:20px; font-size:12px; padding:4px 12px; animation: live-pulse 1s infinite;">🔴 CANLI ODA AKIŞI</span>
+                            <span style="font-size:56px;">📹</span>
                         </div>
                     `;
                 }
 
                 let mButtons = "";
                 if (post.authors.includes(activeSessionUser.username) || activeSessionUser.username === "admin") {
-                    mButtons += `<button onclick="scrapMetaPost('${post.id}')" class="action-icon-btn" style="color:var(--danger-color); font-size:12px;">İçeriği Kaldır</button>`;
+                    mButtons += `<button onclick="scrapMetaPost('${post.id}')" class="action-icon-btn" style="color:var(--danger-color); font-size:12px;">Kaldır</button>`;
                 }
-
                 if (activeSessionUser.username === "admin") {
                     post.authors.forEach(authKey => {
                         if (authKey !== "admin" && usersStore[authKey] && !usersStore[authKey].isBanned) {
-                            mButtons += `<button onclick="suspendUserAccount('${authKey}')" class="action-icon-btn" style="color:var(--danger-color); font-size:12px; border:1px solid var(--danger-color); padding:2px 6px; border-radius:4px; margin-left:5px;">@${authKey} Banla</button>`;
+                            mButtons += `<button onclick="suspendUserAccount('${authKey}')" class="action-icon-btn" style="color:var(--danger-color); font-size:12px; border:1px solid var(--danger-color); padding:2px 6px; border-radius:4px; margin-left:5px;">@${authKey} Engelle</button>`;
                         }
                     });
                 }
 
-                let commentsRendered = post.comments.map(c => `
-                    <div style="font-size:13px; margin-bottom:6px; line-height:1.4;">
-                        <strong style="color:var(--nappag-orange);">@${c.username}:</strong> <span>${c.text}</span>
-                    </div>
-                `).join("");
+                let commentsRendered = post.comments.map(c => `<div style="font-size:13px; margin-bottom:6px;"><strong style="color:var(--nappag-orange);">@${c.username}:</strong> <span>${c.text}</span></div>`).join("");
 
                 node.innerHTML = `
                     <div class="card-header">
                         <div class="user-meta-group"><div>${structuralHtml}</div></div>
-                        <div style="display:flex; align-items:center;">${mButtons}</div>
+                        <div>${mButtons}</div>
                     </div>
                     ${finalMediaContent}
                     <div style="padding:16px;">
-                        <p style="font-size:14px; line-height:1.5; margin-bottom:12px;">${post.description}</p>
-                        
-                        <div class="engagement-action-bar" style="padding:10px 0; margin-bottom:12px;">
-                            <button class="action-icon-btn" onclick="likeMetaPost('${post.id}')">❤️ Beğen (${post.likes.length})</button>
-                            <button class="action-icon-btn">💬 Yorumlar (${post.comments.length})</button>
+                        <p style="font-size:14px; margin-bottom:12px;">${post.description}</p>
+                        <div class="engagement-action-bar" style="padding:10px 0;">
+                            <button class="action-icon-btn" onclick="likeMetaPost('${post.id}')">❤️ Etkileşim (${post.likes.length})</button>
                         </div>
-
-                        <div style="background-color:var(--bg-main); padding:12px; border-radius:12px; border:1px solid var(--border-color);">
-                            <div id="comment_box_zone_${post.id}">${commentsRendered}</div>
+                        <div style="background-color:var(--bg-main); padding:12px; border-radius:12px; border:1px solid var(--border-color); margin-top:10px;">
+                            <div>${commentsRendered}</div>
                             <div style="display:flex; gap:10px; margin-top:10px;">
-                                <input type="text" id="feed_comment_in_${post.id}" placeholder="Meta topluluğuna yorum bırak..." style="margin-bottom:0; padding:8px 12px;">
-                                <button class="meta-primary-btn" style="width:auto; padding:0 16px; font-size:13px;" onclick="appendMetaComment('${post.id}')">Gönder</button>
+                                <input type="text" id="feed_comment_in_${post.id}" placeholder="Fikir belirt..." style="margin-bottom:0;">
+                                <button class="meta-primary-btn" style="width:auto; padding:0 16px;" onclick="appendMetaComment('${post.id}')">Gönder</button>
                             </div>
                         </div>
                     </div>
                 `;
-
                 targetStream.appendChild(node);
             });
         }
@@ -919,8 +805,6 @@
             activeSessionUser = null;
             document.getElementById("metaAppLayout").style.display = "none";
             document.getElementById("metaAuthGateway").style.display = "flex";
-            document.getElementById("authLogUsername").value = "";
-            document.getElementById("authLogPassword").value = "";
         }
     </script>
 </body>
