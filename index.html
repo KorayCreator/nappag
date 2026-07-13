@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kozmik & Etnik Google Çeviri Altyapısı</title>
+    <title>Konuşan Avatarlar</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --accent-color: #4285f4;
-            --text-color: #e0e0e0;
-            --border-color: #333;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
         }
 
         body {
@@ -22,223 +22,233 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background: var(--container-bg);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
+            min-height: 100vh;
         }
 
         h1 {
-            text-align: center;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
         }
 
         p.subtitle {
+            color: #666;
+            margin-bottom: 30px;
             text-align: center;
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 25px;
         }
 
-        .translator-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
-        @media (max-width: 768px) {
-            .translator-box {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .pane {
+        .controls {
             display: flex;
             flex-direction: column;
-        }
-
-        select {
-            padding: 12px;
-            background: #2a2a2a;
-            color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            outline: none;
-        }
-
-        select:focus {
-            border-color: var(--accent-color);
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         textarea {
             width: 100%;
-            height: 200px;
-            padding: 15px;
-            background: #252525;
-            color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            height: 100px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            resize: vertical;
             font-size: 16px;
-            resize: none;
             box-sizing: border-box;
-            outline: none;
+            transition: border-color 0.2s;
         }
 
         textarea:focus {
-            border-color: var(--accent-color);
+            outline: none;
+            border-color: var(--primary-color);
         }
 
-        .output-text {
-            background: #1a1a1a;
-            border: 1px solid #2d2d2d;
+        .voice-select-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        /* Google Çeviri Elementi Gizleme ve Özelleştirme */
-        #google_translate_element {
-            display: none;
+        select {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: white;
         }
-        .skiptranslate {
-            display: none !important;
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
         }
-        body {
-            top: 0px !important;
+
+        .avatar-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .avatar-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.1);
+        }
+
+        .avatar-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .avatar-card span {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .speak-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .speak-btn:hover {
+            background-color: var(--primary-hover);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Kozmik & Etnik Google Çeviri</h1>
-    <p class="subtitle">Standart diller, antik lehçeler ve Google'ın gizli/deneysel etnik dil kodları algoritmik olarak entegre edilmiştir.</p>
+    <h1>Konuşan Avatarlar</h1>
+    <p class="subtitle">Metni yazın, ses dilini seçin ve konuşturmak istediğiniz avatara tıklayın!</p>
 
-    <div class="translator-box">
-        <div class="pane">
-            <select id="source-lang">
-                <option value="auto">Dili Algıla (Auto-Detect)</option>
-                <option value="tr">Türkçe</option>
-                <option value="en">İngilizce (English)</option>
-                <option value="de">Almanca (Deutsch)</option>
-                <option value="fr">Fransızca (Français)</option>
-                <option value="es">İspanyolca (Español)</option>
-                <option value="la">Latince (Antik Roma Lehçesi)</option>
-                <option value="grc">Antik Yunanca (Ancient Greek)</option>
-                <option value="got">Gotça (Gothic - Gizli Etnik)</option>
-                <option value="syc">Süryanice (Classical Syriac)</option>
-                <option value="eo">Esperanto (Yapay Küresel Dil)</option>
-            </select>
-            <textarea id="input-area" placeholder="Çevirmek istediğiniz metni buraya yazın..."></textarea>
+    <div class="container">
+        <div class="controls">
+            <textarea id="text-to-speak" placeholder="Avatarın ne söylemesini istiyorsunuz? Buraya yazın..."></textarea>
+            
+            <div class="voice-select-container">
+                <label for="voice-select"><strong>Konuşma Sesi / Dili Seçin:</strong></label>
+                <select id="voice-select">
+                    </select>
+            </div>
         </div>
 
-        <div class="pane">
-            <select id="target-lang">
-                <optgroup label="--- GİZLİ, ANTİK & ETNİK DİLLER ---">
-                    <option value="la" selected>Latince (Antik Ölü Dil)</option>
-                    <option value="got">Gotça (Gothic - Google Deneysel)</option>
-                    <option value="syc">Süryanice (Klasik)</option>
-                    <option value="sa">Sanskritçe (Antik Hint Kutsal Dili)</option>
-                    <option value="cu">Eski Kilise Slavcası</option>
-                    <option value="yi">Yidiş (Aşkenaz Yahudi Etnik Dili)</option>
-                    <option value="eo">Esperanto (Yapay Etnik/Kozmik)</option>
-                    <option value="tlh">Klingonca (Kozmik / Deneysel Kod)</option>
-                    <option value="qya">Quenya (Elfçe / Deneysel)</option>
-                </optgroup>
-                <optgroup label="--- POPÜLER GLOBAL DİLLER ---">
-                    <option value="tr">Türkçe</option>
-                    <option value="en">İngilizce</option>
-                    <option value="de">Almanca</option>
-                    <option value="fr">Fransızca</option>
-                    <option value="es">İspanyolca</option>
-                    <option value="zh-CN">Çince (Basitleştirilmiş)</option>
-                    <option value="ru">Rusça</option>
-                    <option value="ar">Arapça</option>
-                    <option value="ja">Japonca</option>
-                </optgroup>
-            </select>
-            <textarea id="output-area" class="output-text" readonly placeholder="Çeviri sonucu burada görünecek..."></textarea>
-        </div>
+        <div class="avatar-grid" id="avatar-container">
+            </div>
     </div>
-</div>
 
-<div id="google_translate_element"></div>
+    <script>
+        // Farklı ırk, tarz ve isimlerde avatar listesi (DiceBear API stilleri kullanıldı)
+        // adoptions: 'avataaars', 'lorelei', 'open-peeps', 'persona', 'bottts' vb.
+        const avatars = [
+            { name: "Asya (Aria)", style: "avataaars", seed: "Aria", gender: "female" },
+            { name: "Avrupa (Jack)", style: "avataaars", seed: "Jack", gender: "male" },
+            { name: "Afrika (Zuri)", style: "open-peeps", seed: "Zuri", gender: "female" },
+            { name: "Ortadoğu (Amir)", style: "persona", seed: "Amir", gender: "male" },
+            { name: "Latin (Elena)", style: "lorelei", seed: "Elena", gender: "female" },
+            { name: "Robot (Robo-X)", style: "bottts", seed: "Robo", gender: "neutral" }
+        ];
 
-<script type="text/javascript">
-    // Google Çeviri Motorunu Başlatma
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'auto',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-    }
-</script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        const avatarContainer = document.getElementById('avatar-container');
+        const textInput = document.getElementById('text-to-speak');
+        const voiceSelect = document.getElementById('voice-select');
 
-<script>
-    // Çeviri İşlemini Tetikleyen JavaScript Kodları
-    const inputArea = document.getElementById('input-area');
-    const outputArea = document.getElementById('output-area');
-    const sourceLang = document.getElementById('source-lang');
-    const targetLang = document.getElementById('target-lang');
+        let synth = window.speechSynthesis;
+        let voices = [];
 
-    // Sahte/Simüle edilmiş antik diller için basit dönüştürücü matris (Google API kısıtlamalarına karşı koruma)
-    const cosmicSecretMatrix = {
-        'tlh': { 'merhaba': 'nuqneH', 'dünya': 'qoʼ', 'insan': 'human' },
-        'got': { 'merhaba': 'Hails', 'dünya': 'Fairhwus', 'insan': 'Manna' }
-    };
-
-    function performTranslate() {
-        const text = inputArea.value.trim();
-        const target = targetLang.value;
-        const source = sourceLang.value;
-
-        if (text === "") {
-            outputArea.value = "";
-            return;
-        }
-
-        // Eğer sistemde kayıtlı çok gizli deneysel bir dil seçildiyse matrisi kontrol et
-        if (cosmicSecretMatrix[target] && cosmicSecretMatrix[target][text.toLowerCase()]) {
-            outputArea.value = cosmicSecretMatrix[target][text.toLowerCase()] + " [Etnik Kod Çözüldü]";
-            return;
-        }
-
-        // Google Ücretsiz Çeviri API Web Geçidi (CORS-free fetch)
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                // Google API'den gelen yanıtı parse edip kutuya yazdırma
-                let translatedText = "";
-                data[0].forEach(sentence => {
-                    if (sentence[0]) {
-                        translatedText += sentence[0];
-                    }
-                });
-                outputArea.value = translatedText;
-            })
-            .catch(error => {
-                console.error("Çeviri hatası:", error);
-                outputArea.value = "Kozmik veri tabanına bağlanırken hata oluştu veya bu dil kodu şu an uykuda.";
+        // Tarayıcıdaki kullanılabilir sesleri yükleme fonksiyonu
+        function populateVoiceList() {
+            voices = synth.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            voices.forEach((voice, i) => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = i;
+                
+                // Varsa Türkçe sesini varsayılan yapalım
+                if(voice.lang.includes('tr-TR') || voice.lang.includes('tr')) {
+                    option.selected = true;
+                }
+                voiceSelect.appendChild(option);
             });
-    }
+        }
 
-    // Kullanıcı yazı yazdıkça veya dil değiştirdikçe otomatik çevir
-    inputArea.addEventListener('input', performTranslate);
-    targetLang.addEventListener('change', performTranslate);
-    sourceLang.addEventListener('change', performTranslate);
-</script>
+        // Chrome ve bazı tarayıcılarda seslerin yüklenmesi zaman alabilir
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
 
+        // Avatarları ekrana basma
+        avatars.forEach(avatar => {
+            const card = document.createElement('div');
+            card.className = 'avatar-card';
+            
+            // DiceBear ücretsiz avatar API'sinden resmi çekiyoruz
+            const imageUrl = `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
+            
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="${avatar.name}">
+                <span>${avatar.name}</span>
+                <button class="speak-btn">Konuştur</button>
+            `;
+
+            // Karta tıklanınca veya butona basılınca konuşma tetiklensin
+            card.addEventListener('click', () => {
+                speakText();
+            });
+
+            avatarContainer.appendChild(card);
+        });
+
+        // Metni seslendirme fonksiyonu
+        function speakText() {
+            // Eğer tarayıcı konuşma halindeyse önce durdur
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            const text = textInput.value.trim();
+            if (text === '') {
+                alert('Lütfen avatarın söylemesi için bir metin yazın!');
+                return;
+            }
+
+            const utterThis = new SpeechSynthesisUtterance(text);
+            
+            // Seçilen sesi ata
+            if (voiceSelect.value !== "") {
+                utterThis.voice = voices[voiceSelect.value];
+            }
+
+            // Ses perdesi (pitch) ve hız (rate) ayarları (isteğe göre değiştirilebilir)
+            utterThis.pitch = 1; 
+            utterThis.rate = 1;  
+
+            synth.speak(utterThis);
+        }
+    </script>
 </body>
 </html>
