@@ -1,254 +1,102 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konuşan Avatarlar</title>
-    <style>
-        :root {
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-color: #333;
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
+// Bu bölüm, verdiğim HTML dosyasındaki <script> etiketinin hemen altını değiştirecek.
+
+// 1. ÖNCE: Görseldeki 6 özgün avatar resmini bilgisayarına indir ve 'img' adında bir klasöre kaydet.
+// (Ör: img/asya_aria.png, img/avrupa_jack.png, vb.)
+
+// 2. SONRA: Aşağıdaki diziyi mevcut kodunla değiştir:
+
+const avatars = [
+    { name: "Asya (Aria)", image: "img/asya_aria.png", gender: "female" },
+    { name: "Avrupa (Jack)", image: "img/avrupa_jack.png", gender: "male" },
+    { name: "Afrika (Zuri)", image: "img/afrika_zuri.png", gender: "female" },
+    { name: "Ortadoğu (Amir)", image: "img/ortadogu_amir.png", gender: "male" },
+    { name: "Latin (Elena)", image: "img/latin_elena.png", gender: "female" },
+    { name: "Robot (Robo-X)", image: "img/robot_robox.png", gender: "neutral" }
+];
+
+const avatarContainer = document.getElementById('avatar-container');
+const textInput = document.getElementById('text-to-speak');
+const voiceSelect = document.getElementById('voice-select');
+
+let synth = window.speechSynthesis;
+let voices = [];
+
+// Tarayıcıdaki kullanılabilir sesleri yükleme fonksiyonu
+function populateVoiceList() {
+    voices = synth.getVoices();
+    voiceSelect.innerHTML = '';
+    
+    voices.forEach((voice, i) => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.value = i;
+        
+        if(voice.lang.includes('tr-TR') || voice.lang.includes('tr')) {
+            option.selected = true;
         }
+        voiceSelect.appendChild(option);
+    });
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+populateVoiceList();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoiceList;
+}
 
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
+// ÖZGÜN AVATARLARI EKLEME BÖLÜMÜ (GÜNCELLENDİ)
+avatars.forEach((avatar, index) => {
+    const card = document.createElement('div');
+    card.className = 'avatar-card';
+    card.id = `avatar-${index}`; // Her karta benzersiz ID
+    
+    // API yerine KENDİ ÖZGÜN RESİMLERİNİ kullanıyoruz
+    card.innerHTML = `
+        <img src="${avatar.image}" alt="${avatar.name}">
+        <span>${avatar.name}</span>
+        <button class="speak-btn">
+            <span class="btn-text">Konuştur</span>
+            <span class="speak-icon">🔊</span>
+        </button>
+    `;
 
-        p.subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            text-align: center;
-        }
+    card.addEventListener('click', () => {
+        speakText(index);
+    });
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
+    avatarContainer.appendChild(card);
+});
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
+// Metni seslendirme fonksiyonu (Küçük görsel geri bildirim eklendi)
+function speakText(avatarIndex) {
+    if (synth.speaking) {
+        synth.cancel();
+    }
 
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            resize: vertical;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
+    const text = textInput.value.trim();
+    if (text === '') {
+        alert('Lütfen avatarın söylemesi için bir metin yazın!');
+        return;
+    }
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
+    const utterThis = new SpeechSynthesisUtterance(text);
+    
+    if (voiceSelect.value !== "") {
+        utterThis.voice = voices[voiceSelect.value];
+    }
 
-        .voice-select-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    utterThis.pitch = 1; 
+    utterThis.rate = 1;  
 
-        select {
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            background-color: white;
-        }
+    // Görsel Geri Bildirim: Konuşurken avatar kartına sınıf ekle (CSS ile ağız oynatma/dalga efekti için)
+    const activeCard = document.getElementById(`avatar-${avatarIndex}`);
+    
+    utterThis.onstart = function() {
+        activeCard.classList.add('speaking'); // CSS'te '.speaking' sınıfını tanımlamalısın
+    };
 
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-        }
+    utterThis.onend = function() {
+        activeCard.classList.remove('speaking');
+    };
 
-        .avatar-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .avatar-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.1);
-        }
-
-        .avatar-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            margin-bottom: 10px;
-        }
-
-        .avatar-card span {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            color: #475569;
-        }
-
-        .speak-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            transition: background 0.2s;
-        }
-
-        .speak-btn:hover {
-            background-color: var(--primary-hover);
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Konuşan Avatarlar</h1>
-    <p class="subtitle">Metni yazın, ses dilini seçin ve konuşturmak istediğiniz avatara tıklayın!</p>
-
-    <div class="container">
-        <div class="controls">
-            <textarea id="text-to-speak" placeholder="Avatarın ne söylemesini istiyorsunuz? Buraya yazın..."></textarea>
-            
-            <div class="voice-select-container">
-                <label for="voice-select"><strong>Konuşma Sesi / Dili Seçin:</strong></label>
-                <select id="voice-select">
-                    </select>
-            </div>
-        </div>
-
-        <div class="avatar-grid" id="avatar-container">
-            </div>
-    </div>
-
-    <script>
-        // Farklı ırk, tarz ve isimlerde avatar listesi (DiceBear API stilleri kullanıldı)
-        // adoptions: 'avataaars', 'lorelei', 'open-peeps', 'persona', 'bottts' vb.
-        const avatars = [
-            { name: "Asya (Aria)", style: "avataaars", seed: "Aria", gender: "female" },
-            { name: "Avrupa (Jack)", style: "avataaars", seed: "Jack", gender: "male" },
-            { name: "Afrika (Zuri)", style: "open-peeps", seed: "Zuri", gender: "female" },
-            { name: "Ortadoğu (Amir)", style: "persona", seed: "Amir", gender: "male" },
-            { name: "Latin (Elena)", style: "lorelei", seed: "Elena", gender: "female" },
-            { name: "Robot (Robo-X)", style: "bottts", seed: "Robo", gender: "neutral" }
-        ];
-
-        const avatarContainer = document.getElementById('avatar-container');
-        const textInput = document.getElementById('text-to-speak');
-        const voiceSelect = document.getElementById('voice-select');
-
-        let synth = window.speechSynthesis;
-        let voices = [];
-
-        // Tarayıcıdaki kullanılabilir sesleri yükleme fonksiyonu
-        function populateVoiceList() {
-            voices = synth.getVoices();
-            voiceSelect.innerHTML = '';
-            
-            voices.forEach((voice, i) => {
-                const option = document.createElement('option');
-                option.textContent = `${voice.name} (${voice.lang})`;
-                option.value = i;
-                
-                // Varsa Türkçe sesini varsayılan yapalım
-                if(voice.lang.includes('tr-TR') || voice.lang.includes('tr')) {
-                    option.selected = true;
-                }
-                voiceSelect.appendChild(option);
-            });
-        }
-
-        // Chrome ve bazı tarayıcılarda seslerin yüklenmesi zaman alabilir
-        populateVoiceList();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = populateVoiceList;
-        }
-
-        // Avatarları ekrana basma
-        avatars.forEach(avatar => {
-            const card = document.createElement('div');
-            card.className = 'avatar-card';
-            
-            // DiceBear ücretsiz avatar API'sinden resmi çekiyoruz
-            const imageUrl = `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
-            
-            card.innerHTML = `
-                <img src="${imageUrl}" alt="${avatar.name}">
-                <span>${avatar.name}</span>
-                <button class="speak-btn">Konuştur</button>
-            `;
-
-            // Karta tıklanınca veya butona basılınca konuşma tetiklensin
-            card.addEventListener('click', () => {
-                speakText();
-            });
-
-            avatarContainer.appendChild(card);
-        });
-
-        // Metni seslendirme fonksiyonu
-        function speakText() {
-            // Eğer tarayıcı konuşma halindeyse önce durdur
-            if (synth.speaking) {
-                synth.cancel();
-            }
-
-            const text = textInput.value.trim();
-            if (text === '') {
-                alert('Lütfen avatarın söylemesi için bir metin yazın!');
-                return;
-            }
-
-            const utterThis = new SpeechSynthesisUtterance(text);
-            
-            // Seçilen sesi ata
-            if (voiceSelect.value !== "") {
-                utterThis.voice = voices[voiceSelect.value];
-            }
-
-            // Ses perdesi (pitch) ve hız (rate) ayarları (isteğe göre değiştirilebilir)
-            utterThis.pitch = 1; 
-            utterThis.rate = 1;  
-
-            synth.speak(utterThis);
-        }
-    </script>
-</body>
-</html>
+    synth.speak(utterThis);
+}
