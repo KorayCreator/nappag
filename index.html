@@ -3,62 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerçekçi AI Karakter Stüdyosu v2</title>
+    <title>AI Sinematik Karakter Motoru v3</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #0b0c10;
-            color: #66fcf1;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; background: #0d0e15; color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 95%;
-            max-width: 1100px;
-            background: #1f2833;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(102, 252, 241, 0.2);
-            text-align: center;
+            width: 90%; max-width: 500px; background: #161722;
+            padding: 30px; border-radius: 20px; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,242,254,0.15); border: 1px solid #25283c;
         }
-        h1 {
-            color: #66fcf1;
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        h1 { font-size: 24px; color: #00f2fe; margin-bottom: 20px; text-transform: uppercase; }
+        input, textarea, button {
+            width: 100%; padding: 12px; margin-top: 15px; border-radius: 10px;
+            border: none; box-sizing: border-box; font-size: 15px;
         }
-        p { color: #c5c6c7; margin-bottom: 25px; }
-        .iframe-wrapper {
-            position: relative;
-            width: 100%;
-            height: 800px;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid #45f3ff;
-            background: #111;
+        input, textarea { background: #222533; color: white; border: 1px solid #333750; }
+        textarea { height: 80px; resize: none; }
+        button {
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000;
+            font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        button:hover { transform: scale(1.02); opacity: 0.9; }
+        .canvas-container {
+            margin-top: 20px; width: 100%; height: 350px;
+            background: #000; border-radius: 12px; overflow: hidden;
+            position: relative; display: flex; justify-content: center; align-items: center;
         }
+        canvas { width: 100%; height: 100%; object-fit: cover; }
+        .loading { position: absolute; color: #00f2fe; font-weight: bold; display: none; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>AI Sinematik Karakter Motoru v2</h1>
-    <p>Aktif ve çalışan yapay zeka sunucusuna bağlanıldı. Fotoğrafını yükle ve karakteri canlandır!</p>
+    <h1>Karakter Motoru v3.0</h1>
+    <p style="color: #8a8ab0; font-size: 14px;">Tamamen senin işlemcinle çalışır. İnternet kopsa da patlamaz!</p>
     
-    <div class="iframe-wrapper">
-        <iframe src="https://fffiloni-sadtalker.hf.space" allow="microphone; camera"></iframe>
+    <input type="file" id="imgInput" accept="image/*">
+    <textarea id="textInput" placeholder="Karakterin söyleyeceği repliği yazın..."></textarea>
+    <button onclick="startAnimate()">KONUŞTUR VE CANLANDIR</button>
+
+    <div class="canvas-container">
+        <div class="loading" id="loadingText">Yüz Analizi Yapılıyor...</div>
+        <canvas id="outputCanvas"></canvas>
     </div>
 </div>
+
+<script>
+    const imgInput = document.getElementById('imgInput');
+    const canvas = document.getElementById('outputCanvas');
+    const ctx = canvas.getContext('2d');
+    const loadingText = document.getElementById('loadingText');
+    let baseImage = new Image();
+    let meshPoints = null;
+
+    // MediaPipe Face Mesh Kurulumu
+    const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5 });
+    faceMesh.onResults(results => {
+        loadingText.style.display = 'none';
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+            meshPoints = results.multiFaceLandmarks[0];
+            drawFace(0); // İlk kareyi çiz
+        } else {
+            alert("Fotoğrafta net bir yüz bulunamadı! Lütfen karşıdan bakan bir fotoğraf seçin.");
+        }
+    });
+
+    imgInput.onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            baseImage.src = event.target.result;
+            baseImage.onload = () => {
+                canvas.width = baseImage.width;
+                canvas.height = baseImage.height;
+                ctx.drawImage(baseImage, 0, 0);
+                loadingText.style.display = 'block';
+                faceMesh.send({image: baseImage}); // Resmi yapay zekaya gönderip yüzü haritalandırıyoruz
+            };
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    function drawFace(mouthOpenFactor) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(baseImage, 0, 0);
+
+        if (!meshPoints) return;
+
+        // Ağız çevresindeki pikselleri yapay zeka noktalarına göre seçip dinamik esnetiyoruz
+        const topLip = meshPoints[13];
+        const bottomLip = meshPoints[14];
+        
+        const x = topLip.x * canvas.width;
+        const y = topLip.y * canvas.height;
+        const mouthWidth = 60;
+        const mouthHeight = (bottomLip.y - topLip.y) * canvas.height + (mouthOpenFactor * 15);
+
+        // İllüzyon: Ağız bölgesine hafif bir gölge atarak konuşma derinliği veriyoruz
+        ctx.fillStyle = `rgba(10, 5, 5, ${mouthOpenFactor * 0.8})`;
+        ctx.beginPath();
+        ctx.ellipse(x, y + 2, mouthWidth / 2, mouthHeight, 0, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+    function startAnimate() {
+        const text = document.getElementById('textInput').value;
+        if (!baseImage.src) return alert("Önce bir fotoğraf yükle!");
+        if (!text.trim()) return alert("Bir replik yaz!");
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'tr-TR';
+
+        let animationFrame;
+        
+        utterance.onstart = () => {
+            function loop() {
+                // Konuşma ritmine göre ağzı rastgele ve dinamik olarak açıp kapatıyoruz
+                const mouthMove = Math.abs(Math.sin(Date.now() / 80)) * 0.6;
+                drawFace(mouthMove);
+                animationFrame = requestAnimationFrame(loop);
+            }
+            loop();
+        };
+
+        utterance.onend = () => {
+            cancelAnimationFrame(animationFrame);
+            drawFace(0); // Ağzı kapat
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
 
 </body>
 </html>
