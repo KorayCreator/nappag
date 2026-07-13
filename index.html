@@ -3,57 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Sinematik Dudak Motoru v6</title>
+    <title>AI Sinematik Karakter Motoru v7</title>
     <style>
         body {
-            margin: 0; background: #0a0b10; color: #fff;
+            margin: 0; background: #080810; color: #fff;
             font-family: system-ui, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 90%; max-width: 550px; background: #12131c;
+            width: 90%; max-width: 500px; background: #141423;
             padding: 30px; border-radius: 24px; text-align: center;
-            box-shadow: 0 15px 50px rgba(0, 242, 254, 0.2); border: 1px solid #1f2235;
+            box-shadow: 0 15px 50px rgba(0, 242, 254, 0.2); border: 1px solid #222536;
         }
         h1 { font-size: 24px; color: #00f2fe; margin-bottom: 5px; text-transform: uppercase; }
         input, textarea, button {
             width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px;
             border: none; box-sizing: border-box; font-size: 15px;
         }
-        input, textarea { background: #1a1c29; color: white; border: 1px solid #2a2e45; }
+        input, textarea { background: #1d1f30; color: white; border: 1px solid #2e324d; }
         textarea { height: 80px; resize: none; }
         button {
             background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000;
             font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px;
         }
-        button:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
         .canvas-wrapper {
             margin-top: 25px; width: 100%; height: 380px;
             background: #000; border-radius: 16px; overflow: hidden;
-            border: 2px solid #2a2e45; position: relative;
-            display: flex; justify-content: center; align-items: center;
+            border: 2px solid #2e324d; position: relative;
         }
-        canvas { width: 100%; height: 100%; object-fit: cover; }
-        .ai-status {
-            position: absolute; background: rgba(0,0,0,0.8); width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center; color: #00f2fe;
-            font-weight: bold; font-size: 16px; z-index: 5;
-        }
+        canvas { width: 100%; height: 100%; object-fit: cover; cursor: move; }
+        .info-tag { color: #7979a3; font-size: 13px; margin-top: 5px; }
     </style>
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>Karakter Motoru v6.0</h1>
-    <p style="color: #6c6d8a; font-size: 13px; margin-top: 5px;">Gelişmiş AI Dudak Koordinat Takibi</p>
+    <h1>Karakter Motoru v7.0</h1>
+    <p class="info-tag">Fotoğrafı yükle, hedefi ağzın üzerine sürükle ve konuştur!</p>
     
     <input type="file" id="imgLoader" accept="image/*">
-    <textarea id="textInput" placeholder="Karaktere ne söyletmek istersin? Buraya yaz..."></textarea>
-    <button id="speakBtn" onclick="talkNow()" disabled>AI Model Yükleniyor...</button>
+    <textarea id="textInput" placeholder="Karakterin söyleyeceği cümleyi buraya yaz..."></textarea>
+    <button onclick="talkNow()">GERÇEKÇİ KONUŞTUR</button>
 
     <div class="canvas-wrapper">
-        <div class="ai-status" id="aiStatus">Yapay Zeka Beyni Yükleniyor...</div>
         <canvas id="liveCanvas"></canvas>
     </div>
 </div>
@@ -62,86 +55,82 @@
     const imgLoader = document.getElementById('imgLoader');
     const canvas = document.getElementById('liveCanvas');
     const ctx = canvas.getContext('2d');
-    const aiStatus = document.getElementById('aiStatus');
-    const speakBtn = document.getElementById('speakBtn');
     let uploadedImg = new Image();
-    let mouthLandmarks = null;
+    
+    // Manuel Ağız Hedef Koordinatları (Varsayılan orta alt)
+    let mouthX = 250, mouthY = 260;
+    let mouthWidth = 80, mouthHeight = 45;
+    let isDragging = false;
 
-    // Sayfa açıldığında AI modellerini internetten otomatik çekiyoruz
-    async function initAI() {
-        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-        await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-        aiStatus.innerText = "Yapay Zeka Hazır! Fotoğraf Yükleyin.";
-        setTimeout(() => aiStatus.style.display = 'none', 1500);
-    }
-    initAI();
-
-    imgLoader.addEventListener('change', async function(e) {
-        aiStatus.innerText = "Yüz Hatları Analiz Ediliyor...";
-        aiStatus.style.display = 'flex';
-        speakBtn.disabled = true;
-
+    imgLoader.addEventListener('change', function(e) {
         const reader = new FileReader();
         reader.onload = function(event) {
             uploadedImg.src = event.target.result;
-            uploadedImg.onload = async function() {
+            uploadedImg.onload = function() {
                 canvas.width = uploadedImg.width;
                 canvas.height = uploadedImg.height;
-                ctx.drawImage(uploadedImg, 0, 0);
-
-                // Yapay zeka fotoğraftaki 68 temel yüz noktasını buluyor
-                const detection = await faceapi.detectSingleFace(uploadedImg).withFaceLandmarks();
-                
-                if (detection) {
-                    // Dudakların (iç ve dış) tam koordinatlarını hafızaya alıyoruz
-                    mouthLandmarks = detection.landmarks.getMouth();
-                    aiStatus.style.display = 'none';
-                    speakBtn.innerText = "GERÇEKÇİ KONUŞTUR";
-                    speakBtn.disabled = false;
-                } else {
-                    aiStatus.innerText = "HATA: Fotoğrafta net bir yüz bulunamadı!";
-                    speakBtn.innerText = "Yüz Bulunamadı";
-                }
+                // Varsayılan hedefi resmin boyutuna göre ayarla
+                mouthX = canvas.width / 2;
+                mouthY = canvas.height * 0.7;
+                mouthWidth = canvas.width * 0.22;
+                mouthHeight = canvas.height * 0.08;
+                drawScene(0);
             }
         }
         reader.readAsDataURL(e.target.files[0]);
     });
 
+    function drawScene(wave) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(uploadedImg, 0, 0);
+
+        // Konuşma anında pikselleri dikey esnet
+        if (wave > 0) {
+            ctx.drawImage(
+                canvas, 
+                mouthX - mouthWidth/2, mouthY - mouthHeight/2, mouthWidth, mouthHeight, 
+                mouthX - mouthWidth/2, (mouthY - mouthHeight/2) - (wave/2), mouthWidth, mouthHeight + wave
+            );
+        } else {
+            // Konuşma yokken ekranda ağzı ayarlayabilmen için kırmızı bir hedef kutusu gösterir
+            ctx.strokeStyle = "rgba(255, 0, 85, 0.7)";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(mouthX - mouthWidth/2, mouthY - mouthHeight/2, mouthWidth, mouthHeight);
+            
+            ctx.fillStyle = "rgba(255, 0, 85, 0.2)";
+            ctx.fillRect(mouthX - mouthWidth/2, mouthY - mouthHeight/2, mouthWidth, mouthHeight);
+        }
+    }
+
+    // Fare ile ağzı seçme/sürükleme kontrolleri
+    canvas.addEventListener('mousedown', (e) => { isDragging = true; });
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging || !uploadedImg.src) return;
+        const rect = canvas.getBoundingClientRect();
+        // Fare koordinatlarını canvas boyutuna oranla
+        const clickX = ((e.clientX - rect.left) / rect.width) * canvas.width;
+        const clickY = ((e.clientY - rect.top) / rect.height) * canvas.height;
+        
+        mouthX = clickX;
+        mouthY = clickY;
+        drawScene(0);
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
     function talkNow() {
         const text = document.getElementById('textInput').value;
+        if (!uploadedImg.src) return alert("Lütfen önce bir fotoğraf yükle!");
         if (!text.trim()) return alert("Karaktere söyletmek için bir metin yaz!");
 
         const speech = new SpeechSynthesisUtterance(text);
         speech.lang = 'tr-TR';
         let animationId;
 
-        // Dudak koordinatlarının en sol, en sağ, en üst ve en alt sınırlarını hesapla
-        const xs = mouthLandmarks.map(p => p.x);
-        const ys = mouthLandmarks.map(p => p.y);
-        const minX = Math.min(...xs) - 5;
-        const maxX = Math.max(...xs) + 5;
-        const minY = Math.min(...ys) - 5;
-        const maxY = Math.max(...ys) + 5;
-        
-        const mouthWidth = maxX - minX;
-        const mouthHeight = maxY - minY;
-
         speech.onstart = () => {
             function render() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(uploadedImg, 0, 0);
-
-                // Ses tonuna göre ağzın ne kadar açılacağını hesaplayan dinamik dalga
-                const wave = Math.abs(Math.sin(Date.now() / 70)) * (mouthHeight * 0.4);
-
-                // Yapay zekanın bulduğu dudak alanını alıp, dikey eksende kusursuzca esnetiyoruz
-                ctx.drawImage(
-                    canvas, 
-                    minX, minY, mouthWidth, mouthHeight, // Orijinal dudak yeri
-                    minX, minY - (wave/2), mouthWidth, mouthHeight + wave // Canlanan dudak yeri
-                );
-
+                // Sese göre dudak piksellerini ritmik esneten dalga
+                const wave = Math.abs(Math.sin(Date.now() / 75)) * (mouthHeight * 0.5);
+                drawScene(wave);
                 animationId = requestAnimationFrame(render);
             }
             render();
@@ -149,9 +138,7 @@
 
         speech.onend = () => {
             cancelAnimationFrame(animationId);
-            // Konuşma bittiğinde resmi ilk orijinal haline sıfırla
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(uploadedImg, 0, 0);
+            drawScene(0);
         };
 
         window.speechSynthesis.speak(speech);
