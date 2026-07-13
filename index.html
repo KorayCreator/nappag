@@ -3,65 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerçekçi AI Karakter Stüdyosu v4</title>
+    <title>Ömürlük AI Karakter Motoru</title>
     <style>
-        * { box-sizing: border-box; }
         body {
             margin: 0; padding: 0; background-color: #0b0c10; color: #fff;
-            font-family: 'SF Pro Display', -apple-system, system-ui, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 95%; max-width: 1000px; background: #161722;
+            width: 90%; max-width: 600px; background: #1f2833;
             padding: 30px; border-radius: 20px; text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 242, 254, 0.15); border: 1px solid #25283c;
+            box-shadow: 0 0 30px rgba(102, 252, 241, 0.2); border: 1px solid #45f3ff;
         }
-        h1 {
-            color: #00f2fe; margin-bottom: 5px; font-size: 2.3rem;
-            text-transform: uppercase; letter-spacing: 1px;
+        h1 { color: #66fcf1; text-transform: uppercase; margin-bottom: 20px; font-size: 24px; }
+        input, textarea, button {
+            width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px;
+            border: none; box-sizing: border-box; font-size: 16px;
         }
-        p { color: #8a8ab0; margin-bottom: 25px; font-size: 15px; }
-        .iframe-wrapper {
-            position: relative; width: 100%; height: 750px;
-            border-radius: 15px; overflow: hidden;
-            border: 2px solid #4facfe; background: #0d0e15;
-            box-shadow: 0 0 20px rgba(79, 172, 254, 0.2);
+        input, textarea { background: #252538; color: white; border: 1px solid #3f3f5c; }
+        textarea { height: 100px; resize: none; }
+        button {
+            background: linear-gradient(45deg, #66fcf1, #4facfe); color: #000;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        iframe { width: 100%; height: 100%; border: none; }
-        /* Yükleniyor efekti */
-        .loader {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0d0e15; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10;
-        }
-        .spinner {
-            border: 4px solid #161722; border-top: 4px solid #00f2fe;
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        button:hover { transform: scale(1.02); }
+        #videoResult { width: 100%; margin-top: 20px; border-radius: 8px; display: none; }
+        .status { margin-top: 15px; color: #ff3366; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Karakter Motoru v4.0 (Wav2Lip)</h1>
-    <p>Aktif ve stabil yapay zeka sunucusuna bağlanıldı. Fotoğraf yükle, sesi ekle ve gerçekçi videoyu al!</p>
+    <h1>Yerel AI Karakter Stüdyosu</h1>
+    <p style="color: #c5c6c7; font-size: 14px;">Kendi bilgisayarındaki yapay zeka motoruna doğrudan bağlanır.</p>
     
-    <div class="iframe-wrapper">
-        <div class="loader" id="loader">
-            <div class="spinner"></div>
-            <p style="color: #00f2fe;">Yapay zeka arayüzü yükleniyor...</p>
-        </div>
-        
-        <iframe 
-            src="https://cjwbw-wav2lip.hf.space" 
-            id="aiFrame"
-            allow="microphone; camera"
-            onload="document.getElementById('loader').style.display='none';">
-        </iframe>
-    </div>
+    <input type="file" id="imageInput" accept="image/*">
+    <textarea id="textInput" placeholder="Karaktere söyletmek istediğin sinematik repliği yaz..."></textarea>
+    <button onclick="generateLocalAI()">VİDEOYU ÜRET</button>
+
+    <div class="status" id="statusField">Yapay zeka videoyu işliyor, lütfen bekleyin...</div>
+    <video id="videoResult" controls autoplay></video>
 </div>
+
+<script>
+    async function generateLocalAI() {
+        const imageFile = document.getElementById('imageInput').files[0];
+        const text = document.getElementById('textInput').value;
+        const statusField = document.getElementById('statusField');
+        const videoResult = document.getElementById('videoResult');
+
+        if (!imageFile || !text.trim()) {
+            alert("Lütfen hem bir fotoğraf yükleyin hem de bir metin yazın!");
+            return;
+        }
+
+        statusField.style.display = "block";
+        videoResult.style.display = "none";
+
+        // Kendi bilgisayarındaki (Pinokio veya Local Gradyan/API) yapay zeka sunucusuna veri gönderme
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        formData.append("text", text);
+
+        try {
+            // Bilgisayarındaki yerel yapay zeka portu (Genelde 7860 veya 8000 olur)
+            const response = await fetch("http://127.0.0.1:7860/api/predict", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("Yerel sunucu yanıt vermedi.");
+
+            const data = await response.json();
+            
+            // Yapay zekanın ürettiği video çıktısını ekrana basıyoruz
+            statusField.style.display = "none";
+            videoResult.src = data.video_url; // Sunucudan gelen video linki
+            videoResult.style.display = "block";
+
+        } catch (error) {
+            statusField.innerText = "Hata: Bilgisayarındaki yapay zeka sunucusu (Pinokio/SadTalker) şu an açık değil veya port adresi farklı!";
+            console.error(error);
+        }
+    }
+</script>
 
 </body>
 </html>
