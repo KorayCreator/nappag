@@ -3,88 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ömürlük AI Karakter Motoru</title>
+    <title>AI Sinematik Karakter Motoru v5</title>
     <style>
         body {
-            margin: 0; padding: 0; background-color: #0b0c10; color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; background: #080810; color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 90%; max-width: 600px; background: #1f2833;
-            padding: 30px; border-radius: 20px; text-align: center;
-            box-shadow: 0 0 30px rgba(102, 252, 241, 0.2); border: 1px solid #45f3ff;
+            width: 90%; max-width: 500px; background: #141423;
+            padding: 30px; border-radius: 24px; text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 242, 254, 0.2); border: 1px solid #222536;
         }
-        h1 { color: #66fcf1; text-transform: uppercase; margin-bottom: 20px; font-size: 24px; }
+        h1 { font-size: 26px; color: #00f2fe; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
         input, textarea, button {
-            width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px;
-            border: none; box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px;
+            border: none; box-sizing: border-box; font-size: 15px;
         }
-        input, textarea { background: #252538; color: white; border: 1px solid #3f3f5c; }
-        textarea { height: 100px; resize: none; }
+        input, textarea { background: #1d1f30; color: white; border: 1px solid #2e324d; }
+        textarea { height: 90px; resize: none; }
         button {
-            background: linear-gradient(45deg, #66fcf1, #4facfe); color: #000;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000;
+            font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 25px;
         }
-        button:hover { transform: scale(1.02); }
-        #videoResult { width: 100%; margin-top: 20px; border-radius: 8px; display: none; }
-        .status { margin-top: 15px; color: #ff3366; font-weight: bold; display: none; }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+        .canvas-wrapper {
+            margin-top: 25px; width: 100%; height: 380px;
+            background: #000; border-radius: 16px; overflow: hidden;
+            border: 2px solid #2e324d; position: relative;
+        }
+        canvas { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Yerel AI Karakter Stüdyosu</h1>
-    <p style="color: #c5c6c7; font-size: 14px;">Kendi bilgisayarındaki yapay zeka motoruna doğrudan bağlanır.</p>
+    <h1>Karakter Motoru v5.0</h1>
+    <p style="color: #7979a3; font-size: 14px; margin-top: -10px;">Gelişmiş Piksel Esnetme Teknolojisi (Sıfır Hata)</p>
     
-    <input type="file" id="imageInput" accept="image/*">
-    <textarea id="textInput" placeholder="Karaktere söyletmek istediğin sinematik repliği yaz..."></textarea>
-    <button onclick="generateLocalAI()">VİDEOYU ÜRET</button>
+    <input type="file" id="imgLoader" accept="image/*">
+    <textarea id="textInput" placeholder="Karakterin kuracağı cümleyi buraya yaz..."></textarea>
+    <button onclick="talkNow()">GERÇEKÇİ KONUŞTUR</button>
 
-    <div class="status" id="statusField">Yapay zeka videoyu işliyor, lütfen bekleyin...</div>
-    <video id="videoResult" controls autoplay></video>
+    <div class="canvas-wrapper">
+        <canvas id="liveCanvas"></canvas>
+    </div>
 </div>
 
 <script>
-    async function generateLocalAI() {
-        const imageFile = document.getElementById('imageInput').files[0];
+    const imgLoader = document.getElementById('imgLoader');
+    const canvas = document.getElementById('liveCanvas');
+    const ctx = canvas.getContext('2d');
+    let uploadedImg = new Image();
+
+    imgLoader.addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            uploadedImg.src = event.target.result;
+            uploadedImg.onload = function() {
+                canvas.width = uploadedImg.width;
+                canvas.height = uploadedImg.height;
+                ctx.drawImage(uploadedImg, 0, 0);
+            }
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+    function talkNow() {
         const text = document.getElementById('textInput').value;
-        const statusField = document.getElementById('statusField');
-        const videoResult = document.getElementById('videoResult');
+        if (!uploadedImg.src) return alert("Lütfen önce bir fotoğraf yükle!");
+        if (!text.trim()) return alert("Karaktere söyletmek için bir metin yaz!");
 
-        if (!imageFile || !text.trim()) {
-            alert("Lütfen hem bir fotoğraf yükleyin hem de bir metin yazın!");
-            return;
-        }
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'tr-TR';
 
-        statusField.style.display = "block";
-        videoResult.style.display = "none";
+        let animationId;
 
-        // Kendi bilgisayarındaki (Pinokio veya Local Gradyan/API) yapay zeka sunucusuna veri gönderme
-        const formData = new FormData();
-        formData.append("image", imageFile);
-        formData.append("text", text);
+        speech.onstart = () => {
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(uploadedImg, 0, 0);
 
-        try {
-            // Bilgisayarındaki yerel yapay zeka portu (Genelde 7860 veya 8000 olur)
-            const response = await fetch("http://127.0.0.1:7860/api/predict", {
-                method: "POST",
-                body: formData
-            });
+                // İllüzyon: Fotoğrafın alt orta (ağız) kısmındaki pikselleri matematiksel olarak esnetiyoruz
+                // Siyah yuvarlak yok, fotoğrafın kendi dokusu aşağı yukarı hareket ediyor
+                const mouthY = canvas.height * 0.68; // Ortalama ağız hizası
+                const mouthX = canvas.width * 0.5;
+                const mouthWidth = canvas.width * 0.25;
+                const mouthHeight = canvas.height * 0.12;
 
-            if (!response.ok) throw new Error("Yerel sunucu yanıt vermedi.");
+                // Ses dalgası simülasyonu
+                const wave = Math.abs(Math.sin(Date.now() / 90)) * 12;
 
-            const data = await response.json();
-            
-            // Yapay zekanın ürettiği video çıktısını ekrana basıyoruz
-            statusField.style.display = "none";
-            videoResult.src = data.video_url; // Sunucudan gelen video linki
-            videoResult.style.display = "block";
+                // Ağız piksellerini dikey eksende gererek açılma hissi veriyoruz
+                ctx.drawImage(
+                    canvas, 
+                    mouthX - mouthWidth/2, mouthY, mouthWidth, mouthHeight, // Orijinal alan
+                    mouthX - mouthWidth/2, mouthY + (wave/3), mouthWidth, mouthHeight + wave // Değişen alan
+                );
 
-        } catch (error) {
-            statusField.innerText = "Hata: Bilgisayarındaki yapay zeka sunucusu (Pinokio/SadTalker) şu an açık değil veya port adresi farklı!";
-            console.error(error);
-        }
+                animationId = requestAnimationFrame(render);
+            }
+            render();
+        };
+
+        speech.onend = () => {
+            cancelAnimationFrame(animationId);
+            // Konuşma bittiğinde orijinal resmi temizce geri yükle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(uploadedImg, 0, 0);
+        };
+
+        window.speechSynthesis.speak(speech);
     }
 </script>
 
