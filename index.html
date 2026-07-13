@@ -1,102 +1,121 @@
-// Bu bölüm, verdiğim HTML dosyasındaki <script> etiketinin hemen altını değiştirecek.
-
-// 1. ÖNCE: Görseldeki 6 özgün avatar resmini bilgisayarına indir ve 'img' adında bir klasöre kaydet.
-// (Ör: img/asya_aria.png, img/avrupa_jack.png, vb.)
-
-// 2. SONRA: Aşağıdaki diziyi mevcut kodunla değiştir:
-
-const avatars = [
-    { name: "Asya (Aria)", image: "img/asya_aria.png", gender: "female" },
-    { name: "Avrupa (Jack)", image: "img/avrupa_jack.png", gender: "male" },
-    { name: "Afrika (Zuri)", image: "img/afrika_zuri.png", gender: "female" },
-    { name: "Ortadoğu (Amir)", image: "img/ortadogu_amir.png", gender: "male" },
-    { name: "Latin (Elena)", image: "img/latin_elena.png", gender: "female" },
-    { name: "Robot (Robo-X)", image: "img/robot_robox.png", gender: "neutral" }
-];
-
-const avatarContainer = document.getElementById('avatar-container');
-const textInput = document.getElementById('text-to-speak');
-const voiceSelect = document.getElementById('voice-select');
-
-let synth = window.speechSynthesis;
-let voices = [];
-
-// Tarayıcıdaki kullanılabilir sesleri yükleme fonksiyonu
-function populateVoiceList() {
-    voices = synth.getVoices();
-    voiceSelect.innerHTML = '';
-    
-    voices.forEach((voice, i) => {
-        const option = document.createElement('option');
-        option.textContent = `${voice.name} (${voice.lang})`;
-        option.value = i;
-        
-        if(voice.lang.includes('tr-TR') || voice.lang.includes('tr')) {
-            option.selected = true;
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinematik AI Karakter Konuşturma</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f0f12;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        voiceSelect.appendChild(option);
-    });
-}
+        .container {
+            background: #1a1a24;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 450px;
+            text-align: center;
+        }
+        h2 { color: #ff3366; margin-bottom: 20px; }
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #252538;
+            border: 1px solid #3f3f5c;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            resize: none;
+            box-sizing: border-box;
+        }
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+        select { background: #252538; color: white; border: 1px solid #3f3f5c; }
+        button {
+            background: linear-gradient(45deg, #ff3366, #ff6633);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        .video-box {
+            margin-top: 20px;
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; }
+    </style>
+</head>
+<body>
 
-populateVoiceList();
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoiceList;
-}
-
-// ÖZGÜN AVATARLARI EKLEME BÖLÜMÜ (GÜNCELLENDİ)
-avatars.forEach((avatar, index) => {
-    const card = document.createElement('div');
-    card.className = 'avatar-card';
-    card.id = `avatar-${index}`; // Her karta benzersiz ID
+<div class="container">
+    <h2>AI Karakter Stüdyosu</h2>
     
-    // API yerine KENDİ ÖZGÜN RESİMLERİNİ kullanıyoruz
-    card.innerHTML = `
-        <img src="${avatar.image}" alt="${avatar.name}">
-        <span>${avatar.name}</span>
-        <button class="speak-btn">
-            <span class="btn-text">Konuştur</span>
-            <span class="speak-icon">🔊</span>
-        </button>
-    `;
+    <label for="character">Bir Karakter Seçin:</label>
+    <select id="character">
+        <option value="cyberpunk_girl">Siberpunk Savaşçı (Kadın)</option>
+        <option value="detective_man">Dedektif (Erkek)</option>
+        <option value="historical_king">Antik Kral (Erkek)</option>
+    </select>
 
-    card.addEventListener('click', () => {
-        speakText(index);
-    });
+    <label style="display:block; margin-top:15px;" for="text-input">Söylenmesini İstediğiniz Metin:</label>
+    <textarea id="text-input" placeholder="Karakterin film gibi seslendirmesini istediğiniz repliği buraya yazın..."></textarea>
 
-    avatarContainer.appendChild(card);
-});
+    <button onclick="generateVideo()">Gerçekçi Video Üret</button>
 
-// Metni seslendirme fonksiyonu (Küçük görsel geri bildirim eklendi)
-function speakText(avatarIndex) {
-    if (synth.speaking) {
-        synth.cancel();
+    <div class="video-box" id="video-container">
+        <p id="placeholder-text" style="color: #666;">Video burada görünecek...</p>
+    </div>
+</div>
+
+<script>
+    function generateVideo() {
+        const text = document.getElementById('text-input').value;
+        const character = document.getElementById('character').value;
+        const videoContainer = document.getElementById('video-container');
+        const placeholder = document.getElementById('placeholder-text');
+
+        if (!text.trim()) {
+            alert("Lütfen karakterin söylemesi için bir metin girin!");
+            return;
+        }
+
+        placeholder.innerText = "Yapay zeka karakteri oluşturuyor... (Simülasyon)";
+        
+        // NOT: Gerçek bir projede buraya D-ID, HeyGen veya HeyGen benzeri bir API'ye 
+        // istek (fetch/POST) atan JavaScript kodları eklenmelidir.
+        
+        // Simülasyon amaçlı 2 saniye sonra örnek bir video yüklüyoruz:
+        setTimeout(() => {
+            videoContainer.innerHTML = `
+                <video controls autoplay>
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    Tarayıcınız video etiketini desteklemiyor.
+                </video>
+            `;
+        }, 2000);
     }
+</script>
 
-    const text = textInput.value.trim();
-    if (text === '') {
-        alert('Lütfen avatarın söylemesi için bir metin yazın!');
-        return;
-    }
-
-    const utterThis = new SpeechSynthesisUtterance(text);
-    
-    if (voiceSelect.value !== "") {
-        utterThis.voice = voices[voiceSelect.value];
-    }
-
-    utterThis.pitch = 1; 
-    utterThis.rate = 1;  
-
-    // Görsel Geri Bildirim: Konuşurken avatar kartına sınıf ekle (CSS ile ağız oynatma/dalga efekti için)
-    const activeCard = document.getElementById(`avatar-${avatarIndex}`);
-    
-    utterThis.onstart = function() {
-        activeCard.classList.add('speaking'); // CSS'te '.speaking' sınıfını tanımlamalısın
-    };
-
-    utterThis.onend = function() {
-        activeCard.classList.remove('speaking');
-    };
-
-    synth.speak(utterThis);
-}
+</body>
+</html>
